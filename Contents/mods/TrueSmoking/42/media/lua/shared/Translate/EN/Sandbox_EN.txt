@@ -1,0 +1,57 @@
+Sandbox_EN = {
+	Sandbox_TrueSmoking = "True Smoking - Options",
+
+    Sandbox_TrueSmoking_OverrideSmokeLength = "Override ALL Smoke Length",
+    Sandbox_TrueSmoking_OverrideSmokeLength_tooltip = "Overrides ALL smoke lengths to the set value",
+
+    Sandbox_TrueSmoking_SmokeLength = "Smoke Length Value",
+    Sandbox_TrueSmoking_SmokeLength_tooltip = "The default smoke length value to use when the item does not contain one (Higher = longer)",
+
+
+
+
+    Sandbox_TrueSmoking_PuffFactor = "Burn rate increase while puffing",
+    Sandbox_TrueSmoking_PuffFactor_tooltip = "How much the burn rate increases when puffing",
+
+    Sandbox_TrueSmoking_RunningFactor = "Burn rate decrease while running",
+    Sandbox_TrueSmoking_RunningFactor_tooltip = "How much the burn rate decreases when running/sprinting",
+
+    Sandbox_TrueSmoking_IdleFactor = "Burn rate decrease while idle",
+    Sandbox_TrueSmoking_IdleFactor_tooltip = "How much the burn rate decreases when idle",
+
+
+
+
+    Sandbox_TrueSmoking_SmokeRelighting = "Smoke Relighting",
+    Sandbox_TrueSmoking_SmokeRelighting_tooltip = "Option to enable relighting of the smoke if it drops below 'Minimum burn limit''",
+
+
+
+
+    Sandbox_TrueSmoking_Coughing = "Coughing from smoking",
+    Sandbox_TrueSmoking_Coughing_tooltip = "Enable/disable the vanilla mechanic for a chance at coughing when taking a puff",
+    
+    Sandbox_TrueSmoking_CoughingChanceSmoker = "Coughing Chance % for Smokers",
+    Sandbox_TrueSmoking_CoughingChanceSmoker_tooltip = "The % chance of coughing when taking a puff for smokers",
+
+    Sandbox_TrueSmoking_CoughingChanceNonSmoker = "Coughing Chance % for Non-Smokers",
+    Sandbox_TrueSmoking_CoughingChanceNonSmoker_tooltip = "The % chance of coughing when taking a puff for non-smokers",
+
+
+
+
+    Sandbox_TrueSmoking_CigaretteLength = "Cigarette Length",
+    Sandbox_TrueSmoking_CigaretteLength_tooltip ="How long it takes to smoke a cigarette",
+
+    Sandbox_TrueSmoking_CigarilloLength = "Cigarillo Length",
+    Sandbox_TrueSmoking_CigarilloLength_tooltip = "How long it takes to smoke a cigarillo",
+
+    Sandbox_TrueSmoking_CigarLength = "Cigar Length",
+    Sandbox_TrueSmoking_CigarLength_tooltip = "How long it takes to smoke a cigar",
+
+    Sandbox_TrueSmoking_PipeLength = "Tobacco Pipe Length",
+    Sandbox_TrueSmoking_PipeLength_tooltip = "How long it takes to smoke a tobacco pipe",
+
+    Sandbox_TrueSmoking_CanLength = "Tobacco Can Length",
+    Sandbox_TrueSmoking_CanLength_tooltip = "How long it takes to smoke tobacco from a can",
+}

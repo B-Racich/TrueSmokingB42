@@ -1,0 +1,58 @@
+version=1
+id=3423984426
+title=True Smoking [B42]
+description=[h1] True Smoking [B42] [/h1]
+description=
+description=[h3]Updated for B42![/h3]
+description=
+description=This mod overhauls the smoking mechanic to make it more immersive, providing longer smoking times, manual puffing of your smoke, and dynamically calculating the burn rate as you smoke faster or slower. This mod is save compatible and will work with MP when it releases.
+description=
+description=[h3] Features [/h3]
+description=[list]
+description=[*]Moodle tracks your smoke after lighting
+description=[*]Smoke burns faster or slower depending on how much you puff
+description=[*]Relight the smoke if it goes out
+description=[*]Stat effects are now distributed over the duration of the smoke
+description=[*]Compatible with Smoker Trait
+description=[*]Hotkey for unpacking and lighting a cigarette
+description=[*]Different smoke times for different items (cigars take longer than cigarettes)
+description=[*]Options and Settings configurable via Sandbox Options and Mod Options
+description=[*]Automatic passive puffing (configurable in options)
+description=[*]Coughing mechanic configurable in sandbox options (chance to cough on taking a puff)
+description=[/list]
+description=
+description=[h3] Default Keybinds [/h3]
+description=Press [b]K[/b] to take puffs and to relight your smoke if it goes out, finds a cigarette and lights it if not smoking
+description=Press [b]; (colon)[/b] to stop smoking
+description=
+description=[h3] Options [/h3]
+description=If you want to adjust how long it takes to smoke something change the values in the sandbox options for the different item lengths (Cigarette Length, Cigar Length, etc)
+description=Passive Smoking when enabled will allow the player to automatically take puffs based on the user defined interval
+description=
+description=[h3] Supported Mods [/h3]
+description=[list]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404563567]Hemp & Tobacco[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404956403]N&C's Narcotics[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3424309174]HGO Expansion (B42)[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2951287846]Clove Cigarettes[/url]
+description=[*]Most mods that just add more smokes should work without a patch, if you encounter issues let me know!
+description=[/list]
+description=
+description=[h3] Future Updates[/h3]
+description=[list]
+description=[*]Display smoke in mouth when possible
+description=[*]Custom animations for lighting and putting out
+description=[*]Mod support as requested and needed
+description=[*]Further tweaks, options, etc
+description=[*]Dynamic smoker trait / Addiction / Withdrawal
+description=[/list]
+description=
+description=You can also reach me on discord @ _ratamus
+description=
+description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
+description=
+description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
+description=
+description=[code]Ask for permission before redistributing[/code]
+tags=Build 42;Balance;Realistic
+visibility=public
