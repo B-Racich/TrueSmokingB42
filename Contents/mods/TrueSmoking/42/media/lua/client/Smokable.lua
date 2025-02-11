@@ -4,8 +4,15 @@ require 'Utils'
 Smokable = Smokable or {}
 Smokable.__index = Smokable
 
---Smokable class creates an object from any smokable items. It tracks the burn rate and smoke length as its
---smoked, and triggers the SmokingMoodle to start and stop smoking
+--[[
+    Smokable class that creates our object from smokable items. It takes in a reference to the Global TrueSmoking table to ensure the same
+    instance is used.
+
+    The majority of the smoking logic is handled here, the update method runs onTick to calculate the burn rate and call the OnEat_OverTime
+    method from ISEatFoodAction.lua
+
+    The moodle is started/stopped here but stored in the TrueSmoking table reference
+]]
 
 --Create a new Smokable object from consumed item (ISEatFoodAction)
 function Smokable:new(item, TrueSmoking)
@@ -88,20 +95,31 @@ function Smokable:getFoodSick(item)
 end
 
 --Helper function to set smokeLengths
+--Some custom fixes are in place to hook different mods. Some mods have custom OnEat methods,
+--some use vanilla functions but don't match their item as they should, we are checking however
+--we can and settings smoke lengths, this will be cleaned up more as support is adopted/changed
 function Smokable:getSmokeLength(item, TrueSmoking)
+    --The vanilla items could be checking onEat but we have to use names to properly set Hemp&Tobacco
     local list = {
         ["Cigarette"] = TrueSmoking.Options.CigaretteLength or 1.0,
         ["Cigar"] = TrueSmoking.Options.CigarLength or 3.0,
         ["Cigarillo"] = TrueSmoking.Options.CigarilloLength or 1.5,
         ["Smoking Pipe with Tobacco"] = TrueSmoking.Options.PipeLength or 1.75,
         ["Can Pipe with Tobacco"] = TrueSmoking.Options.CanLength or 2.5,
-        --Hemp&Tabacco
+        --Hemp&Tobacco
         ["Hemp Cigarette"] = TrueSmoking.Options.CigaretteLength or 1.0,
         ["Cigar (Hemp)"] = TrueSmoking.Options.CigarLength or 3.0,
         ["Cheroot (Hemp)"] = TrueSmoking.Options.CigarilloLength or 1.5,
         ["Smoking Pipe with Hemp"] = TrueSmoking.Options.PipeLength or 1.75,
+        -- Give these a slightly faster smoke time (more effecient)
         ["Glass Smoking Pipe with Hemp"] = 1.5,
         ["Glass Smoking Pipe with Tobacco"] = 1.5,
+    }
+
+    --ReeferMadness adjustment, we we just check the modded onEat
+    local listReeferMadness = {
+        ['OnEat_WeedPipe'] = 1.5,
+        ['OnEat_WeedJoint'] = 1.0
     }
 
     -- 1. if our override is set, return that
@@ -112,25 +130,20 @@ function Smokable:getSmokeLength(item, TrueSmoking)
         return item:getModData().smokeLength
     end
 
-    local listReeferMadness = {
-        ['OnEat_WeedPipe'] = 1.5,
-        ['OnEat_WeedJoint'] = 1.0
-    }
-
     -- 3. check our lists for predefined values (sandbox/hard coded)
     for name, length in pairs(listReeferMadness) do
         if item:getOnEat() == name then
             return length
         end
     end
-
+    -- 4. use displayNames after checking onEat
     for name, length in pairs(list) do
         if item:getDisplayName() == name then
             return length
         end
     end
 
-    -- 4. safety return for default value
+    -- 5. safety return for default value
     return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
@@ -160,6 +173,7 @@ function Smokable:light()
             self.burnRate = ZombRandFloat(self.burnMin, self.burnMax)
         end
 
+        --Some placeholder for when we figure out displaying smokables
         -- getPlayer():setWornItem("Mask", self.item)
         -- getPlayer():setWornItem("MakeUp_Lips", self.item)
     end
@@ -167,6 +181,7 @@ end
 
 --Stop smoking and remove the update event
 function Smokable:putOut()
+    --Placeholder for putOut action (need a custom animation to be proper)
     -- if self.TrueSmoking.isSmoking then
     --     ISTimedActionQueue.add(PutOut:new(getPlayer()))
     -- end

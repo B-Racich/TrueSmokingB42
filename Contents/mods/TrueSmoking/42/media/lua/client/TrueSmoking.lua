@@ -4,6 +4,12 @@ require 'Utils'
 require 'Smokable'
 require 'SmokingMoodle'
 
+--[[
+    This class serves as the entry point for the mod and stores references to the moodle and smokable object to retain the same instance.
+    Apart from holding a few variables, and options there are a few functions to handle unpacking cigarrettes and finding them. Mostly this
+    event code for context menu and key listeners.
+]]
+
 TrueSmoking = TrueSmoking or {}
 TrueSmoking.__index = TrueSmoking
 TrueSmoking.Options = TrueSmoking.Options or {}
@@ -68,8 +74,6 @@ end
 
 --Key Event Listener
 function TrueSmoking:onKeyStartPressed(key)
-    print('key pressed'..key)
-    print(Keyboard.KEY_SEMICOLON)
     if getPlayer() then
         if self.isSmoking and self.Smokable.smokeLit and key == self.Config.keySmoke then
             self.Smokable:puff()

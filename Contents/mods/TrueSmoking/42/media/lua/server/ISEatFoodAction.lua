@@ -3,6 +3,11 @@ require 'TimedActions/ISEatFoodAction'
 local originalActionNew = ISEatFoodAction.new
 local originalActionIsValid = ISEatFoodAction.isValid
 
+--[[
+    This file hooks the foodAction and houses on custom OnEat methods, here the Smokable object is created and stored into
+    the global TrueSmoking object.
+]]
+
 --Hook the ISEatFoodAction to grab smokable items and make our changes, stop the vanilla actions and call our own.
 function ISEatFoodAction:new (character, item, percentage)
     local o = {}
@@ -74,7 +79,8 @@ function OnEat_Hook(food, character, percent)
     TrueSmoking.Smokable:light()
 end
 
---Modified OnEat function to cover vanilla Smokables and distribute stats over time
+--Modified OnEat function to cover Smokables and distribute stats over time
+--Respects the vanilla logic and smoker trait
 function OnEat_OverTime(smokable)
     -- local food = smokable.item
     local percent = smokable.puffPercent
@@ -96,6 +102,8 @@ function OnEat_OverTime(smokable)
     end
 
     local temp  --Store temp values for calculations
+
+    --===Vanilla logic starts here
 
     --Mimic vanilla logic for smoker which essentially 0's these stats
     if character:HasTrait("Smoker") then
@@ -143,6 +151,10 @@ function OnEat_OverTime(smokable)
             end
         end
     end
+    
+    --===Vanilla logic ends here===
+
+    --===Check for item stats and start applying===
 
     --If smokable has boredom or unhappyness distribute them (these are applied in vanilla outside of OnEat, but we 0'd them earlier.)
     if smokable.boredom ~= 0 then
@@ -259,6 +271,10 @@ function OnEat_OverTime(smokable)
 end
 
 --Function to wrap and call original OnEat methods
+--previous implementations used to record stat changes before and after calling the native function,
+--record the stat changes, and apply them over time. The stat changes worked okay but it was a quick and dirty way to
+--make it compatible with lots of mods that need to be calling their original functions. However things like ETW would simply
+--mark the begininng of the smoke as having smoked the whole thing which was undesired. Do it right or don't do it at all.
 function OnEat_Original(food, character, percent)
     local modOnEat = food:getModData().modOnEat or ''
     local tableName, funcName = modOnEat:match("([^%.]+)%.([^%.]+)")
