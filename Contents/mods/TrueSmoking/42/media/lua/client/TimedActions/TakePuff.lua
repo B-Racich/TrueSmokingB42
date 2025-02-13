@@ -21,6 +21,13 @@ function TakePuff:waitToStart()
 end
 
 function TakePuff:start()
+    --Play custom sound
+    -- if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
+    --     if self.eatAudio then
+    --         self.eatAudio = self.character:getEmitter():playSound("Smoking_matches2m");
+    --     end
+    -- end
+
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable("FoodType", self.item:getEatType())
@@ -32,6 +39,12 @@ function TakePuff:start()
 end
 
 function TakePuff:stop()
+    -- if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
+    --     if self.eatAudio then
+    --         self.character:getEmitter():stopSound(self.eatAudio)
+    --     end
+    -- end
+
     TrueSmoking.takingPuff = false
     TrueSmoking.Smokable.puffTimeMark = os.time()
     self:forceComplete()
@@ -52,6 +65,10 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
+    if self.eatAudio then
+        self.character:getEmitter():stopSound(self.eatAudio)
+    end
+
     --Track puff
     TrueSmoking.takingPuff = false
     TrueSmoking.Smokable.puffTimeMark = os.time()
