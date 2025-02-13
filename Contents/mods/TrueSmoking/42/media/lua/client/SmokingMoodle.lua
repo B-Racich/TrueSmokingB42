@@ -3,13 +3,14 @@ require 'MF_ISMoodle'
 SmokingMoodle = SmokingMoodle or {}
 SmokingMoodle.__index = SmokingMoodle
 
-function SmokingMoodle:new(TrueSmoking)
+function SmokingMoodle:new(TrueSmoking, playerNum)
     local obj = {}
     setmetatable(obj, self)
 
     obj.TrueSmoking = TrueSmoking
+    obj.playerNum = playerNum
     MF.createMoodle('smoking')
-    print('create moodle')
+    -- print('create moodle')
 
     return obj
 end
@@ -25,7 +26,7 @@ end
 
 --Stops the moodle event and hides moodle
 function SmokingMoodle:stop()
-    local moodle = MF.getMoodle('smoking')
+    local moodle = MF.getMoodle('smoking',self.playerNum)
     if moodle ~= nil then
         moodle:setValue(0.5)
         moodle:setPicture(moodle:getGoodBadNeutral(),moodle:getLevel(),getTexture('media/ui/Moodles/notSmoking.png'))
@@ -38,7 +39,7 @@ end
 
 --On tick event for the moodle to update
 function SmokingMoodle:update()
-    local moodle = MF.getMoodle('smoking')
+    local moodle = MF.getMoodle('smoking',self.playerNum)
     if not self.TrueSmoking.isSmoking then return end
     if moodle == nil then return end
     local item = self.TrueSmoking.Smokable

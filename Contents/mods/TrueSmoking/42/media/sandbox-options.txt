@@ -79,7 +79,7 @@ option TrueSmoking.CigaretteLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 1.0,
+    default = 1.25,
     page = TrueSmoking, translation=TrueSmoking_CigaretteLength,
 }
 option TrueSmoking.CigarilloLength
@@ -87,7 +87,7 @@ option TrueSmoking.CigarilloLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 1.5,
+    default = 1.65,
     page = TrueSmoking, translation=TrueSmoking_CigarilloLength,
 }
 option TrueSmoking.CigarLength
@@ -111,6 +111,6 @@ option TrueSmoking.CanLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 2.5,
+    default = 2.25,
     page = TrueSmoking, translation=TrueSmoking_CanLength,
 }

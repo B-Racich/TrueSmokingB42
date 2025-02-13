@@ -15,14 +15,26 @@ Smokable.__index = Smokable
 ]]
 
 --Create a new Smokable object from consumed item (ISEatFoodAction)
-function Smokable:new(item, TrueSmoking)
+function Smokable:new(item, player)
     local obj = {}
     setmetatable(obj, self)
 
     local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
     obj.burnMin, obj.burnMax = 0.000135, 0.000365
 
-    obj.TrueSmoking = TrueSmoking
+    obj.player = player
+
+    local num = player:getPlayerNum()
+    if num == 0 then
+        obj.table = TrueSmoking.Player_1
+    elseif num == 1 then
+        obj.table = TrueSmoking.Player_2
+    elseif num == 2 then
+        obj.table = TrueSmoking.Player_3
+    else
+        obj.table = TrueSmoking.Player_4
+    end
+
     obj.item = item
     obj.onEat = item:getOnEat() or ''
     obj.replaceOnUse = item:getReplaceOnUse() or ''
@@ -59,7 +71,7 @@ function Smokable:new(item, TrueSmoking)
 
     obj.replaceOnUse = item:getReplaceOnUseFullType() or ''
 
-    obj.smokeLength = self:getSmokeLength(item, TrueSmoking)
+    obj.smokeLength = self:getSmokeLength(item)
 
     obj.originalSmokeLength = obj.smokeLength
     obj.smokePercent = 1.0
@@ -98,7 +110,7 @@ end
 --Some custom fixes are in place to hook different mods. Some mods have custom OnEat methods,
 --some use vanilla functions but don't match their item as they should, we are checking however
 --we can and settings smoke lengths, this will be cleaned up more as support is adopted/changed
-function Smokable:getSmokeLength(item, TrueSmoking)
+function Smokable:getSmokeLength(item)
     --The vanilla items could be checking onEat but we have to use names to properly set Hemp&Tobacco
     local list = {
         ["Cigarette"] = TrueSmoking.Options.CigaretteLength or 1.0,
@@ -149,9 +161,9 @@ end
 
 --Start smoking and light the smokable
 function Smokable:light()
-    if not self.TrueSmoking.isSmoking then
-        self.TrueSmoking.isSmoking = true
-        self.TrueSmoking.Moodle:start()
+    if not self.table.isSmoking then
+        self.table.isSmoking = true
+        self.table.Moodle:start()
 
         --Start the update event
         local function updateWrapper()
@@ -163,7 +175,7 @@ function Smokable:light()
     if not self.smokeLit then
         --Allows relighting of smoke but lets the native call run first time
         if self.smokeLength ~= self.originalSmokeLength then
-            ISTimedActionQueue.add(LightSmoke:new(getPlayer()))
+            ISTimedActionQueue.add(LightSmoke:new(self.player))
         end
 
         self.smokeLit = true
@@ -174,7 +186,9 @@ function Smokable:light()
         end
 
         --Some placeholder for when we figure out displaying smokables
-        -- getPlayer():setWornItem("Mask", self.item)
+        -- self.player:getInventory():AddItem("Hat_Cigarette")
+        -- local item =  self.player:getInventory():getItem("Hat_Cigarette")
+        -- self.player:setWornItem(item:getBodyLocation(), item)
         -- getPlayer():setWornItem("MakeUp_Lips", self.item)
     end
 end
@@ -186,11 +200,11 @@ function Smokable:putOut()
     --     ISTimedActionQueue.add(PutOut:new(getPlayer()))
     -- end
 
-    self.TrueSmoking.isSmoking = false
-    self.TrueSmoking.takingPuff = false
+    self.table.isSmoking = false
+    self.table.takingPuff = false
     self.smokeLit = false
 
-    self.TrueSmoking.Moodle:stop()
+    self.table.Moodle:stop()
 
     if self.updateWrapper then
         Events.OnTick.Remove(self.updateWrapper)
@@ -213,18 +227,18 @@ function Smokable:update()
         --Try to take idle puff before calculate burn changes
         self:idlePuff()
         -- print(string.format('Smokable is lit - Burn Rate: %.6f', self.burnRate))
-        if self.TrueSmoking.takingPuff then
+        if self.table.takingPuff then
             --change burn rate with puffFactor
             if self.burnRate < self.burnMin then
-                self.burnRate = self.burnRate + self.burnRate * 0.01 * self.TrueSmoking.Options.PuffFactor
+                self.burnRate = self.burnRate + self.burnRate * 0.01 * TrueSmoking.Options.PuffFactor
             elseif self.burnRate < self.burnMax then
-                self.burnRate = self.burnRate + self.burnRate * 0.001 * self.TrueSmoking.Options.PuffFactor
+                self.burnRate = self.burnRate + self.burnRate * 0.001 * TrueSmoking.Options.PuffFactor
             else
-                self.burnRate = self.burnRate + self.burnRate * 0.00001 * self.TrueSmoking.Options.PuffFactor
+                self.burnRate = self.burnRate + self.burnRate * 0.00001 * TrueSmoking.Options.PuffFactor
             end
-        elseif getPlayer():isRunning() or getPlayer():isSprinting() then
+        elseif self.player:isRunning() or self.player:isSprinting() then
             --change burn rate with runningFactor
-            self.burnRate = self.burnRate - self.burnRate * 0.001 * self.TrueSmoking.Options.RunningFactor
+            self.burnRate = self.burnRate - self.burnRate * 0.001 * TrueSmoking.Options.RunningFactor
         else
             --change burn rate with idleFactor
             self.burnRate = self.burnRate - self.burnRate * 0.001
@@ -241,10 +255,10 @@ function Smokable:update()
     end
 
     --Smoke went out (burn rate is 0)
-    if self.TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.000002 then
+    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.000002 then
         self.burnRate = 0
         self.smokeLit = false
-    elseif not self.TrueSmoking.Options.SmokeRelighting and self.burnRate < self.burnMin then
+    elseif not TrueSmoking.Options.SmokeRelighting and self.burnRate < self.burnMin then
         self.burnRate = self.burnMin
     end
 
@@ -258,7 +272,7 @@ end
 --Manual puff action while smokeKey is held
 function Smokable:puff()
     if self.smokeLength-self.burnRate > 0 then
-        ISTimedActionQueue.add(TakePuff:new(getPlayer()))
+        ISTimedActionQueue.add(TakePuff:new(self.player))
     end
 end
 
@@ -266,12 +280,12 @@ end
 function Smokable:idlePuff()
     local timeDiff = os.difftime(os.time(), self.puffTimeMark)
 
-    if self.TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
-        local puff = TakePuff:new(getPlayer())
+    if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
+        local puff = TakePuff:new(self.player)
         puff.maxTime = 80
-        TrueSmoking.Smokable.puffTimeMark = os.time()
+        self.puffTimeMark = os.time()
         ISTimedActionQueue.add(puff)
-        self.timeCheck = ZombRand(self.TrueSmoking.Config.PassiveMinTime, self.TrueSmoking.Config.PassiveMaxTime)
+        self.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
     end
 end
 
