@@ -4,7 +4,7 @@ LightSmoke = ISBaseTimedAction:derive("LightSmoke")
 
 function LightSmoke:isValid()
     --Check if we have a smoke lit
-    return TrueSmoking.isSmoking
+    return self.trueSmoking.isSmoking
 end
 
 function LightSmoke:update()
@@ -25,20 +25,20 @@ function LightSmoke:start()
     self:setOverrideHandModels(nil, self.item)
 
     --Track puff
-    TrueSmoking.takingPuff = true
-    TrueSmoking.Smokable.puffTimeMark = os.time()
+    self.trueSmoking.takingPuff = true
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
 end
 
 function LightSmoke:stop()
-    TrueSmoking.takingPuff = false
+    self.trueSmoking.takingPuff = false
     self:forceComplete()
     ISBaseTimedAction.stop(self)
 end
 
 function LightSmoke:perform()
     --Track puff
-    TrueSmoking.takingPuff = false
-    TrueSmoking.Smokable.puffTimeMark = os.time()
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
     ISBaseTimedAction.perform(self)
 end
 
@@ -49,8 +49,11 @@ function LightSmoke:new(character)
         stopOnAim = true,
         forceProgressBar = false,
         character = character,
-        item = TrueSmoking.Smokable.item,
     }
+
+    if character:getPlayerNum() == 0 then o.trueSmoking = TrueSmoking.Player_1 else o.trueSmoking = TrueSmoking.Player_2 end
+    o.item = o.trueSmoking.Smokable.item
+
     setmetatable(o, self)
     self.__index = self
 

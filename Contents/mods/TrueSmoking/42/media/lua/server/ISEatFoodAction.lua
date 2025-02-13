@@ -34,9 +34,23 @@ function ISEatFoodAction:new (character, item, percentage)
     --Store the original action to return it if we don't need to hook it
     o = originalActionNew(self, character, item, percentage)
 
+    local trueSmoking
+    local num = character:getPlayerNum()
+    if num == 0 then
+         trueSmoking = TrueSmoking.Player_1
+    elseif num == 1 then
+        trueSmoking = TrueSmoking.Player_2
+    elseif num == 2 then
+        trueSmoking = TrueSmoking.Player_3
+    else
+        trueSmoking = TrueSmoking.Player_4
+    end
+    o.trueSmoking = trueSmoking
+
+
     if isInList(onEat, funcsToHook) and not isInList(name, itemsToSkip) then
         print('Hooking: '..onEat..' -> '..hook)
-        if not TrueSmoking.isSmoking then TrueSmoking.Smokable = Smokable:new(item, TrueSmoking) end
+        if not trueSmoking.isSmoking then trueSmoking.Smokable = Smokable:new(item, character) end
         -- print(item:getReplaceOnUse())
         -- print(name)
         item:setReplaceOnUse(nil) --nil this fields to avoid consuming the item 
@@ -67,7 +81,7 @@ function ISEatFoodAction:isValid()
     if self.item:getOnEat() == nil or self.item:getOnEat() == '' then
         return originalActionIsValid(self)
     else
-        return not TrueSmoking.isSmoking
+        return not self.trueSmoking.isSmoking
     end
 end
 
@@ -75,8 +89,19 @@ end
 function OnEat_Hook(food, character, percent)
     --Deprecate this for now, we don't need to be calling the original code
     -- OnEat_Original(food, character, percent)
+    local trueSmoking
+    local num = character:getPlayerNum()
+    if num == 0 then
+         trueSmoking = TrueSmoking.Player_1
+    elseif num == 1 then
+        trueSmoking = TrueSmoking.Player_2
+    elseif num == 2 then
+        trueSmoking = TrueSmoking.Player_3
+    else
+        trueSmoking = TrueSmoking.Player_4
+    end
 
-    TrueSmoking.Smokable:light()
+    trueSmoking.Smokable:light()
 end
 
 --Modified OnEat function to cover Smokables and distribute stats over time
@@ -84,7 +109,7 @@ end
 function OnEat_OverTime(smokable)
     -- local food = smokable.item
     local percent = smokable.puffPercent
-    local character = getPlayer()
+    local character = smokable.player
     local body = character:getBodyDamage()
     local stats = character:getStats()
 
@@ -151,7 +176,7 @@ function OnEat_OverTime(smokable)
             end
         end
     end
-    
+
     --===Vanilla logic ends here===
 
     --===Check for item stats and start applying===
@@ -274,28 +299,28 @@ end
 --previous implementations used to record stat changes before and after calling the native function,
 --record the stat changes, and apply them over time. The stat changes worked okay but it was a quick and dirty way to
 --make it compatible with lots of mods that need to be calling their original functions. However things like ETW would simply
---mark the begininng of the smoke as having smoked the whole thing which was undesired. Do it right or don't do it at all.
+--mark the begininng of the smoke as having smoked the whole thing which was undesired.
 function OnEat_Original(food, character, percent)
-    local modOnEat = food:getModData().modOnEat or ''
-    local tableName, funcName = modOnEat:match("([^%.]+)%.([^%.]+)")
-    local modTable, functionToCall
+    -- local modOnEat = food:getModData().modOnEat or ''
+    -- local tableName, funcName = modOnEat:match("([^%.]+)%.([^%.]+)")
+    -- local modTable, functionToCall
 
-    if tableName and funcName then
-        modTable = _G[tableName]
-        functionToCall = modTable and modTable[funcName]
-    else
-        functionToCall = _G[modOnEat]
-    end
+    -- if tableName and funcName then
+    --     modTable = _G[tableName]
+    --     functionToCall = modTable and modTable[funcName]
+    -- else
+    --     functionToCall = _G[modOnEat]
+    -- end
 
-    TrueSmoking.statsBefore = getStats()
+    -- TrueSmoking.statsBefore = getStats()
 
-    if type(functionToCall) == "function" then
-        print('Calling mod function: ' .. modOnEat)
-        local modFunction = callModFunction(functionToCall)
-        modFunction(food, character, percent)
-    end
+    -- if type(functionToCall) == "function" then
+    --     print('Calling mod function: ' .. modOnEat)
+    --     local modFunction = callModFunction(functionToCall)
+    --     modFunction(food, character, percent)
+    -- end
 
-    TrueSmoking.statsAfter = getStats()
+    -- TrueSmoking.statsAfter = getStats()
 
-    setStats(TrueSmoking.statsBefore)
+    -- setStats(TrueSmoking.statsBefore)
 end
