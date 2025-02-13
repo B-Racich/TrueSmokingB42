@@ -93,6 +93,128 @@ function TrueSmoking:onKeyStartPressed(key)
     end
 end
 
+TrueSmoking.addBPrompts = function()
+    Events.OnTick.Remove(TrueSmoking.addBPrompts)
+
+    TrueSmoking.activateFindSmokable = function(data, player)
+        TrueSmoking:findSmokable(player)
+    end
+
+    TrueSmoking.activatePuff = function(data, playerData)
+        playerData.Smokable:puff()
+    end
+
+    TrueSmoking.activateLight = function(data, playerData)
+        playerData.Smokable:light()
+    end
+
+    TrueSmoking.activatePutOut = function(data, playerData)
+        playerData.Smokable:putOut()
+    end
+
+    TrueSmoking.ISButtonPrompt = TrueSmoking.ISButtonPrompt or {}
+    TrueSmoking.ISButtonPrompt.onJoypadButtonReleased = ISButtonPrompt.onJoypadButtonReleased
+    TrueSmoking.ISButtonPrompt.onLBPress = ISButtonPrompt.onLBPress
+    TrueSmoking.ISButtonPrompt.onBPress = ISButtonPrompt.onBPress
+    TrueSmoking.ISButtonPrompt.getBestBButtonAction = ISButtonPrompt.getBestBButtonAction
+
+    function ISButtonPrompt:onJoypadButtonReleased(button)
+        TrueSmoking.ISButtonPrompt.onJoypadButtonReleased(self, button)
+
+        local o
+        if self.player == 0 then
+            o = TrueSmoking.Player_1
+        elseif self.player == 1 then
+            o = TrueSmoking.Player_2
+        elseif self.player == 2 then
+            o = TrueSmoking.Player_3
+        else
+            o = TrueSmoking.Player_4
+        end
+
+        if button == 4 then
+            o.LB_HELD = false
+        elseif button == 1 then
+            o.B_HELD = false
+        end
+        print(string.format('Button released - %s',button))
+    end
+
+    function ISButtonPrompt:onLBPress()
+        TrueSmoking.ISButtonPrompt.onLBPress(self)
+
+        local o
+        if self.player == 0 then
+            o = TrueSmoking.Player_1
+        elseif self.player == 1 then
+            o = TrueSmoking.Player_2
+        elseif self.player == 2 then
+            o = TrueSmoking.Player_3
+        else
+            o = TrueSmoking.Player_4
+        end
+
+        o.LB_HELD = true
+        print('LB pressed')
+    end
+
+    function ISButtonPrompt:onBPress()
+        TrueSmoking.ISButtonPrompt.onBPress(self)
+
+        local o
+        if self.player == 0 then
+            o = TrueSmoking.Player_1
+        elseif self.player == 1 then
+            o = TrueSmoking.Player_2
+        elseif self.player == 2 then
+            o = TrueSmoking.Player_3
+        else
+            o = TrueSmoking.Player_4
+        end
+
+        o.B_HELD = true
+        print('B pressed')
+    end
+
+    function ISButtonPrompt:getBestBButtonAction(dir)
+        TrueSmoking.ISButtonPrompt.getBestBButtonAction(self, dir)
+
+        local grab = getText("UI_GrabAndDrop_GrabAction")
+        local drop = getText("UI_GrabAndDrop_DropAction")
+
+        local player = self.player and getSpecificPlayer(self.player)
+
+        local square = player and player:getSquare()
+
+        if not square then return end -- Possibly teleporting.
+
+        if self.bPrompt and not (self.bPrompt:find(grab) or self.bPrompt:find(drop)) then return end
+
+        local o
+        if self.player == 0 then
+            o = TrueSmoking.Player_1
+        elseif self.player == 1 then
+            o = TrueSmoking.Player_2
+        elseif self.player == 2 then
+            o = TrueSmoking.Player_3
+        else
+            o = TrueSmoking.Player_4
+        end
+
+        if o.isSmoking and o.Smokable.smokeLit and not o.LB_HELD then
+            self:setBPrompt("Take Puff", TrueSmoking.activatePuff, o)
+        elseif o.isSmoking and not o.Smokable.smokeLit and not o.LB_HELD then
+            self:setBPrompt("Relight Smoke", TrueSmoking.activateLight, o)
+        elseif TrueSmoking.Config.FindSmoke and not o.isSmoking and o.LB_HELD then
+            self:setBPrompt("Get Cigarette", TrueSmoking.activateFindSmokable, player)
+        elseif o.isSmoking and o.LB_HELD then
+            self:setBPrompt("Put Out Smoke", TrueSmoking.activatePutOut, o)
+        end
+    end
+end
+
+Events.OnTick.Add(TrueSmoking.addBPrompts)
+
 --Hook into context menu for Smokable objects and toggle the Smoke option when Smoking
 function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     for i, v in ipairs(items) do

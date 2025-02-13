@@ -24,7 +24,7 @@ function Smokable:new(item, player)
 
     obj.player = player
 
-    local num = obj.table
+    local num = player:getPlayerNum()
     if num == 0 then
         obj.table = TrueSmoking.Player_1
     elseif num == 1 then

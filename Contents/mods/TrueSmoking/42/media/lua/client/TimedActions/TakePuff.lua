@@ -5,7 +5,7 @@ TakePuff = ISBaseTimedAction:derive("TakePuff")
 function TakePuff:isValid()
     --Check if we have a smoke lit
     return self.trueSmoking.isSmoking and 
-    (isKeyDown(TrueSmoking.Config.keySmoke) or self.maxTime ~= -1)
+    ((isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) or self.maxTime ~= -1)
 end
 
 function TakePuff:update()
