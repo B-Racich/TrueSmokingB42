@@ -159,6 +159,22 @@ function Smokable:getSmokeLength(item)
     return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
+Smokable.originalAct = ISWearClothing.new
+
+function ISWearClothing:new(character, item)
+	local o = ISBaseTimedAction.new(self, character);
+	o.item = item;
+	o.maxTime = o:getDuration();
+	o.fromHotbar = true; -- just to disable hotbar:update() during the wearing
+	o.clothingAction = true;
+
+    if item:getClothingItem() == 'Hat_Cigarette' then
+        o.maxTime = 0
+        o.clothingAction = false
+    end
+	return o;
+end
+
 --Start smoking and light the smokable
 function Smokable:light()
     if not self.table.isSmoking then
@@ -186,6 +202,11 @@ function Smokable:light()
         end
 
         --Some placeholder for when we figure out displaying smokables
+        self.smokeItem = self.player:getInventory():AddItem('Hat_Cigarette')
+        ISTimedActionQueue.add(ISWearClothing:new(self.player, self.smokeItem))
+
+        -- self.smokeItem = getItem('Hat_Cigarette')
+        -- ISInventoryPaneContextMenu.wearItem(self.smokeItem, self.player:getPlayerNum())
         -- getPlayer():setWornItem("Mask", self.item)
         -- getPlayer():setWornItem("MakeUp_Lips", self.item)
     end
@@ -197,6 +218,8 @@ function Smokable:putOut()
     -- if self.TrueSmoking.isSmoking then
     --     ISTimedActionQueue.add(PutOut:new(getPlayer()))
     -- end
+
+    ISInventoryPaneContextMenu.unequipItem(self.smokeItem, self.player:getPlayerNum())
 
     self.table.isSmoking = false
     self.table.takingPuff = false
