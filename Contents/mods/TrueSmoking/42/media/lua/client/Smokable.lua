@@ -303,7 +303,7 @@ function Smokable:idlePuff()
 
     if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
         local puff = TakePuff:new(self.player)
-        puff.maxTime = 80
+        puff.maxTime = 180
         self.puffTimeMark = os.time()
         ISTimedActionQueue.add(puff)
         self.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)

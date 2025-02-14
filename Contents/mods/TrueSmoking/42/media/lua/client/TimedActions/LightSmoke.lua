@@ -20,13 +20,27 @@ end
 
 function LightSmoke:start()
     --Set the animation
-    self:setActionAnim(CharacterActionAnims.Eat)
+    local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
+    self:setActionAnim(anim)
     self:setAnimVariable("FoodType", self.item:getEatType())
     self:setOverrideHandModels(nil, self.item)
 
     --Track puff
     self.trueSmoking.takingPuff = true
     self.trueSmoking.Smokable.puffTimeMark = os.time()
+
+    -- Play custom sound when no sound is playing
+    if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
+        local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
+        if self.eatSound == '' then -- No sound running for first time
+            self.eatSound = sound
+            -- Check if we previously started a puff and its audio is still playing
+            if not self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound) then
+                self.trueSmoking.lightingEatSound = sound
+                self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+            end
+        end
+    end
 end
 
 function LightSmoke:stop()
@@ -54,9 +68,12 @@ function LightSmoke:new(character)
     if character:getPlayerNum() == 0 then o.trueSmoking = TrueSmoking.Player_1 else o.trueSmoking = TrueSmoking.Player_2 end
     o.item = o.trueSmoking.Smokable.item
 
+    o.eatSound = ''
+    o.eatAudio = 0
+
     setmetatable(o, self)
     self.__index = self
 
-    o.maxTime = 80
+    o.maxTime = TrueSmoking.lightTime
     return o
 end

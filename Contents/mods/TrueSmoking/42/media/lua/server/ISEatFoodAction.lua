@@ -2,6 +2,8 @@ require 'TimedActions/ISEatFoodAction'
 
 local originalActionNew = ISEatFoodAction.new
 local originalActionIsValid = ISEatFoodAction.isValid
+local originalActionStop = ISEatFoodAction.stop
+local originalActionPerform = ISEatFoodAction.perform
 
 --[[
     This file hooks the foodAction and houses on custom OnEat methods, here the Smokable object is created and stored into
@@ -71,7 +73,8 @@ function ISEatFoodAction:new (character, item, percentage)
         item:setReduceFoodSickness(0)
 
         o.item = item
-        o.maxTime = 50; --Shorten time to mimic 'lightng' the smokable
+        -- 460 original -- 200 works nicely with smoking sounds overhaul, 50 was used before for a shortened vanilla
+        o.maxTime = TrueSmoking.lightTime;
     end
 
     return o
@@ -82,6 +85,29 @@ function ISEatFoodAction:isValid()
         return originalActionIsValid(self)
     else
         return not self.trueSmoking.isSmoking
+    end
+end
+
+function ISEatFoodAction:stop()
+    if getActivatedMods():contains('\\SmokingSoundsOverhaul') and self.item:getModData().modOnEat
+     and self.item:getModData().modOnEat ~= '' then
+        self.trueSmoking.lightingEatSound = self.eatSound
+        ISBaseTimedAction.stop(self);
+        self.item:setJobDelta(0.0);
+    else
+        originalActionStop(self)
+    end
+end
+
+function ISEatFoodAction:perform()
+    if getActivatedMods():contains('\\SmokingSoundsOverhaul') and self.item:getModData().modOnEat
+     and self.item:getModData().modOnEat ~= '' then
+        self.trueSmoking.lightingEatSound = self.eatSound
+        self.item:getContainer():setDrawDirty(true);
+        self.item:setJobDelta(0.0);
+        ISBaseTimedAction.perform(self);
+    else
+        originalActionPerform(self)
     end
 end
 

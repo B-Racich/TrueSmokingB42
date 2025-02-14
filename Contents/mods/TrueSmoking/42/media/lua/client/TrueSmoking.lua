@@ -78,9 +78,9 @@ end
 
 --Key Event Listener
 function TrueSmoking:onKeyStartPressed(key)
-    print(string.format('KEY PRESSED - %s',key))
+    -- print(string.format('KEY PRESSED - %s',key))
     local o = self.Player_1
-    local player = getSpecificPlayer(0)
+    local player = getSpecificPlayer(0) -- Player_0 is always keyboard
     if player then
         if o.isSmoking and o.Smokable.smokeLit and key == self.Config.keySmoke then
             o.Smokable:puff()
@@ -95,7 +95,11 @@ function TrueSmoking:onKeyStartPressed(key)
 end
 
 --[[
-    Controller Support begins here
+    Controller Support begins here, everything is bound to B/O but we listen for LB presses and button releases
+    to flag when buttons are held, LB is used as a modifer key. Store the original functions and call them first to ensure vanilla
+    functionality takes priority
+
+    This could be configured through a combo box and options later.
 ]]
 TrueSmoking.ISButtonPrompt = TrueSmoking.ISButtonPrompt or {}
 TrueSmoking.ISButtonPrompt.onJoypadButtonReleased = ISButtonPrompt.onJoypadButtonReleased
@@ -185,13 +189,13 @@ function ISButtonPrompt:getBestBButtonAction(dir)
     end
 
     if o.isSmoking and o.Smokable.smokeLit and not o.LB_HELD then
-        self:setBPrompt("Take Puff", function() o.Smokable:puff() end)
+        self:setBPrompt(getText("UI_TRUESMOKING_PUFF"), function() o.Smokable:puff() end)
     elseif o.isSmoking and not o.Smokable.smokeLit and not o.LB_HELD then
-        self:setBPrompt("Relight Smoke", function() o.Smokable:light() end)
+        self:setBPrompt(getText("UI_TRUESMOKING_RELIGHT"), function() o.Smokable:light() end)
     elseif TrueSmoking.Config.FindSmoke and not o.isSmoking and o.LB_HELD then
-        self:setBPrompt("Get Cigarette", function() TrueSmoking:findSmokable(player) end)
+        self:setBPrompt(getText("UI_TRUESMOKING_GET_SMOKE"), function() TrueSmoking:findSmokable(player) end)
     elseif o.isSmoking and o.LB_HELD then
-        self:setBPrompt("Put Out Smoke", function() o.Smokable:putOut() end)
+        self:setBPrompt(getText("UI_TRUESMOKING_PUT_OUT"), function() o.Smokable:putOut() end)
     end
 end
 
@@ -238,7 +242,11 @@ function TrueSmoking:start(playerNum, player)
     else
         o = self.Player_4
     end
-    o.Moodle = SmokingMoodle:new(o)
+    o.Moodle = SmokingMoodle:new(o, playerNum)
+    o.eatSound = ''
+    o.lightingEatSound = ''
+
+    self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 350 or 180
 
     --Start the update event
     local function keyWrapper(key)
