@@ -11,9 +11,21 @@ end
 function TakePuff:update()
     -- Trigger every game update when the action is performs
     self.trueSmoking.Smokable.puffTimeMark = os.time()
+    -- This should cover if the audio got stopped
+    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
+    end
+    -- Restarts audio if starting with audio playing
+    if self.eatSound ~= '' and self.eatAudio == 0 and not self.character:getEmitter():isPlaying(self.trueSmoking.eatSound) then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
+    end
 end
 
 function TakePuff:waitToStart()
+    if self.character:getEmitter():isPlaying(self.trueSmoking.eatSound)
+        or (self.trueSmoking.lightingEatSound and self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound)) then
+        return true
+    end
     --Wait for timed actions to finish
     if not self.character:isStrafing() and not self.character:isRunning() and not self.character:isSprinting()
             and not self.character:isAiming() and not self.character:isAsleep() and not self.character:isPerformingAnAction()
@@ -21,37 +33,37 @@ function TakePuff:waitToStart()
 end
 
 function TakePuff:start()
-    -- Play custom sound
-    -- local gender = self.character:isFemale()
-    -- if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
-    --     if self.eatAudio then
-    --         self.eatAudio = self.character:getEmitter():playSound(SmokingSoundsOverhaul:getPuffSound(gender));
-                -- This might be a better function to call to stop overlapping, need to test
-            -- self.eatAudio = self.character:getEmitter():stopOrTriggerSound(SmokingSoundsOverhaul:getPuffSound(gender));
-    --     end
-    -- end
-
-    --Set the animation
-    self:setActionAnim(CharacterActionAnims.Eat)
+    -- --Set the animation
+    local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
+    self:setActionAnim(anim)
     self:setAnimVariable("FoodType", self.item:getEatType())
     self:setOverrideHandModels(nil, self.item)
     self.trueSmoking.Smokable.puffTimeMark = os.time()
 
     --Track puff
     self.trueSmoking.takingPuff = true
+
+    -- Play custom sound when no sound is playing
+    if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
+        local gender = self.character:isFemale()
+        local sound = SmokingSoundsOverhaul:getPuffSound(gender)
+        if self.eatSound == '' then -- No sound running for first time
+            self.eatSound = sound
+            -- Check if we previously started a puff and its audio is still playing
+            if not self.character:getEmitter():isPlaying(self.trueSmoking.eatSound) then
+                self.trueSmoking.eatSound = sound
+                self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+            end
+        end
+    end
 end
 
 function TakePuff:stop()
-    -- if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
-    --     if self.eatAudio then
-    --         self.character:getEmitter():stopSound(self.eatAudio)
-    --     end
-    -- end
+    ISBaseTimedAction.stop(self)
 
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
     self:forceComplete()
-    ISBaseTimedAction.stop(self)
 
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
@@ -68,10 +80,6 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
-    if self.eatAudio then
-        self.character:getEmitter():stopSound(self.eatAudio)
-    end
-
     --Track puff
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
@@ -89,6 +97,9 @@ function TakePuff:new(character)
 
     if character:getPlayerNum() == 0 then o.trueSmoking = TrueSmoking.Player_1 else o.trueSmoking = TrueSmoking.Player_2 end
     o.item = o.trueSmoking.Smokable.item
+
+    o.eatSound = ''
+    o.eatAudio = 0
 
     setmetatable(o, self)
     self.__index = self

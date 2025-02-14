@@ -21,11 +21,22 @@ description=[*]Different smoke times for different items (cigars take longer tha
 description=[*]Options and Settings configurable via Sandbox Options and Mod Options
 description=[*]Automatic passive puffing (configurable in options)
 description=[*]Coughing mechanic configurable in sandbox options (chance to cough on taking a puff)
+description=[*]Controller support
+description=[*]Split-screen support
+description=[*]Save Game Compatible
 description=[/list]
 description=
 description=[h3] Default Keybinds [/h3]
 description=Press [b]K[/b] to take puffs and to relight your smoke if it goes out, finds a cigarette and lights it if not smoking
 description=Press [b]; (semi colon)[/b] to stop smoking
+description=
+description=[h3] Controllers [/h3]
+description=I've added button prompts that display when you can do the following action.  LB is a modifier key that when held changes the B action as follows below:
+description=LB + B = Get/Light Cigarette
+description=LB + B = Put Out Smoke
+description=B = (Hold) Take Puff / Relight
+description=
+description=Eventually i'll make these configurable in the options, let me know if there is major issues with these controller binds
 description=
 description=[h3] Options [/h3]
 description=To configure smoking times change the Sandbox options for the item Lengths i.e Cigarette Length. Adjust this to your preference but take note; the longer the smoking time the longer it takes for you to get the full effect from the smoke. In terms of balance items like cigars which give more benefit should take longer to smoke, not just for realism but to distribute the bigger chunk of stat changes over a longer time.
@@ -52,7 +63,7 @@ description=[*]Display smoke in mouth when possible
 description=[*]Custom animations for lighting and putting out
 description=[*]Mod support as requested and needed
 description=[*]Further tweaks, options, etc
-description=[*]Dynamic smoker trait / Addiction / Withdrawal
+description=[*]Dynamic smoker trait / Addiction / Withdrawal
 description=[/list]
 description=
 description=[h3] General Notes On Balance [/h3]
@@ -75,6 +86,6 @@ description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/im
 description=
 description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
 description=
-description=[code]Ask for permission before redistributing[/code]
+description=[code]Ask for permission before redistributing[/code]
 tags=Build 42;Balance;Food;Framework;Hardmode;Items;Misc;Multiplayer;Realistic;Silly/Fun;QoL
 visibility=public

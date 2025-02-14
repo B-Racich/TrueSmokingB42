@@ -243,6 +243,10 @@ function TrueSmoking:start(playerNum, player)
         o = self.Player_4
     end
     o.Moodle = SmokingMoodle:new(o, playerNum)
+    o.eatSound = ''
+    o.lightingEatSound = ''
+
+    self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 350 or 180
 
     --Start the update event
     local function keyWrapper(key)

@@ -27,7 +27,7 @@ option TrueSmoking.PuffFactor
 option TrueSmoking.RunningFactor
 {
     type = double,
-    min = 0.0,
+    min = -10.0,
     max = 10.0,
     default = 2,
     page = TrueSmoking, translation=TrueSmoking_RunningFactor,
@@ -79,7 +79,7 @@ option TrueSmoking.CigaretteLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 1.25,
+    default = 1.5,
     page = TrueSmoking, translation=TrueSmoking_CigaretteLength,
 }
 option TrueSmoking.CigarilloLength
@@ -87,7 +87,7 @@ option TrueSmoking.CigarilloLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 1.65,
+    default = 2.0,
     page = TrueSmoking, translation=TrueSmoking_CigarilloLength,
 }
 option TrueSmoking.CigarLength
@@ -95,7 +95,7 @@ option TrueSmoking.CigarLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 3.0,
+    default = 3.5,
     page = TrueSmoking, translation=TrueSmoking_CigarLength,
 }
 option TrueSmoking.PipeLength
@@ -103,7 +103,7 @@ option TrueSmoking.PipeLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 1.75,
+    default = 2.5,
     page = TrueSmoking, translation=TrueSmoking_PipeLength,
 }
 option TrueSmoking.CanLength
@@ -111,6 +111,6 @@ option TrueSmoking.CanLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 2.25,
+    default = 2.5,
     page = TrueSmoking, translation=TrueSmoking_CanLength,
 }
