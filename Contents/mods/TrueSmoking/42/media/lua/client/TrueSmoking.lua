@@ -38,7 +38,6 @@ function TrueSmoking:checkForMaskAndEquip(player)
 end
 
 function TrueSmoking:wearingMask(player)
-    local o = self:getPlayerReference(player)
     local items = {}
     items['Mask'] = player:getWornItem('Mask') or ''
     items['MaskEyes'] = player:getWornItem('MaskEyes') or ''
@@ -52,19 +51,15 @@ function TrueSmoking:wearingMask(player)
             return item
         end
     end
-    return nil
+    return false
 end
 
-function TrueSmoking:removeItem(player, item, instant)
-    local o = self:getPlayerReference(player)
-    local time = instant and 1 or 50
+function TrueSmoking:removeItem(player, item, time)
     ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
 end
 
-function TrueSmoking:equipItem(player, item, instant)
-    local o = self:getPlayerReference(player)
-    local time = instant and 1 or 50
-    ISTimedActionQueue.add(ISWearClothing:new(player, item))
+function TrueSmoking:equipItem(player, item, time)
+    ISTimedActionQueue.add(ISWearClothing:new(player, item, time))
 end
 
 function TrueSmoking:getPlayerReference(player)

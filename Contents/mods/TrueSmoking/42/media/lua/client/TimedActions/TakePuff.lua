@@ -19,6 +19,10 @@ function TakePuff:update()
     if self.eatSound ~= '' and self.eatAudio == 0 and not self.character:getEmitter():isPlaying(self.trueSmoking.eatSound) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
+
+    -- if not (isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) then 
+    --     self.maxTime = 1
+    -- end
 end
 
 function TakePuff:waitToStart()
@@ -33,8 +37,7 @@ function TakePuff:waitToStart()
 end
 
 function TakePuff:start()
-    self.timer = os.time()
-    -- --Set the animation
+    -- set the anim for vanilla or modded
     local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
     self:setActionAnim(anim)
     self:setAnimVariable("FoodType", self.item:getEatType())
@@ -44,6 +47,7 @@ function TakePuff:start()
     --Track puff
     self.trueSmoking.takingPuff = true
 
+    -- TODO base this off of anim instead for future expansion
     -- Play custom sound when no sound is playing
     if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
         local gender = self.character:isFemale()
@@ -57,14 +61,22 @@ function TakePuff:start()
             end
         end
     end
+    self.character:reportEvent("EventEating");
 end
 
-function TakePuff:stop()
-    ISBaseTimedAction.stop(self)
+-- function TakePuff:forceStop()
+--     print('we are force stopping')
+--     ISBaseTimedAction.forceStop(self)
+-- end
 
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
-    self:forceComplete()
+-- function TakePuff:forceComplete()
+--     print('we are force completing')
+--     ISBaseTimedAction.forceComplete(self)
+-- end
+
+function TakePuff:stop()
+    print('STOP-1')
+    ISBaseTimedAction.stop(self)
 
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
@@ -78,16 +90,19 @@ function TakePuff:stop()
             end
         end
     end
-
-    print('add ciggy back')
-    TrueSmoking:equipItem(self.character, self.trueSmoking.visualItem, true)
+    print('STOP-2')
+    -- self.trueSmoking.Smokable:equipVisualSmoke()
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
+    self:forceComplete()
+    print('STOP-3')
 end
 
 function TakePuff:perform()
+    ISBaseTimedAction.perform(self)
     --Track puff
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
-    ISBaseTimedAction.perform(self)
 end
 
 function TakePuff:new(character)
@@ -99,17 +114,14 @@ function TakePuff:new(character)
         character = character,
     }
 
-    if character:getPlayerNum() == 0 then o.trueSmoking = TrueSmoking.Player_1 else o.trueSmoking = TrueSmoking.Player_2 end
+    o.trueSmoking = TrueSmoking:getPlayerReference(character)
     o.item = o.trueSmoking.Smokable.item
-
     o.eatSound = ''
     o.eatAudio = 0
-
-    o.removedForPuff = false
+    o.maxTime = -1 -- -1 means it will never finish
 
     setmetatable(o, self)
     self.__index = self
 
-    o.maxTime = -1 -- -1 means it will never finish
     return o
 end

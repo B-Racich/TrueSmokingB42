@@ -65,15 +65,14 @@ function LightSmoke:new(character)
         character = character,
     }
 
-    if character:getPlayerNum() == 0 then o.trueSmoking = TrueSmoking.Player_1 else o.trueSmoking = TrueSmoking.Player_2 end
+    o.trueSmoking = TrueSmoking:getPlayerReference(character)
     o.item = o.trueSmoking.Smokable.item
-
     o.eatSound = ''
     o.eatAudio = 0
-
+    o.maxTime = TrueSmoking.lightTime
+    
     setmetatable(o, self)
     self.__index = self
 
-    o.maxTime = TrueSmoking.lightTime
     return o
 end

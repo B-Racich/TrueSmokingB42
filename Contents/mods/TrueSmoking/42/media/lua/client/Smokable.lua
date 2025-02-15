@@ -150,6 +150,39 @@ function Smokable:getSmokeLength(item)
     return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
+function Smokable:equipVisualSmoke()
+    if not self.player:getWornItem('Mask') then
+        print('Equip VisualItem')
+        print(self.table.visualItem)
+        TrueSmoking:equipItem(self.player, self.table.visualItem, 1)
+    end
+end
+
+function Smokable:removeVisualSmoke()
+    if self.table.visualItem and self.player:getWornItem('Mask') == self.table.visualItem then
+        print('Remove VisualItem')
+        TrueSmoking:removeItem(self.player, self.table.visualItem, 1)
+    end
+end
+
+function Smokable:getVisualSmoke()
+    if self.item and not self.table.visualItem then
+        local items = {
+            ['Cigarette'] = 'Hat_Cigarette'
+        }
+        local itemName = self.item:getDisplayName()
+
+        if items[itemName] then
+            -- self.table.visualItem = instanceItem(items[itemName])
+            -- print(self.table.visualItem)
+            print('Add VisualItem')
+            return self.player:getInventory():AddItem(items[itemName])
+        else
+            return false
+        end
+    end
+end
+
 --Start smoking and light the smokable
 function Smokable:light()
     if not self.table.isSmoking then
@@ -176,8 +209,8 @@ function Smokable:light()
             self.burnRate = ZombRandFloat(self.burnMin, self.burnMax)
         end
 
-        self.table.visualItem = self.player:getInventory():AddItem('Hat_Cigarette')
-        TrueSmoking:equipItem(self.player, self.table.visualItem, true)
+        self.table.visualItem = self:getVisualSmoke()
+        self:equipVisualSmoke()
     end
 end
 
@@ -205,11 +238,11 @@ function Smokable:putOut()
         addOnUseItem()
     end
 
-    if self.table.mask then
-        TrueSmoking:removeItem(self.player, self.table.visualItem, true)
-        self.player:getInventory():removeItem(self.table.visualItem)
-        TrueSmoking:checkForMaskAndEquip(self.player)
-    end
+    self:removeVisualSmoke()
+    self.player:getInventory():Remove(self.table.visualItem)
+    self.table.visualItem = false
+    print('Delete VisualItem')
+    TrueSmoking:checkForMaskAndEquip(self.player)
 
     self.item = {}  --clear item for safety.
 end
@@ -217,6 +250,10 @@ end
 --Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
 function Smokable:update()
     --If smoke is lit update burnRate
+    if not self.table.takingPuff then
+        self:equipVisualSmoke()
+    end
+
     if self.smokeLit then
         --Try to take idle puff before calculate burn changes
         self:idlePuff()
@@ -265,10 +302,8 @@ end
 
 --Manual puff action while smokeKey is held
 function Smokable:puff()
-    if self.smokeLength-self.burnRate > 0 then
-        TrueSmoking:removeItem(self.player, self.table.visualItem, true)
-        ISTimedActionQueue.add(TakePuff:new(self.player))
-    end
+    self:removeVisualSmoke()
+    ISTimedActionQueue.add(TakePuff:new(self.player))
 end
 
 --Passive puff action triggered by PassiveSmoking
@@ -276,6 +311,7 @@ function Smokable:idlePuff()
     local timeDiff = os.difftime(os.time(), self.puffTimeMark)
 
     if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
+        self:removeVisualSmoke()
         local puff = TakePuff:new(self.player)
         puff.maxTime = 180
         self.puffTimeMark = os.time()
