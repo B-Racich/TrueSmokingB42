@@ -42,6 +42,14 @@ option TrueSmoking.IdleFactor
 }
 
 
+option TrueSmoking.ManageHeadGear
+{
+    type = boolean,
+    default = true,
+    page = TrueSmoking, translation=TrueSmoking_ManageHeadGear
+}
+
+
 option TrueSmoking.SmokeRelighting
 {
 	type = boolean,

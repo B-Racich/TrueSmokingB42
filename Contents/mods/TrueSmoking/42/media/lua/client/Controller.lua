@@ -67,7 +67,7 @@ function ISButtonPrompt:getBestBButtonAction(dir)
         self:setBPrompt(getText("UI_TRUESMOKING_GET_SMOKE"), function() TrueSmoking:findSmokable(player) end)
     elseif o.isSmoking and o.LB_HELD then
         self:setBPrompt(getText("UI_TRUESMOKING_PUT_OUT"), function() o.Smokable:putOut() end)
-    elseif not o.isSmoking and o.LB_HELD and o.mask then
+    elseif not o.isSmoking and o.LB_HELD and o.mask and TrueSmoking.Options.ManageHeadGear then
         self:setBPrompt(getText("UI_TRUESMOKING_PUT_OUT"), function() TrueSmoking:equipItem(player, o.mask, false) end)
     end
 end

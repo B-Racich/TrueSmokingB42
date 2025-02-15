@@ -70,7 +70,7 @@ function LightSmoke:new(character)
     o.eatSound = ''
     o.eatAudio = 0
     o.maxTime = TrueSmoking.lightTime
-    
+
     setmetatable(o, self)
     self.__index = self
 

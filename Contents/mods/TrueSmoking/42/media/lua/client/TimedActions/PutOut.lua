@@ -22,7 +22,7 @@ function PutOut:start()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable("FoodType", self.item:getEatType())
-    self:setOverrideHandModels(nil, self.item)
+    -- self:setOverrideHandModels(nil, self.item)
 end
 
 function PutOut:stop()

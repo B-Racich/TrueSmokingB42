@@ -4,25 +4,43 @@ TakePuff = ISBaseTimedAction:derive("TakePuff")
 
 function TakePuff:isValid()
     --Check if we have a smoke lit
-    return self.trueSmoking.isSmoking and 
-    ((isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) or self.maxTime ~= -1)
+    return self.trueSmoking.isSmoking
+        -- and ((isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) or self.maxTime ~= -1)
 end
 
 function TakePuff:update()
+    -- Sync up the anim to remove the visualItem when the hand reaches the mouth
+    local curTime = os.time()
+    if not self.visualItemFlag then
+        if os.difftime(curTime, self.timer) > self.visualItemTimer then
+            self.trueSmoking.Smokable:removeVisualItem()
+            self.visualItemFlag = true
+            self:setOverrideHandModels(nil, self.item)
+        end
+    end
+
     -- Trigger every game update when the action is performs
     self.trueSmoking.Smokable.puffTimeMark = os.time()
-    -- This should cover if the audio got stopped
+    -- This should cover if the audio got stopped and needs to loop
     if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
-    -- Restarts audio if starting with audio playing
+    -- starts audio if starting with audio already playing
     if self.eatSound ~= '' and self.eatAudio == 0 and not self.character:getEmitter():isPlaying(self.trueSmoking.eatSound) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
 
-    -- if not (isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) then 
-    --     self.maxTime = 1
-    -- end
+    local diffTime = os.difftime(curTime, self.timer)
+    local roundedDiffTime = tonumber(string.format("%.1f", diffTime))
+    local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % 3.7))
+    print(string.format('timer: %s - roundedDiffTime: %s',roundedDiffTime, roundedDiffTimeMod))
+    if not (isKeyDown(TrueSmoking.Config.keySmoke) and not self.trueSmoking.B_HELD) and not self.endAction then
+        if roundedDiffTimeMod == 0.7 then
+            self.maxTime = 1
+            self.endAction = true
+            self:stop()
+        end
+    end
 end
 
 function TakePuff:waitToStart()
@@ -37,11 +55,12 @@ function TakePuff:waitToStart()
 end
 
 function TakePuff:start()
+    self.timer = os.time()
     -- set the anim for vanilla or modded
     local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
     self:setActionAnim(anim)
     self:setAnimVariable("FoodType", self.item:getEatType())
-    self:setOverrideHandModels(nil, self.item)
+    -- self:setOverrideHandModels(nil, self.item)
     self.trueSmoking.Smokable.puffTimeMark = os.time()
 
     --Track puff
@@ -64,18 +83,7 @@ function TakePuff:start()
     self.character:reportEvent("EventEating");
 end
 
--- function TakePuff:forceStop()
---     print('we are force stopping')
---     ISBaseTimedAction.forceStop(self)
--- end
-
--- function TakePuff:forceComplete()
---     print('we are force completing')
---     ISBaseTimedAction.forceComplete(self)
--- end
-
 function TakePuff:stop()
-    print('STOP-1')
     ISBaseTimedAction.stop(self)
 
     if TrueSmoking.Options.Coughing then
@@ -90,12 +98,12 @@ function TakePuff:stop()
             end
         end
     end
-    print('STOP-2')
-    -- self.trueSmoking.Smokable:equipVisualSmoke()
+
+    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
+    self.trueSmoking.Smokable.removedVisualItem = true
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
     self:forceComplete()
-    print('STOP-3')
 end
 
 function TakePuff:perform()
@@ -119,6 +127,9 @@ function TakePuff:new(character)
     o.eatSound = ''
     o.eatAudio = 0
     o.maxTime = -1 -- -1 means it will never finish
+    o.endAction = false
+    o.visualItemTimer = 0.7
+    o.visualItemFlag = false
 
     setmetatable(o, self)
     self.__index = self

@@ -22,8 +22,14 @@ Sandbox_EN = {
 
 
 
+    Sandbox_TrueSmoking_ManageHeadGear = "Manage Headgear",
+    Sandbox_TrueSmoking_ManageHeadGear_tooltip = "When enabled headgear that restricts smoking will need to be removed to display the smoke",
+
+
+
+
     Sandbox_TrueSmoking_SmokeRelighting = "Smoke Relighting",
-    Sandbox_TrueSmoking_SmokeRelighting_tooltip = "Option to enable relighting of the smoke if it drops below 'Minimum burn limit''",
+    Sandbox_TrueSmoking_SmokeRelighting_tooltip = "Option to enable relighting of the smoke if it drops below 'Minimum burn limit'",
 
 
 

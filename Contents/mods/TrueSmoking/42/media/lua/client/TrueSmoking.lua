@@ -21,11 +21,12 @@ TrueSmoking.Player_3 = TrueSmoking.Player_3 or {}
 TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
 function TrueSmoking:checkForMaskAndRemove(player)
+    if not TrueSmoking.Options.ManageHeadGear then return end
     local o = self:getPlayerReference(player)
     local mask = self:wearingMask(player)
     if mask then
         o.mask = mask
-        self:removeItem(player, mask, false)
+        self:removeItem(player, mask, 50)
     end
 end
 
@@ -33,7 +34,7 @@ function TrueSmoking:checkForMaskAndEquip(player)
     local o = self:getPlayerReference(player)
     local mask = o.mask
     if mask then
-        self:equipItem(player, mask, false)
+        self:equipItem(player, mask, 50)
     end
 end
 
@@ -149,7 +150,7 @@ function TrueSmoking:onKeyStartPressed(key)
             self:findSmokable(player)
         elseif o.isSmoking and key == self.Config.keyStopSmoke then
             o.Smokable:putOut()
-        elseif not o.isSmoking and key == self.Config.keyStopSmoke and o.mask then
+        elseif not o.isSmoking and key == self.Config.keyStopSmoke and o.mask and self.Options.ManageHeadGear then
             self:equipItem(player, o.mask, false)
         end
     end
@@ -243,6 +244,8 @@ Events.OnPreMapLoad.Add(function()
     TrueSmoking.Options.PuffFactor = SandboxVars.TrueSmoking.PuffFactor
     TrueSmoking.Options.RunningFactor = SandboxVars.TrueSmoking.RunningFactor
     TrueSmoking.Options.IdleFactor = SandboxVars.TrueSmoking.IdleFactor
+
+    TrueSmoking.Options.ManageHeadGear = SandboxVars.TrueSmoking.ManageHeadGear
 
     TrueSmoking.Options.SmokeRelighting = SandboxVars.TrueSmoking.SmokeRelighting
 

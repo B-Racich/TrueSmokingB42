@@ -45,8 +45,6 @@ function ISEatFoodAction:new (character, item, percentage)
     if isInList(onEat, funcsToHook) and not isInList(name, itemsToSkip) then
         print('Hooking: '..onEat..' -> '..hook)
         if not trueSmoking.isSmoking then trueSmoking.Smokable = Smokable:new(item, character) end
-        -- print(item:getReplaceOnUse())
-        -- print(name)
         item:setReplaceOnUse(nil) --nil this fields to avoid consuming the item 
         if modOnEat ~= hook then
             item:getModData().modOnEat = onEat

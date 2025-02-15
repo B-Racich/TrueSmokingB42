@@ -69,6 +69,7 @@ function Smokable:new(item, player)
     obj.smokeLit = false
     obj.burnRate = ZombRandFloat(obj.burnMin,obj.burnMax)
     obj.timeCheck = ZombRand(puffMin,puffMax)
+    obj.removedVisualItem = false
 
     --NnC vals
     obj.NnC_StiffRemoval = 15
@@ -150,22 +151,27 @@ function Smokable:getSmokeLength(item)
     return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
-function Smokable:equipVisualSmoke()
+function Smokable:equipVisualItem()
+    if not TrueSmoking.Options.ManageHeadGear then return end
     if not self.player:getWornItem('Mask') then
         print('Equip VisualItem')
         print(self.table.visualItem)
-        TrueSmoking:equipItem(self.player, self.table.visualItem, 1)
+        self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem);
+        -- TrueSmoking:equipItem(self.player, self.table.visualItem, 1)
     end
 end
 
-function Smokable:removeVisualSmoke()
+function Smokable:removeVisualItem()
+    if not TrueSmoking.Options.ManageHeadGear then return end
     if self.table.visualItem and self.player:getWornItem('Mask') == self.table.visualItem then
         print('Remove VisualItem')
-        TrueSmoking:removeItem(self.player, self.table.visualItem, 1)
+        self.player:removeWornItem(self.table.visualItem)
+        -- TrueSmoking:removeItem(self.player, self.table.visualItem, 1)
     end
 end
 
-function Smokable:getVisualSmoke()
+function Smokable:getVisualItem()
+    if not TrueSmoking.Options.ManageHeadGear then return false end
     if self.item and not self.table.visualItem then
         local items = {
             ['Cigarette'] = 'Hat_Cigarette'
@@ -176,7 +182,8 @@ function Smokable:getVisualSmoke()
             -- self.table.visualItem = instanceItem(items[itemName])
             -- print(self.table.visualItem)
             print('Add VisualItem')
-            return self.player:getInventory():AddItem(items[itemName])
+            -- return self.player:getInventory():AddItem(items[itemName])
+            return instanceItem(items[itemName])
         else
             return false
         end
@@ -209,8 +216,8 @@ function Smokable:light()
             self.burnRate = ZombRandFloat(self.burnMin, self.burnMax)
         end
 
-        self.table.visualItem = self:getVisualSmoke()
-        self:equipVisualSmoke()
+        self.table.visualItem = self:getVisualItem()
+        self:equipVisualItem()
     end
 end
 
@@ -238,8 +245,10 @@ function Smokable:putOut()
         addOnUseItem()
     end
 
-    self:removeVisualSmoke()
-    self.player:getInventory():Remove(self.table.visualItem)
+    self:removeVisualItem()
+    if self.table.visualItem and self.player:getInventory():contains(self.table.visualItem) then
+        self.player:getInventory():Remove(self.table.visualItem)
+    end
     self.table.visualItem = false
     print('Delete VisualItem')
     TrueSmoking:checkForMaskAndEquip(self.player)
@@ -249,11 +258,12 @@ end
 
 --Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
 function Smokable:update()
-    --If smoke is lit update burnRate
-    if not self.table.takingPuff then
-        self:equipVisualSmoke()
-    end
+    -- if not self.table.takingPuff and self.removedVisualItem then
+    --     self:equipVisualSmoke()
+    --     self.removedVisualItem = false
+    -- end
 
+    --If smoke is lit update burnRate
     if self.smokeLit then
         --Try to take idle puff before calculate burn changes
         self:idlePuff()
@@ -302,8 +312,9 @@ end
 
 --Manual puff action while smokeKey is held
 function Smokable:puff()
-    self:removeVisualSmoke()
+    -- self:removeVisualSmoke()
     ISTimedActionQueue.add(TakePuff:new(self.player))
+    -- self:equipVisualSmoke()
 end
 
 --Passive puff action triggered by PassiveSmoking
@@ -311,11 +322,12 @@ function Smokable:idlePuff()
     local timeDiff = os.difftime(os.time(), self.puffTimeMark)
 
     if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
-        self:removeVisualSmoke()
         local puff = TakePuff:new(self.player)
         puff.maxTime = 180
         self.puffTimeMark = os.time()
+        self:removeVisualItem()
         ISTimedActionQueue.add(puff)
+        self:equipVisualItem()
         self.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
     end
 end
