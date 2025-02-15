@@ -36,19 +36,11 @@ function ISEatFoodAction:new (character, item, percentage)
     --Store the original action to return it if we don't need to hook it
     o = originalActionNew(self, character, item, percentage)
 
-    local trueSmoking
-    local num = character:getPlayerNum()
-    if num == 0 then
-         trueSmoking = TrueSmoking.Player_1
-    elseif num == 1 then
-        trueSmoking = TrueSmoking.Player_2
-    elseif num == 2 then
-        trueSmoking = TrueSmoking.Player_3
-    else
-        trueSmoking = TrueSmoking.Player_4
-    end
+    local trueSmoking = TrueSmoking:getPlayerReference(character)
     o.trueSmoking = trueSmoking
 
+    trueSmoking.mask = false
+    TrueSmoking:checkForMaskAndRemove(character)
 
     if isInList(onEat, funcsToHook) and not isInList(name, itemsToSkip) then
         print('Hooking: '..onEat..' -> '..hook)
@@ -115,17 +107,8 @@ end
 function OnEat_Hook(food, character, percent)
     --Deprecate this for now, we don't need to be calling the original code
     -- OnEat_Original(food, character, percent)
-    local trueSmoking
+    local trueSmoking = TrueSmoking:getPlayerReference(character)
     local num = character:getPlayerNum()
-    if num == 0 then
-         trueSmoking = TrueSmoking.Player_1
-    elseif num == 1 then
-        trueSmoking = TrueSmoking.Player_2
-    elseif num == 2 then
-        trueSmoking = TrueSmoking.Player_3
-    else
-        trueSmoking = TrueSmoking.Player_4
-    end
 
     trueSmoking.Smokable:light()
 end

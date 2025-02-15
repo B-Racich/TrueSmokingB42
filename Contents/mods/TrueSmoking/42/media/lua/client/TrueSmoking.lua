@@ -20,6 +20,74 @@ TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
 TrueSmoking.Player_3 = TrueSmoking.Player_3 or {}
 TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
+function TrueSmoking:checkForMaskAndRemove(player)
+    local o = self:getPlayerReference(player)
+    -- if TrueSmoking.Options.RemoveHeadWear then
+    local mask = self:wearingMask(player)
+    if mask then
+        o.mask = mask
+        self:removeItem(player, mask, false)
+    end
+    -- end
+end
+
+function TrueSmoking:checkForMaskAndEquip(player)
+    local o = self:getPlayerReference(player)
+    -- if TrueSmoking.Options.RemoveHeadWear then
+    local mask = o.mask
+    if mask then
+        self:equipItem(player, mask, false)
+    end
+    -- end
+end
+
+function TrueSmoking:wearingMask(player)
+    local o = self:getPlayerReference(player)
+    local items = {}
+    items['Mask'] = player:getWornItem('Mask') or ''
+    items['MaskEyes'] = player:getWornItem('MaskEyes') or ''
+    items['FullHat'] = player:getWornItem('FullHat') or ''
+    items['MaskFull'] = player:getWornItem('MaskFull') or ''
+    items['Hat'] = player:getWornItem('Hat') or ''
+    items['Neck'] = player:getWornItem('Neck') or ''
+    for _, item in pairs(items) do
+        if item ~= '' and not item:getTags():contains('CanEat') then
+            print(item)
+            return item
+        end
+    end
+    return nil
+end
+
+function TrueSmoking:removeItem(player, item, instant)
+    local o = self:getPlayerReference(player)
+    local time = instant and 1 or 50
+    ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
+end
+
+function TrueSmoking:equipItem(player, item, instant)
+    local o = self:getPlayerReference(player)
+    local time = instant and 1 or 50
+    ISTimedActionQueue.add(ISWearClothing:new(player, item, time))
+end
+
+function TrueSmoking:getPlayerReference(player)
+    local num = player
+    if type(player) ~= 'number' then
+        num = player:getPlayerNum()
+    end
+
+    if num == 0 then
+        return self.Player_1
+    elseif num == 1 then
+        return self.Player_2
+    elseif num == 2 then
+        return self.Player_3
+    elseif num == 3 then
+        return self.Player_4
+    end
+end
+
 --Calls the crafting recipe from the item
 function TrueSmoking:useRecipe(item, player, recipeString)
     local containers = ISInventoryPaneContextMenu.getContainers(player)
@@ -90,6 +158,8 @@ function TrueSmoking:onKeyStartPressed(key)
             self:findSmokable(player)
         elseif o.isSmoking and key == self.Config.keyStopSmoke then
             o.Smokable:putOut()
+        elseif not o.isSmoking and key == self.Config.keyStopSmoke and o.mask then
+            self:equipItem(player, o.mask, false)
         end
     end
 end
@@ -110,16 +180,7 @@ TrueSmoking.ISButtonPrompt.getBestBButtonAction = ISButtonPrompt.getBestBButtonA
 function ISButtonPrompt:onJoypadButtonReleased(button)
     TrueSmoking.ISButtonPrompt.onJoypadButtonReleased(self, button)
 
-    local o
-    if self.player == 0 then
-        o = TrueSmoking.Player_1
-    elseif self.player == 1 then
-        o = TrueSmoking.Player_2
-    elseif self.player == 2 then
-        o = TrueSmoking.Player_3
-    else
-        o = TrueSmoking.Player_4
-    end
+    local o = TrueSmoking:getPlayerReference(self.player)
 
     if button == 4 then
         o.LB_HELD = false
@@ -132,16 +193,7 @@ end
 function ISButtonPrompt:onLBPress()
     TrueSmoking.ISButtonPrompt.onLBPress(self)
 
-    local o
-    if self.player == 0 then
-        o = TrueSmoking.Player_1
-    elseif self.player == 1 then
-        o = TrueSmoking.Player_2
-    elseif self.player == 2 then
-        o = TrueSmoking.Player_3
-    else
-        o = TrueSmoking.Player_4
-    end
+    local o = TrueSmoking:getPlayerReference(self.player)
 
     o.LB_HELD = true
 end
@@ -149,16 +201,7 @@ end
 function ISButtonPrompt:onBPress()
     TrueSmoking.ISButtonPrompt.onBPress(self)
 
-    local o
-    if self.player == 0 then
-        o = TrueSmoking.Player_1
-    elseif self.player == 1 then
-        o = TrueSmoking.Player_2
-    elseif self.player == 2 then
-        o = TrueSmoking.Player_3
-    else
-        o = TrueSmoking.Player_4
-    end
+    local o = TrueSmoking:getPlayerReference(self.player)
 
     o.B_HELD = true
 end
@@ -177,16 +220,7 @@ function ISButtonPrompt:getBestBButtonAction(dir)
 
     if self.bPrompt and not (self.bPrompt:find(grab) or self.bPrompt:find(drop)) then return end
 
-    local o
-    if self.player == 0 then
-        o = TrueSmoking.Player_1
-    elseif self.player == 1 then
-        o = TrueSmoking.Player_2
-    elseif self.player == 2 then
-        o = TrueSmoking.Player_3
-    else
-        o = TrueSmoking.Player_4
-    end
+    local o = TrueSmoking:getPlayerReference(player)
 
     if o.isSmoking and o.Smokable.smokeLit and not o.LB_HELD then
         self:setBPrompt(getText("UI_TRUESMOKING_PUFF"), function() o.Smokable:puff() end)
@@ -205,16 +239,7 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         local item = v
         local hasSmoke = nil
 
-        local o
-        if player == 0 then
-            o = self.Player_1
-        elseif player == 1 then
-            o = self.Player_2
-        elseif player == 2 then
-            o = self.Player_3
-        else
-            o = self.Player_4
-        end
+        local o = self:getPlayerReference(player)
 
         if not instanceof(v, 'InventoryItem') then item = v.items[1] end
 
@@ -232,16 +257,7 @@ end
 
 --Start our event listerns on player load
 function TrueSmoking:start(playerNum, player)
-    local o
-    if playerNum == 0 then
-        o = self.Player_1
-    elseif playerNum == 1 then
-        o = self.Player_2
-    elseif playerNum == 2 then
-        o = self.Player_3
-    else
-        o = self.Player_4
-    end
+    local o = self:getPlayerReference(player)
     o.Moodle = SmokingMoodle:new(o, playerNum)
     o.eatSound = ''
     o.lightingEatSound = ''
@@ -267,16 +283,7 @@ end
 
 --Stop our event listeners on player death
 function TrueSmoking:stop(playerNum, player)
-    local o
-    if playerNum == 0 then
-        o = self.Player_1
-    elseif playerNum == 1 then
-        o = self.Player_2
-    elseif playerNum == 2 then
-        o = self.Player_3
-    else
-        o = self.Player_4
-    end
+    local o = self:getPlayerReference(player)
 
     o.Moodle:stop()
     if o.Smokable then

@@ -24,16 +24,7 @@ function Smokable:new(item, player)
 
     obj.player = player
 
-    local num = player:getPlayerNum()
-    if num == 0 then
-        obj.table = TrueSmoking.Player_1
-    elseif num == 1 then
-        obj.table = TrueSmoking.Player_2
-    elseif num == 2 then
-        obj.table = TrueSmoking.Player_3
-    else
-        obj.table = TrueSmoking.Player_4
-    end
+    obj.table = TrueSmoking:getPlayerReference(player)
 
     obj.item = item
     obj.onEat = item:getOnEat() or ''
@@ -159,22 +150,6 @@ function Smokable:getSmokeLength(item)
     return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
-Smokable.originalAct = ISWearClothing.new
-
-function ISWearClothing:new(character, item)
-	local o = ISBaseTimedAction.new(self, character);
-	o.item = item;
-	o.maxTime = o:getDuration();
-	o.fromHotbar = true; -- just to disable hotbar:update() during the wearing
-	o.clothingAction = true;
-
-    if item:getClothingItem() == 'Hat_Cigarette' then
-        o.maxTime = 0
-        o.clothingAction = false
-    end
-	return o;
-end
-
 --Start smoking and light the smokable
 function Smokable:light()
     if not self.table.isSmoking then
@@ -202,8 +177,8 @@ function Smokable:light()
         end
 
         --Some placeholder for when we figure out displaying smokables
-        self.smokeItem = self.player:getInventory():AddItem('Hat_Cigarette')
-        ISTimedActionQueue.add(ISWearClothing:new(self.player, self.smokeItem))
+        -- self.smokeItem = self.player:getInventory():AddItem('Hat_Cigarette')
+        -- ISTimedActionQueue.add(ISWearClothing:new(self.player, self.smokeItem))
 
         -- self.smokeItem = getItem('Hat_Cigarette')
         -- ISInventoryPaneContextMenu.wearItem(self.smokeItem, self.player:getPlayerNum())
@@ -218,8 +193,6 @@ function Smokable:putOut()
     -- if self.TrueSmoking.isSmoking then
     --     ISTimedActionQueue.add(PutOut:new(getPlayer()))
     -- end
-
-    ISInventoryPaneContextMenu.unequipItem(self.smokeItem, self.player:getPlayerNum())
 
     self.table.isSmoking = false
     self.table.takingPuff = false
@@ -236,6 +209,10 @@ function Smokable:putOut()
     if onUse and onUse ~= '' then
         -- print("Calling on use")
         addOnUseItem()
+    end
+
+    if self.table.mask then
+        TrueSmoking:checkForMaskAndEquip(self.player)
     end
 
     self.item = {}  --clear item for safety.
