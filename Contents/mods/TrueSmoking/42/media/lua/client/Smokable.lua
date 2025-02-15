@@ -176,14 +176,8 @@ function Smokable:light()
             self.burnRate = ZombRandFloat(self.burnMin, self.burnMax)
         end
 
-        --Some placeholder for when we figure out displaying smokables
-        -- self.smokeItem = self.player:getInventory():AddItem('Hat_Cigarette')
-        -- ISTimedActionQueue.add(ISWearClothing:new(self.player, self.smokeItem))
-
-        -- self.smokeItem = getItem('Hat_Cigarette')
-        -- ISInventoryPaneContextMenu.wearItem(self.smokeItem, self.player:getPlayerNum())
-        -- getPlayer():setWornItem("Mask", self.item)
-        -- getPlayer():setWornItem("MakeUp_Lips", self.item)
+        self.table.visualItem = self.player:getInventory():AddItem('Hat_Cigarette')
+        TrueSmoking:equipItem(self.player, self.table.visualItem, true)
     end
 end
 
@@ -212,6 +206,8 @@ function Smokable:putOut()
     end
 
     if self.table.mask then
+        TrueSmoking:removeItem(self.player, self.table.visualItem, true)
+        self.player:getInventory():removeItem(self.table.visualItem)
         TrueSmoking:checkForMaskAndEquip(self.player)
     end
 
@@ -270,6 +266,7 @@ end
 --Manual puff action while smokeKey is held
 function Smokable:puff()
     if self.smokeLength-self.burnRate > 0 then
+        TrueSmoking:removeItem(self.player, self.table.visualItem, true)
         ISTimedActionQueue.add(TakePuff:new(self.player))
     end
 end

@@ -33,6 +33,7 @@ function TakePuff:waitToStart()
 end
 
 function TakePuff:start()
+    self.timer = os.time()
     -- --Set the animation
     local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
     self:setActionAnim(anim)
@@ -77,6 +78,9 @@ function TakePuff:stop()
             end
         end
     end
+
+    print('add ciggy back')
+    TrueSmoking:equipItem(self.character, self.trueSmoking.visualItem, true)
 end
 
 function TakePuff:perform()
@@ -100,6 +104,8 @@ function TakePuff:new(character)
 
     o.eatSound = ''
     o.eatAudio = 0
+
+    o.removedForPuff = false
 
     setmetatable(o, self)
     self.__index = self

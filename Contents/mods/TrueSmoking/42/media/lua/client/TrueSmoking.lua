@@ -22,23 +22,19 @@ TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
 function TrueSmoking:checkForMaskAndRemove(player)
     local o = self:getPlayerReference(player)
-    -- if TrueSmoking.Options.RemoveHeadWear then
     local mask = self:wearingMask(player)
     if mask then
         o.mask = mask
         self:removeItem(player, mask, false)
     end
-    -- end
 end
 
 function TrueSmoking:checkForMaskAndEquip(player)
     local o = self:getPlayerReference(player)
-    -- if TrueSmoking.Options.RemoveHeadWear then
     local mask = o.mask
     if mask then
         self:equipItem(player, mask, false)
     end
-    -- end
 end
 
 function TrueSmoking:wearingMask(player)
@@ -68,7 +64,7 @@ end
 function TrueSmoking:equipItem(player, item, instant)
     local o = self:getPlayerReference(player)
     local time = instant and 1 or 50
-    ISTimedActionQueue.add(ISWearClothing:new(player, item, time))
+    ISTimedActionQueue.add(ISWearClothing:new(player, item))
 end
 
 function TrueSmoking:getPlayerReference(player)
@@ -115,13 +111,13 @@ function TrueSmoking:findSmokable(player)
     end
 end
 
---Predicate to check if the item has uses (lighters, matches, etc)
-local function predicateNotEmpty(item)
-    return item:getCurrentUsesFloat() > 0
-end
-
 --Checks if the player has a lightable item (lighter, matches, etc)
 function TrueSmoking:hasLightable(item, player)
+    --Predicate to check if the item has uses (lighters, matches, etc)
+    local function predicateNotEmpty(item)
+        return item:getCurrentUsesFloat() > 0
+    end
+
     local found = false;
     if item:hasTag("Smokable") and player:getVehicle() and player:getVehicle():canLightSmoke(player) then found = true end
     if item:hasTag("Smokable") and not found then
@@ -164,75 +160,6 @@ function TrueSmoking:onKeyStartPressed(key)
     end
 end
 
---[[
-    Controller Support begins here, everything is bound to B/O but we listen for LB presses and button releases
-    to flag when buttons are held, LB is used as a modifer key. Store the original functions and call them first to ensure vanilla
-    functionality takes priority
-
-    This could be configured through a combo box and options later.
-]]
-TrueSmoking.ISButtonPrompt = TrueSmoking.ISButtonPrompt or {}
-TrueSmoking.ISButtonPrompt.onJoypadButtonReleased = ISButtonPrompt.onJoypadButtonReleased
-TrueSmoking.ISButtonPrompt.onLBPress = ISButtonPrompt.onLBPress
-TrueSmoking.ISButtonPrompt.onBPress = ISButtonPrompt.onBPress
-TrueSmoking.ISButtonPrompt.getBestBButtonAction = ISButtonPrompt.getBestBButtonAction
-
-function ISButtonPrompt:onJoypadButtonReleased(button)
-    TrueSmoking.ISButtonPrompt.onJoypadButtonReleased(self, button)
-
-    local o = TrueSmoking:getPlayerReference(self.player)
-
-    if button == 4 then
-        o.LB_HELD = false
-    elseif button == 1 then
-        o.B_HELD = false
-    end
-    -- print(string.format('Button released - %s',button))
-end
-
-function ISButtonPrompt:onLBPress()
-    TrueSmoking.ISButtonPrompt.onLBPress(self)
-
-    local o = TrueSmoking:getPlayerReference(self.player)
-
-    o.LB_HELD = true
-end
-
-function ISButtonPrompt:onBPress()
-    TrueSmoking.ISButtonPrompt.onBPress(self)
-
-    local o = TrueSmoking:getPlayerReference(self.player)
-
-    o.B_HELD = true
-end
-
-function ISButtonPrompt:getBestBButtonAction(dir)
-    TrueSmoking.ISButtonPrompt.getBestBButtonAction(self, dir)
-
-    local grab = getText("UI_GrabAndDrop_GrabAction")
-    local drop = getText("UI_GrabAndDrop_DropAction")
-
-    local player = self.player and getSpecificPlayer(self.player)
-
-    local square = player and player:getSquare()
-
-    if not square then return end -- Possibly teleporting.
-
-    if self.bPrompt and not (self.bPrompt:find(grab) or self.bPrompt:find(drop)) then return end
-
-    local o = TrueSmoking:getPlayerReference(player)
-
-    if o.isSmoking and o.Smokable.smokeLit and not o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_PUFF"), function() o.Smokable:puff() end)
-    elseif o.isSmoking and not o.Smokable.smokeLit and not o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_RELIGHT"), function() o.Smokable:light() end)
-    elseif TrueSmoking.Config.FindSmoke and not o.isSmoking and o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_GET_SMOKE"), function() TrueSmoking:findSmokable(player) end)
-    elseif o.isSmoking and o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_PUT_OUT"), function() o.Smokable:putOut() end)
-    end
-end
-
 --Hook into context menu for Smokable objects and toggle the Smoke option when Smoking
 function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     for i, v in ipairs(items) do
@@ -262,7 +189,8 @@ function TrueSmoking:start(playerNum, player)
     o.eatSound = ''
     o.lightingEatSound = ''
 
-    self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 350 or 180
+    -- self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 350 or 180
+    self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 350 or 220
 
     --Start the update event
     local function keyWrapper(key)
