@@ -56,7 +56,7 @@ function PutOut:complete()
 
     local onUse = self.trueSmoking.Smokable.replaceOnUse
     if onUse and onUse ~= '' then
-        addOnUseItem()
+        addOnUseItem(self.character)
     end
 
     -- self:removeVisualItem()

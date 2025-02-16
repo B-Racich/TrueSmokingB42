@@ -18,6 +18,10 @@ function ISEatFoodAction:new (character, item, percentage)
     local name = item:getFullType() or ''
     local hook = 'OnEat_Hook'
     local hasSmokableTag = item:getTags():contains('Smokable')
+    local funcsToHook = {'OnEat_Cigarettes','OnEat_Cigarillo','OnEat_Cigar',
+    'OnEat_WeedSmoke','OnEat_WeedJoint','OnEat_WeedPipe'}
+    local itemsToSkip = {}
+    local hook = 'OnEat_Hook'
 
     --Store the original action to return it if we don't need to hook it
     o = originalActionNew(self, character, item, percentage)
@@ -28,8 +32,8 @@ function ISEatFoodAction:new (character, item, percentage)
     trueSmoking.mask = false
     TrueSmoking:checkForMaskAndRemove(character)
 
-    if hasSmokableTag then
-        print('Hooking: '..name)
+    if isInList(onEat, funcsToHook) and not isInList(name, itemsToSkip) or hasSmokableTag then
+        print('Hooking: '..onEat..' -> '..hook)
         if not trueSmoking.isSmoking then trueSmoking.Smokable = Smokable:new(item, character) end
         item:setReplaceOnUse(nil) --nil this fields to avoid consuming the item 
         if modOnEat ~= hook then

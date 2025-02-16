@@ -6,10 +6,10 @@ function isInList(str, list)
     return string.find(listString, str) ~= nil
 end
 
-function addOnUseItem()
-    local player = getPlayer()
-    local type = TrueSmoking.Smokable.item:getFullType()
-    local item = TrueSmoking.Smokable.replaceOnUse
+function addOnUseItem(player)
+    local trueSmoking = TrueSmoking:getPlayerReference(player)
+    local type = trueSmoking.Smokable.item:getFullType()
+    local item = trueSmoking.Smokable.replaceOnUse
     local base = type:match("^[^.]+")
     if base then
         local str = base..'.'..item

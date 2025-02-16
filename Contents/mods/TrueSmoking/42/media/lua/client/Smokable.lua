@@ -168,9 +168,13 @@ function Smokable:getVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return false end
     if self.item and not self.table.visualItem then
         local items = {
-            ['Cigarette'] = 'Hat_Cigarette'
+            ['Cigarette'] = 'Mask_Cigarette',
+            ['Cheroot'] = 'Mask_Cigarillo',
+            ['Cigar'] = 'Mask_Cigar',
+            ['Smoking Pipe with Tobacco'] = 'Mask_Pipe'
         }
         local itemName = self.item:getDisplayName()
+        print(string.format('Item Display Name: %s',itemName))
 
         if items[itemName] then
             return instanceItem(items[itemName])

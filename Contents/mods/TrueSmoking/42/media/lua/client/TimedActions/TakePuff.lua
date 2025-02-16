@@ -34,8 +34,8 @@ function TakePuff:update()
         local diffTime = os.difftime(curTime, self.timer)
         local roundedDiffTime = tonumber(string.format("%.1f", diffTime))
         local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % self.visualItemAnimLength))
-        -- print(string.format('timer: %s - roundedDiffTime: %s',roundedDiffTime, roundedDiffTimeMod))
-        if roundedDiffTimeMod == self.visualItemTimer then
+        -- print(string.format('timer: %s - roundedDiffTime: %s - roundedDiffTimeMod: %s',self.timer, roundedDiffTime, roundedDiffTimeMod))
+        if roundedDiffTime > self.visualItemTimer and roundedDiffTimeMod == self.visualItemTimer then
             self.maxTime = 1
             self.endAction = true
             self:stop()
