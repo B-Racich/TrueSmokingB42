@@ -46,7 +46,7 @@ option TrueSmoking.ManageHeadGear
 {
     type = boolean,
     default = true,
-    page = TrueSmoking, translation=TrueSmoking_ManageHeadGear
+    page = TrueSmoking, translation=TrueSmoking_ManageHeadGear,
 }
 
 

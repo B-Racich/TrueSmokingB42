@@ -23,11 +23,7 @@ function LightSmoke:start()
     local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
     self:setActionAnim(anim)
     self:setAnimVariable("FoodType", self.item:getEatType())
-    self:setOverrideHandModels(nil, self.item)
-
-    --Track puff
-    self.trueSmoking.takingPuff = true
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
+    -- self:setOverrideHandModels(nil, self.item)
 
     -- Play custom sound when no sound is playing
     if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
@@ -44,15 +40,11 @@ function LightSmoke:start()
 end
 
 function LightSmoke:stop()
-    self.trueSmoking.takingPuff = false
-    self:forceComplete()
     ISBaseTimedAction.stop(self)
+    self:forceComplete()
 end
 
 function LightSmoke:perform()
-    --Track puff
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
     ISBaseTimedAction.perform(self)
 end
 
@@ -69,7 +61,7 @@ function LightSmoke:new(character)
     o.item = o.trueSmoking.Smokable.item
     o.eatSound = ''
     o.eatAudio = 0
-    o.maxTime = TrueSmoking.lightTime
+    o.maxTime = 120
 
     setmetatable(o, self)
     self.__index = self

@@ -205,6 +205,11 @@ function Smokable:light()
         end
         Events.OnTick.Add(updateWrapper)
         self.updateWrapper = updateWrapper
+
+        if self.smokeLength == self.originalSmokeLength then
+            self.table.visualItem = self:getVisualItem()
+            self:equipVisualItem()
+        end
     end
     if not self.smokeLit then
         --Allows relighting of smoke but lets the native call run first time
@@ -218,9 +223,6 @@ function Smokable:light()
         if self.burnRate == 0 then
             self.burnRate = ZombRandFloat(self.burnMin, self.burnMax)
         end
-
-        self.table.visualItem = self:getVisualItem()
-        self:equipVisualItem()
     end
 end
 
@@ -293,7 +295,7 @@ function Smokable:idlePuff()
 
     if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
         local puff = TakePuff:new(self.player)
-        puff.maxTime = 180
+        puff.maxTime = 220
         self.puffTimeMark = os.time()
         ISTimedActionQueue.add(puff)
         self.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
