@@ -30,6 +30,7 @@ function Smokable:new(item, player)
     obj.item = item
     obj.onEat = item:getOnEat() or ''
     obj.replaceOnUse = item:getReplaceOnUse() or ''
+    obj.fullType = item:getFullType() or ''
 
     obj.stress = item:getStressChange() or -5
     obj.originalStress = obj.stress
@@ -129,9 +130,8 @@ function Smokable:getSmokeLength(item)
     if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
 
     -- 2. if an item has smokeLength set use that
-    local fullType = self.item:getFullType()
     for index, value in ipairs(TrueSmoking.Mods.SmokeLengths) do
-        if fullType == index then
+        if self.fullType == index then
             return value
         end
     end
@@ -179,9 +179,8 @@ function Smokable:getVisualItem()
         local itemName = self.item:getDisplayName()
         -- print(string.format('Item Display Name: %s',itemName))
 
-        local fullType = self.item:getFullType()
         for index, value in ipairs(TrueSmoking.Mods.SmokeLengths) do
-            if fullType == index then
+            if self.fullType == index then
                 return instanceItem(value)
             end
         end
