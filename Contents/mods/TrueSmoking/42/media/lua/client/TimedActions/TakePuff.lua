@@ -65,10 +65,10 @@ function TakePuff:start()
     --Track puff
     self.trueSmoking.takingPuff = true
 
-    --untested!!! just x2 the value for 1/2 the anim speed??
+    --2x for 1/2 speed anim
     if anim == 'Smoke_Quiet' then
-        self.visualItemTimer = 1.4
-        self.visualItemAnimLength = 7.4
+        self.visualItemTimer = self.visualItemTimer*2
+        self.visualItemAnimLength = self.visualItemAnimLength*2
     end
 
     -- TODO base this off of anim instead for future expansion
@@ -102,6 +102,10 @@ function TakePuff:stop()
                 self.character:triggerCough()
             end
         end
+    end
+
+    if self.character:getEmitter():isPlaying(self.eatSound) then
+        self.character:getEmitter():stopSound(self.eatAudio)
     end
 
     self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
