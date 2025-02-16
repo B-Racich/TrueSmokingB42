@@ -14,7 +14,13 @@ function PutOut:update()
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
             self.trueSmoking.Smokable:removeVisualItem()
             self.visualItemFlag = true
-            self:setOverrideHandModels(nil, self.item)
+            local hasPrimary = self.character:getPrimaryHandItem() and self.character:getPrimaryHandItem():getStaticModel() or nil
+            if hasPrimary then
+                self:setOverrideHandModels(hasPrimary, self.item)
+            else
+                self:setOverrideHandModels(nil, self.item)
+            end
+            -- self:setOverrideHandModels(self.character:getPrimaryHandItem():getStaticModel(), self.item)
         end
     end
 end

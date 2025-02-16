@@ -155,7 +155,7 @@ end
 
 function Smokable:equipVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
-    if not self.player:getWornItem('Mask') then
+    if not self.player:getWornItem('Mask') and self.table.visualItem then
         self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem);
     end
 end

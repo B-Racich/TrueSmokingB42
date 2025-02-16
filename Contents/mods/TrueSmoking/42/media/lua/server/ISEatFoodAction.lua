@@ -4,6 +4,7 @@ local originalActionNew = ISEatFoodAction.new
 local originalActionIsValid = ISEatFoodAction.isValid
 local originalActionStop = ISEatFoodAction.stop
 local originalActionPerform = ISEatFoodAction.perform
+local originalActionStart = ISEatFoodAction.start
 
 --[[
     This file hooks the foodAction and houses on custom OnEat methods, here the Smokable object is created and stored into
@@ -87,5 +88,17 @@ function ISEatFoodAction:perform()
         ISBaseTimedAction.perform(self);
     else
         originalActionPerform(self)
+    end
+end
+
+function ISEatFoodAction:start()
+    originalActionStart(self)
+    if self.item:getOnEat() == 'OnEat_Hook' then
+        local hasPrimary = self.character:getPrimaryHandItem() and self.character:getPrimaryHandItem():getStaticModel() or nil
+        if hasPrimary then
+            self:setOverrideHandModels(hasPrimary, self.item)
+        else
+            self:setOverrideHandModels(nil, self.item)
+        end
     end
 end
