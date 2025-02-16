@@ -74,7 +74,6 @@ function TrueSmoking:wearingMask(player)
     items['Neck'] = player:getWornItem('Neck') or ''
     for _, item in pairs(items) do
         if item ~= '' and not item:getTags():contains('CanEat') then
-            print(item)
             return item
         end
     end

@@ -14,7 +14,6 @@ function ISWearClothing:complete()
     if self.item == o.mask then
         o.mask = false
     end
-    print('Inside Wear-complete')
     return rtn
 end
 
@@ -25,6 +24,5 @@ TrueSmoking.ISWearClothing.new = ISWearClothing.new
 function ISWearClothing:new(character, item, time)
     local o = TrueSmoking.ISWearClothing.new(self, character, item)
     if time then o.maxTime = time end
-    print('Inside Wear-New')
     return o
 end
