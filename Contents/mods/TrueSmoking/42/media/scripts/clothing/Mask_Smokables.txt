@@ -13,6 +13,7 @@ module Base
         WindResistance = 0.0,
         Weight = 0.0,
 		WorldStaticModel = Cigarette_Ground,
+		Tags = CanEat,
     }
 	item Mask_Pipe
     {
@@ -27,6 +28,7 @@ module Base
         WindResistance = 0.0,
         Weight = 0.0,
 		WorldStaticModel = Pipe_ground,
+		Tags = CanEat,
     }
 	item Mask_Cigarillo
     {
@@ -41,6 +43,7 @@ module Base
         WindResistance = 0.0,
         Weight = 0.0,
 		WorldStaticModel = Cigarette_Ground,
+		Tags = CanEat,
     }
 	item Mask_Cigar
     {
@@ -55,5 +58,6 @@ module Base
         WindResistance = 0.0,
         Weight = 0.0,
 		WorldStaticModel = Cigarette_Ground,
+		Tags = CanEat,
     }
 }
