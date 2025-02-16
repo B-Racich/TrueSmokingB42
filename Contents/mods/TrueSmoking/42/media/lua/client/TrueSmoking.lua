@@ -13,6 +13,9 @@ require 'SmokingMoodle'
 TrueSmoking = TrueSmoking or {}
 TrueSmoking.__index = TrueSmoking
 TrueSmoking.Options = TrueSmoking.Options or {}
+TrueSmoking.Mods = TrueSmoking.Mods or {}
+TrueSmoking.Mods.VisualItems = TrueSmoking.Mods.VisualItems or {}
+TrueSmoking.Mods.SmokeLengths = TrueSmoking.Mods.SmokeLengths or {}
 TrueSmoking.Config = require 'ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
@@ -20,6 +23,29 @@ TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
 TrueSmoking.Player_3 = TrueSmoking.Player_3 or {}
 TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
+--[[
+    For modders use this to set smoke lengths on your smokables
+    { [item:getFullType()] = <Smoke Length> }
+    ex. { ['CigaretteSingle'] = 1.5 }
+]]
+function TrueSmoking:setModdedSmokeLengths(table)
+    for index, value in ipairs(table) do
+        self.Mods.SmokeLengths[index] = value
+    end
+end
+
+--[[
+    For modders use this to set visualItems for your smokables
+    { [item:getFullType()] = <Name of item> }
+    ex. { ['CigaretteSingle'] = 'Mask_Cigarette' }
+]]
+function TrueSmoking:setModdedVisualItems(table)
+    for index, value in ipairs(table) do
+        self.Mods.VisualItems[index] = value
+    end
+end
+
+--Mask helper functions
 function TrueSmoking:checkForMaskAndRemove(player)
     if not TrueSmoking.Options.ManageHeadGear then return end
     local o = self:getPlayerReference(player)
@@ -55,6 +81,7 @@ function TrueSmoking:wearingMask(player)
     return false
 end
 
+--Wrappers for mask actions
 function TrueSmoking:removeItem(player, item, time)
     ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
 end

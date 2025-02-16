@@ -129,8 +129,11 @@ function Smokable:getSmokeLength(item)
     if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
 
     -- 2. if an item has smokeLength set use that
-    if item:getModData().smokeLength and item:getModData().smokeLength > 0 then
-        return item:getModData().smokeLength
+    local fullType = self.item:getFullType()
+    for index, value in ipairs(TrueSmoking.Mods.SmokeLengths) do
+        if fullType == index then
+            return value
+        end
     end
 
     -- 3. check our lists for predefined values (sandbox/hard coded)
@@ -174,7 +177,14 @@ function Smokable:getVisualItem()
             ['Smoking Pipe with Tobacco'] = 'Mask_Pipe'
         }
         local itemName = self.item:getDisplayName()
-        print(string.format('Item Display Name: %s',itemName))
+        -- print(string.format('Item Display Name: %s',itemName))
+
+        local fullType = self.item:getFullType()
+        for index, value in ipairs(TrueSmoking.Mods.SmokeLengths) do
+            if fullType == index then
+                return instanceItem(value)
+            end
+        end
 
         if items[itemName] then
             return instanceItem(items[itemName])
