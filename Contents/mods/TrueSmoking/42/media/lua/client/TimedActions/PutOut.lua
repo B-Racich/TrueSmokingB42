@@ -4,11 +4,19 @@ PutOut = ISBaseTimedAction:derive("PutOut")
 
 function PutOut:isValid()
     --Check if we have a smoke lit
-    return TrueSmoking.isSmoking
+    return self.trueSmoking.isSmoking
 end
 
 function PutOut:update()
     -- Trigger every game update when the action is performs
+    local curTime = os.time()
+    if not self.visualItemFlag then
+        if os.difftime(curTime, self.timer) > self.visualItemTimer then
+            self.trueSmoking.Smokable:removeVisualItem()
+            self.visualItemFlag = true
+            self:setOverrideHandModels(nil, self.item)
+        end
+    end
 end
 
 function PutOut:waitToStart()
@@ -19,6 +27,7 @@ function PutOut:waitToStart()
 end
 
 function PutOut:start()
+    self.timer = os.time()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable("FoodType", self.item:getEatType())
@@ -26,29 +35,59 @@ function PutOut:start()
 end
 
 function PutOut:stop()
-    TrueSmoking.takingPuff = false
-    self:forceComplete()
     ISBaseTimedAction.stop(self)
-    local item = TrueSmoking.Smokable.item:getReplaceOnUse()
+    self:forceComplete()
+end
+
+function PutOut:complete()
+    self.trueSmoking.isSmoking = false
+    self.trueSmoking.visualItem = false
+
+    -- self.table.isSmoking = false
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable.smokeLit = false
+
+    self.trueSmoking.Moodle:stop()
+
+    if self.trueSmoking.Smokable.updateWrapper then
+        Events.OnTick.Remove(self.trueSmoking.Smokable.updateWrapper)
+        self.trueSmoking.Smokable.updateWrapper = nil
+    end
+
+    local onUse = self.trueSmoking.Smokable.replaceOnUse
+    if onUse and onUse ~= '' then
+        addOnUseItem()
+    end
+
+    -- self:removeVisualItem()
+    -- self.table.visualItem = false
+    TrueSmoking:checkForMaskAndEquip(self.character)
+
+    self.trueSmoking.Smokable.item = {}  --clear item for safety.
 end
 
 function PutOut:perform()
-    --Track puff
     ISBaseTimedAction.perform(self)
 end
 
 function PutOut:new(character)
     local o = {
         stopOnWalk = false,
-        stopOnRun = true,
+        stopOnRun = false,
         stopOnAim = true,
         forceProgressBar = false,
         character = character,
-        item = TrueSmoking.Smokable.item,
     }
+
+    o.trueSmoking = TrueSmoking:getPlayerReference(character)
+    o.item = o.trueSmoking.Smokable.item
+    o.maxTime = 120
+
+    o.visualItemTimer = 0.7
+    o.visualItemFlag = false
+
     setmetatable(o, self)
     self.__index = self
 
-    o.maxTime = 80
     return o
 end

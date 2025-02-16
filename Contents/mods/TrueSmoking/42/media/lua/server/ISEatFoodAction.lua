@@ -16,22 +16,8 @@ function ISEatFoodAction:new (character, item, percentage)
     local onEat = item:getOnEat() or ''
     local modOnEat = item:getModData().modOnEat or ''
     local name = item:getFullType() or ''
-    local funcsToHook = {'OnEat_Cigarettes','OnEat_Cigarillo','OnEat_Cigar',
-                            'OnEat_WeedSmoke','OnEat_WeedJoint','OnEat_WeedPipe'}
-    local itemsToSkip = {}
     local hook = 'OnEat_Hook'
-
-    if getActivatedMods():contains("\\B42Hemp&Tobacco") then
-        local displayName = item:getDisplayName()
-        local fixList = {
-            ['Cheroot (Hemp)'] = 'OnEat_Cigarillo',
-            ['Cigar (Hemp)'] = 'OnEat_Cigar'
-        }
-
-        if fixList[displayName] then
-            onEat = fixList[displayName]
-        end
-    end
+    local hasSmokableTag = item:getTags():contains('Smokable')
 
     --Store the original action to return it if we don't need to hook it
     o = originalActionNew(self, character, item, percentage)
@@ -42,8 +28,8 @@ function ISEatFoodAction:new (character, item, percentage)
     trueSmoking.mask = false
     TrueSmoking:checkForMaskAndRemove(character)
 
-    if isInList(onEat, funcsToHook) and not isInList(name, itemsToSkip) then
-        print('Hooking: '..onEat..' -> '..hook)
+    if hasSmokableTag then
+        print('Hooking: '..name)
         if not trueSmoking.isSmoking then trueSmoking.Smokable = Smokable:new(item, character) end
         item:setReplaceOnUse(nil) --nil this fields to avoid consuming the item 
         if modOnEat ~= hook then
@@ -63,7 +49,6 @@ function ISEatFoodAction:new (character, item, percentage)
         item:setReduceFoodSickness(0)
 
         o.item = item
-        -- 460 original -- 200 works nicely with smoking sounds overhaul, 50 was used before for a shortened vanilla
         o.maxTime = TrueSmoking.lightTime;
     end
 

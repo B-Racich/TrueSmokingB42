@@ -185,6 +185,7 @@ function TrueSmoking:start(playerNum, player)
     o.eatSound = ''
     o.lightingEatSound = ''
 
+    -- 460 is vanilla
     -- self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 350 or 180
     self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 350 or 220
 

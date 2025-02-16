@@ -30,12 +30,12 @@ function TakePuff:update()
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
 
-    local diffTime = os.difftime(curTime, self.timer)
-    local roundedDiffTime = tonumber(string.format("%.1f", diffTime))
-    local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % 3.7))
-    print(string.format('timer: %s - roundedDiffTime: %s',roundedDiffTime, roundedDiffTimeMod))
     if not (isKeyDown(TrueSmoking.Config.keySmoke) and not self.trueSmoking.B_HELD) and not self.endAction then
-        if roundedDiffTimeMod == 0.7 then
+        local diffTime = os.difftime(curTime, self.timer)
+        local roundedDiffTime = tonumber(string.format("%.1f", diffTime))
+        local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % self.visualItemAnimLength))
+        -- print(string.format('timer: %s - roundedDiffTime: %s',roundedDiffTime, roundedDiffTimeMod))
+        if roundedDiffTimeMod == self.visualItemTimer then
             self.maxTime = 1
             self.endAction = true
             self:stop()
@@ -60,11 +60,16 @@ function TakePuff:start()
     local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
     self:setActionAnim(anim)
     self:setAnimVariable("FoodType", self.item:getEatType())
-    -- self:setOverrideHandModels(nil, self.item)
     self.trueSmoking.Smokable.puffTimeMark = os.time()
 
     --Track puff
     self.trueSmoking.takingPuff = true
+
+    --untested!!! just x2 the value for 1/2 the anim speed??
+    if anim == 'Smoke_Quiet' then
+        self.visualItemTimer = 1.4
+        self.visualItemAnimLength = 7.4
+    end
 
     -- TODO base this off of anim instead for future expansion
     -- Play custom sound when no sound is playing
@@ -128,6 +133,7 @@ function TakePuff:new(character)
     o.eatAudio = 0
     o.maxTime = -1 -- -1 means it will never finish
     o.endAction = false
+    o.visualItemAnimLength = 3.7
     o.visualItemTimer = 0.7
     o.visualItemFlag = false
 
