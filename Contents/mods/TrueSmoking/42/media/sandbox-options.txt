@@ -50,6 +50,14 @@ option TrueSmoking.ManageHeadGear
 }
 
 
+option TrueSmoking.UseNewMoodle
+{
+    type = boolean,
+    default = true,
+    page = TrueSmoking, translation=TrueSmoking_UseNewMoodle,
+}
+
+
 option TrueSmoking.SmokeRelighting
 {
 	type = boolean,

@@ -18,6 +18,7 @@ TrueSmoking.VisualItems = TrueSmoking.VisualItems or {}
 TrueSmoking.SmokeLengths = TrueSmoking.SmokeLengths or {}
 TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
+TrueSmoking.BlockingItems = TrueSmoking.BlockingItems or {}
 TrueSmoking.Config = require 'ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
@@ -75,22 +76,34 @@ end
 function TrueSmoking:checkForMaskAndRemove(player)
     if not TrueSmoking.Options.ManageHeadGear then return end
     local o = self:getPlayerReference(player)
-    local mask = self:wearingMask(player)
-    if mask then
-        o.mask = mask
-        self:removeItem(player, mask, 50)
+    self:getWornMask(player)
+    if o.mask then
+        self:removeItem(player, o.mask, 50)
+    end
+    if o.shemagh then
+        self:adjustShemagh(player, o.shemagh, true)
     end
 end
 
 function TrueSmoking:checkForMaskAndEquip(player)
     local o = self:getPlayerReference(player)
-    local mask = o.mask
-    if mask then
-        self:equipItem(player, mask, 50)
+    if o.mask then
+        self:equipItem(player, o.mask, 50)
+    end
+    if o.shemagh then
+        self:getWornMask(player, true)
+        self:adjustShemagh(player, o.shemagh, false)
     end
 end
 
-function TrueSmoking:wearingMask(player)
+--[[
+    Nothing is easy, have to rewrite this and find every item that makes sense.
+    Shemagh support would be nice to reveal face to smoke.
+
+    strip out some checks to be more liberal here for now.
+]]
+function TrueSmoking:getWornMask(player, reCover)
+    local o = self:getPlayerReference(player)
     local items = {}
     items['Mask'] = player:getWornItem('Mask') or ''
     items['MaskEyes'] = player:getWornItem('MaskEyes') or ''
@@ -99,8 +112,19 @@ function TrueSmoking:wearingMask(player)
     items['Hat'] = player:getWornItem('Hat') or ''
     items['Neck'] = player:getWornItem('Neck') or ''
     for _, item in pairs(items) do
-        if item ~= '' and not item:getTags():contains('CanEat') then
-            return item
+        if item ~= '' then
+            local type = item:getFullType()
+            if item:getTags():contains('CantSmoke') then
+                if type:contains('Shemagh') then
+                    o.shemagh = item
+                    return item
+                end
+                o.mask = item
+                return item
+            elseif reCover and type:contains('Shemagh') then
+                o.shemagh = item
+                return item
+            end
         end
     end
     return false
@@ -109,6 +133,36 @@ end
 --Wrappers for mask actions
 function TrueSmoking:removeItem(player, item, time)
     ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
+end
+
+function TrueSmoking:adjustShemagh(player, item, putDown)
+    local fullCovers = {
+        ['Base.Hat_ShemaghFull'] = 'Base.Hat_ShemaghFace',
+        ['Base.Hat_ShemaghFull_Green'] = 'Base.Hat_ShemaghFace_Green',
+        ['Base.Hat_ShemaghFull_Cotton'] = 'Base.Hat_ShemaghFace_Cotton',
+    }
+    local scarfCovers = {
+        ['Base.ShemaghScarfFace'] = 'Base.Hat_ShemagScarf',
+        ['Base.ShemaghScarfFace_Green'] = 'Base.Hat_ShemagScarf_Green',
+    }
+    local fullType = item:getFullType() or ''
+
+    -- print(string.format('Fulltype of shemagh: %s',fullType))
+
+    local function handleCovers(covers)
+        for covered, open in pairs(covers) do
+            local setTo = putDown and open or covered
+            if fullType == covered or fullType == open then
+                ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo))
+                -- print(string.format('Adjusted Shegmah: %s - putDown: %s - setTo: %s',fullType, putDown and 'true' or 'false', setTo))
+                return true
+            end
+        end
+        return false
+    end
+
+    if handleCovers(fullCovers) then return end
+    handleCovers(scarfCovers)
 end
 
 function TrueSmoking:equipItem(player, item, time)
@@ -147,13 +201,13 @@ end
 --Finds a smokable object from the inventory or a pack of cigarettes
 function TrueSmoking:findSmokable(player)
     local cigarette = false
-    for index, value in ipairs(self.HotkeySmokes) do
+    for _, value in ipairs(self.HotkeySmokes) do
         cigarette = player:getInventory():getFirstTypeRecurse(value)
         if cigarette then break end
     end
 
     local pack = false
-    for index, value in ipairs(self.HotkeyPacks) do
+    for _, value in ipairs(self.HotkeyPacks) do
         pack = player:getInventory():getFirstTypeRecurse(value)
         if pack then break end
     end
@@ -301,8 +355,7 @@ Events.OnPlayerDeath.Add(function(playerNum, player)
 end)
 
 --Load SandboxVars
-Events.OnPreMapLoad.Add(function()
-    print('PRE MAP LOAD VARS')
+Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.OverrideSmokeLength = SandboxVars.TrueSmoking.OverrideSmokeLength
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
 
@@ -311,6 +364,8 @@ Events.OnPreMapLoad.Add(function()
     TrueSmoking.Options.IdleFactor = SandboxVars.TrueSmoking.IdleFactor
 
     TrueSmoking.Options.ManageHeadGear = SandboxVars.TrueSmoking.ManageHeadGear
+
+    TrueSmoking.Options.UseNewMoodle = SandboxVars.TrueSmoking.UseNewMoodle
 
     TrueSmoking.Options.SmokeRelighting = SandboxVars.TrueSmoking.SmokeRelighting
 

@@ -28,6 +28,11 @@ Sandbox_EN = {
 
 
 
+    Sandbox_TrueSmoking_UseNewMoodle = "Use The New Moodle (B42 Style)",
+    Sandbox_TrueSmoking_UseNewMoodle_tooltip = "Disable to use the older B41 style moodle icon",
+
+
+
     Sandbox_TrueSmoking_SmokeRelighting = "Smoke Relighting",
     Sandbox_TrueSmoking_SmokeRelighting_tooltip = "Option to enable relighting of the smoke if it drops below 'Minimum burn limit'",
 

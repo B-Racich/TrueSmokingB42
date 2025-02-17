@@ -31,6 +31,7 @@ function ISEatFoodAction:new (character, item, percentage)
     o.trueSmoking = trueSmoking
 
     trueSmoking.mask = false
+    trueSmoking.shemagh = false
     TrueSmoking:checkForMaskAndRemove(character)
 
     if isInList(onEat, funcsToHook) and not isInList(name, itemsToSkip) or hasSmokableTag then
@@ -64,7 +65,7 @@ function ISEatFoodAction:isValid()
     if self.item:getOnEat() == nil or self.item:getOnEat() == '' then
         return originalActionIsValid(self)
     else
-        return not self.trueSmoking.isSmoking
+        return true
     end
 end
 

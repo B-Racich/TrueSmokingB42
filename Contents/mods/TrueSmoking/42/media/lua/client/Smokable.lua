@@ -204,7 +204,7 @@ end
 --Stop smoking and remove the update event
 function Smokable:putOut()
     if self.table.takingPuff then return end
-    --Placeholder for putOut action (need a custom animation to be proper)
+
     if self.table.isSmoking then
         ISTimedActionQueue.add(PutOut:new(self.player))
     end

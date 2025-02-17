@@ -1,0 +1,162 @@
+module Base{
+    item Hat_NBCmask_nofilter
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_NBCmask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_ShemaghFull
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_ShemaghFull_Green
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_Spiffo
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_ShemaghFull_Burlap
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_ShemaghFull_Cotton
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HeadSack_Burlap
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HeadSack_Cotton
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_MetalHelmet
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_MetalScrapHelmet
+    {
+        Tags = CantSmoke,
+    }
+    item ShemaghScarfFace
+    {
+        Tags = CantSmoke,
+    }
+    item ShemaghScarfFace_Green
+    {
+        Tags = CantSmoke,
+    }
+    item WeldingMask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_RiotHelmet
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_CrashHelmetFULL
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_CrashHelmetFULL_Black
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_DustMask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_GasMask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_GasMask_nofilter
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HalloweenMaskDevil
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HalloweenMaskMonster
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HalloweenMaskPumpkin
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HalloweenMaskSkeleton
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HalloweenMaskVampire
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HalloweenMaskWitch
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HockeyMask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_BoneMask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HockeyMask_Wood
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HockeyMask_Metal
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HockeyMask_Copper
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HockeyMask_Gold
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HockeyMask_Silver
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_HockeyMask_MetalScrap
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_SurgicalMask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_BuildersRespirator
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_BandanaMask_Green
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_BandanaMask
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_BandanaMaskTINT
+    {
+        Tags = CantSmoke,
+    }
+    item Hat_BuildersRespirator_nofilter
+    {
+        Tags = CantSmoke,
+    }
+}

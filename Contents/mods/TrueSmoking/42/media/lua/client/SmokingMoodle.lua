@@ -3,14 +3,16 @@ require 'MF_ISMoodle'
 SmokingMoodle = SmokingMoodle or {}
 SmokingMoodle.__index = SmokingMoodle
 
-function SmokingMoodle:new(TrueSmoking, playerNum)
+function SmokingMoodle:new(table, playerNum)
     local obj = {}
     setmetatable(obj, self)
 
-    obj.TrueSmoking = TrueSmoking
+    obj.table = table
     obj.playerNum = playerNum
-    MF.createMoodle('smoking')
-    -- print('create moodle')
+
+    obj.moodleImage = TrueSmoking.Options.UseNewMoodle and 'smoking_new' or 'smoking_old'
+
+    MF.createMoodle(obj.moodleImage)
 
     return obj
 end
@@ -26,10 +28,9 @@ end
 
 --Stops the moodle event and hides moodle
 function SmokingMoodle:stop()
-    local moodle = MF.getMoodle('smoking',self.playerNum)
+    local moodle = MF.getMoodle(self.moodleImage, self.playerNum)
     if moodle ~= nil then
         moodle:setValue(0.5)
-        moodle:setPicture(moodle:getGoodBadNeutral(),moodle:getLevel(),getTexture('media/ui/Moodles/notSmoking.png'))
     end
     if self.updateWrapper then
         Events.OnTick.Remove(self.updateWrapper)
@@ -39,10 +40,10 @@ end
 
 --On tick event for the moodle to update
 function SmokingMoodle:update()
-    local moodle = MF.getMoodle('smoking',self.playerNum)
-    if not self.TrueSmoking.isSmoking then return end
+    local moodle = MF.getMoodle(self.moodleImage,self.playerNum)
+    if not self.table.isSmoking then return end
     if moodle == nil then return end
-    local item = self.TrueSmoking.Smokable
+    local item = self.table.Smokable
     local smokeLit = item.smokeLit
     local percentVal = item.smokePercent
     local displayedPercentage = string.format('%.2f', percentVal * 100)
@@ -51,13 +52,9 @@ function SmokingMoodle:update()
 
     moodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
 
-    if smokeLit then
-        moodle:setPicture(moodle:getGoodBadNeutral(),moodle:getLevel(),getTexture('media/ui/Moodles/smoking.png'))
-    else
-        moodle:setPicture(moodle:getGoodBadNeutral(),moodle:getLevel(),getTexture('media/ui/Moodles/notSmoking.png'))
+    if not smokeLit then
         moodle:doWiggle()
     end
     moodle:setValue(percentVal)
     moodle:setDescription(moodle:getGoodBadNeutral(),moodle:getLevel(),getText('Moodles_smoking_Custom',smokeLitText, displayedPercentage))
-    moodle:setBackground(moodle:getGoodBadNeutral(),moodle:getLevel(),getTexture('media/ui/Moodles/bg.png'))
 end

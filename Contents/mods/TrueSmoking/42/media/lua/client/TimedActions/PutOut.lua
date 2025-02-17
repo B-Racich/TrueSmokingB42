@@ -65,8 +65,6 @@ function PutOut:complete()
         addOnUseItem(self.character)
     end
 
-    -- self:removeVisualItem()
-    -- self.table.visualItem = false
     TrueSmoking:checkForMaskAndEquip(self.character)
 
     self.trueSmoking.Smokable.item = {}  --clear item for safety.
