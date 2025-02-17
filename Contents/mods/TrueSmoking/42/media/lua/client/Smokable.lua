@@ -103,53 +103,28 @@ end
 --Helper function to set smokeLengths
 --TODO likely rewrite this
 function Smokable:getSmokeLength(item)
-    --The vanilla items could be checking onEat but we have to use names to properly set Hemp&Tobacco
-    local list = {
-        ["Cigarette"] = TrueSmoking.Options.CigaretteLength or 1.0,
-        ["Cigar"] = TrueSmoking.Options.CigarLength or 3.0,
-        ["Cigarillo"] = TrueSmoking.Options.CigarilloLength or 1.5,
-        ["Smoking Pipe with Tobacco"] = TrueSmoking.Options.PipeLength or 1.75,
-        ["Can Pipe with Tobacco"] = TrueSmoking.Options.CanLength or 2.5,
-        --Hemp&Tobacco
-        ["Hemp Cigarette"] = TrueSmoking.Options.CigaretteLength or 1.0,
-        ["Cigar (Hemp)"] = TrueSmoking.Options.CigarLength or 3.0,
-        ["Cheroot (Hemp)"] = TrueSmoking.Options.CigarilloLength or 1.5,
-        ["Smoking Pipe with Hemp"] = TrueSmoking.Options.PipeLength or 1.75,
-        -- Give these a slightly faster smoke time (more effecient)
-        ["Glass Smoking Pipe with Hemp"] = 1.5,
-        ["Glass Smoking Pipe with Tobacco"] = 1.5,
-    }
-
-    --ReeferMadness adjustment, we we just check the modded onEat
-    local listReeferMadness = {
-        ['OnEat_WeedPipe'] = 1.5,
-        ['OnEat_WeedJoint'] = 1.0
-    }
-
-    -- 1. if our override is set, return that
+    -- 1. If our override is set return that
     if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
 
-    -- 2. if an item has smokeLength set use that
-    for index, value in ipairs(TrueSmoking.Mods.SmokeLengths) do
-        if self.fullType == index then
-            return value
-        end
-    end
-
-    -- 3. check our lists for predefined values (sandbox/hard coded)
-    for name, length in pairs(listReeferMadness) do
-        if item:getOnEat() == name then
-            return length
-        end
-    end
-    -- 4. use displayNames after checking onEat
-    for name, length in pairs(list) do
-        if item:getDisplayName() == name then
+    -- 2. If we have a value set return that
+    for fullType, length in pairs(TrueSmoking.SmokeLengths) do
+        if item:getFullType() == fullType then
             return length
         end
     end
 
-    -- 5. safety return for default value
+    local OnEat_Defaults = {
+        ['OnEat_Cigarettes'] = TrueSmoking.Options.CigaretteLength,
+        ['OnEat_Cigarillo'] = TrueSmoking.Options.CigarilloLength,
+        ['OnEat_Cigar'] = TrueSmoking.Options.CigarLength,
+    }
+
+    -- 3. If we can find a default use that
+    for key, value in pairs(OnEat_Defaults) do
+        if self.onEat == key then return value end
+    end
+
+    -- 4. Return our default value
     return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
@@ -170,26 +145,26 @@ end
 function Smokable:getVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return false end
     if self.item and not self.table.visualItem then
-        local items = {
-            ['Cigarette'] = 'Mask_Cigarette',
-            ['Cheroot'] = 'Mask_Cigarillo',
-            ['Cigar'] = 'Mask_Cigar',
-            ['Smoking Pipe with Tobacco'] = 'Mask_Pipe'
-        }
-        local itemName = self.item:getDisplayName()
-        -- print(string.format('Item Display Name: %s',itemName))
-
-        for index, value in ipairs(TrueSmoking.Mods.SmokeLengths) do
-            if self.fullType == index then
-                return instanceItem(value)
+        for fullType, item in pairs(TrueSmoking.VisualItems) do
+            -- print(string.format('item: %s - fullType: %s - item: %s',self.fullType, fullType, item))
+            if self.fullType == fullType then
+                return instanceItem(item)
             end
         end
 
-        if items[itemName] then
-            return instanceItem(items[itemName])
-        else
-            return false
+        local OnEat_Defaults = {
+            ['OnEat_Cigarettes'] = 'Mask_Cigarette',
+            ['OnEat_Cigarillo'] = 'Mask_Cigarillo',
+            ['OnEat_Cigar'] = 'Mask_Cigar',
+        }
+
+        --If we can find a default use that
+        for key, value in pairs(OnEat_Defaults) do
+            if self.onEat == key then return instanceItem(value) end
         end
+
+        -- If we found nothing do not display anything
+        return false
     end
 end
 

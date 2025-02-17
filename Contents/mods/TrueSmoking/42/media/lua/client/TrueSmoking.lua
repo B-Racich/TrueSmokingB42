@@ -14,8 +14,10 @@ TrueSmoking = TrueSmoking or {}
 TrueSmoking.__index = TrueSmoking
 TrueSmoking.Options = TrueSmoking.Options or {}
 TrueSmoking.Mods = TrueSmoking.Mods or {}
-TrueSmoking.Mods.VisualItems = TrueSmoking.Mods.VisualItems or {}
-TrueSmoking.Mods.SmokeLengths = TrueSmoking.Mods.SmokeLengths or {}
+TrueSmoking.VisualItems = TrueSmoking.VisualItems or {}
+TrueSmoking.SmokeLengths = TrueSmoking.SmokeLengths or {}
+TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
+TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
 TrueSmoking.Config = require 'ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
@@ -26,22 +28,46 @@ TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 --[[
     For modders use this to set smoke lengths on your smokables
     { [item:getFullType()] = <Smoke Length> }
-    ex. { ['CigaretteSingle'] = 1.5 }
+    ex. { ['Base.CigaretteSingle'] = 1.5 }
 ]]
-function TrueSmoking:setModdedSmokeLengths(table)
-    for index, value in ipairs(table) do
-        self.Mods.SmokeLengths[index] = value
+function TrueSmoking:setSmokeLengths(table)
+    for index, value in pairs(table) do
+        -- print(string.format('Smoke Lengths Setting: %s - %s',index, value))
+        self.SmokeLengths[index] = value
     end
 end
 
 --[[
     For modders use this to set visualItems for your smokables
     { [item:getFullType()] = <Name of item> }
-    ex. { ['CigaretteSingle'] = 'Mask_Cigarette' }
+    ex. { ['Base.CigaretteSingle'] = 'Base.Mask_Cigarette' }
 ]]
-function TrueSmoking:setModdedVisualItems(table)
-    for index, value in ipairs(table) do
-        self.Mods.VisualItems[index] = value
+function TrueSmoking:setVisualItems(table)
+    for index, value in pairs(table) do
+        -- print(string.format('Setting: %s - %s',index, value))
+        self.VisualItems[index] = value
+    end
+end
+
+--[[
+    For modders use this to set smokes for the hotkey
+    { [item:getFullType()] = <Name of item> }
+    ex. { ['Base.CigaretteSingle'] = 'Base.Mask_Cigarette' }
+]]
+function TrueSmoking:setHotkeySmokes(list)
+    for _, item in ipairs(list) do
+        table.insert(self.HotkeySmokes, item)
+    end
+end
+
+--[[
+    For modders use this to set smoke packs for the hotkey
+    { [item:getFullType()] = <Name of item> }
+    ex. { ['Base.CigaretteSingle'] = 'Base.Mask_Cigarette' }
+]]
+function TrueSmoking:setHotkeyPacks(list)
+    for _, item in ipairs(list) do
+        table.insert(self.HotkeyPacks, item)
     end
 end
 
@@ -120,11 +146,23 @@ end
 
 --Finds a smokable object from the inventory or a pack of cigarettes
 function TrueSmoking:findSmokable(player)
-    local cigarette = player:getInventory():getFirstTypeRecurse("Base.CigaretteSingle")
-    local pack = player:getInventory():getFirstTypeRecurse("Base.CigarettePack")
+    local cigarette = false
+    for index, value in ipairs(self.HotkeySmokes) do
+        cigarette = player:getInventory():getFirstTypeRecurse(value)
+        if cigarette then break end
+    end
+
+    local pack = false
+    for index, value in ipairs(self.HotkeyPacks) do
+        pack = player:getInventory():getFirstTypeRecurse(value)
+        if pack then break end
+    end
+
     if not cigarette and pack then
         self:useRecipe(pack, player, 'TakeACigarette')
-        cigarette = player:getInventory():getFirstTypeRecurse("Base.CigaretteSingle")
+        for index, value in ipairs(self.HotkeySmokes) do
+            cigarette = player:getInventory():getFirstTypeRecurse(value)
+        end
     end
     if cigarette and self:hasLightable(cigarette, player) then
         -- cigarette:
@@ -264,6 +302,7 @@ end)
 
 --Load SandboxVars
 Events.OnPreMapLoad.Add(function()
+    print('PRE MAP LOAD VARS')
     TrueSmoking.Options.OverrideSmokeLength = SandboxVars.TrueSmoking.OverrideSmokeLength
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
 
