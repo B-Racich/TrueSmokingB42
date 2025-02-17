@@ -7,7 +7,7 @@ local originalActionPerform = ISEatFoodAction.perform
 local originalActionStart = ISEatFoodAction.start
 
 --[[
-    This file hooks the foodAction and houses on custom OnEat methods, here the Smokable object is created and stored into
+    This file hooks the foodAction, here the Smokable object is created and stored into
     the global TrueSmoking object.
 ]]
 

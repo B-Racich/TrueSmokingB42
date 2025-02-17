@@ -83,9 +83,10 @@ description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=34243
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2951287846]Clove Cigarettes[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3416588496][B42] Tobacco Hotkey Mod[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3421508458]<B42>Reefer Madness[/url]
-description=[*]Most mods that just add more smokes should work without a patch, if you encounter issues let me know!
-description=[*]Unsupported mods that add items should still work normally but won't use this new mechanic
 description=[/list]
+description=[code]Mods that add more items following the vanilla logic should work fine, mods that are overwriting items or overwriting vanilla functions (or entirely bypassing them) will likely not work.
+description=
+description=My mod is very [b]un-intrusive[/b] it hooks on after the OnEat method is called, any mod that uses the vanilla logic of calling ISEatFoodAction and has proper tags on the item should hook without issue and work. If they don't it should just follow the vanilla mechanics and not use my system.[/code]
 description=
 description=[h3]Incompatibilities[/h3]
 description=[list]
@@ -127,10 +128,10 @@ description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/im
 description=
 description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
 description=
-description=[code]Do not redistribute my mod or code without consent, ask for permission[/code]
+description=[code]Do not modify or redistribute my mod/code without consent, ask for permission. Treat this mod as on 'lockdown'[/code]
 description=
 description=[h3]Credits[/h3]
 description=Credits to BongoRaccoon32 and CenturyOldRat for the wearable smokable assets
-description=Thanks to everyone in the discord for their contributions in sharing modding knowledge
+description=Thanks to everyone in the discord for their contributions in sharing modding knowledg
 tags=Build 42;Balance;Food;Framework;Hardmode;Items;Misc;Multiplayer;Realistic;Silly/Fun;QoL
 visibility=public

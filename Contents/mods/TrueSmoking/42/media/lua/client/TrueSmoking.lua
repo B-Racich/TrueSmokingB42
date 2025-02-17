@@ -18,7 +18,6 @@ TrueSmoking.VisualItems = TrueSmoking.VisualItems or {}
 TrueSmoking.SmokeLengths = TrueSmoking.SmokeLengths or {}
 TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
-TrueSmoking.BlockingItems = TrueSmoking.BlockingItems or {}
 TrueSmoking.Config = require 'ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
