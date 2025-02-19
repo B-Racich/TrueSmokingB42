@@ -15,7 +15,7 @@ function TakePuff:update()
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
             self.trueSmoking.Smokable:removeVisualItem()
             self.visualItemFlag = true
-            local hasPrimary = self.character:getPrimaryHandItem() and self.character:getPrimaryHandItem():getStaticModel() or nil
+            local hasPrimary = self.character:getPrimaryHandItem()
             if hasPrimary then
                 self:setOverrideHandModels(hasPrimary, self.item)
             else
@@ -116,7 +116,6 @@ function TakePuff:stop()
     end
 
     self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
-    self.trueSmoking.Smokable.removedVisualItem = true
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
     self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)

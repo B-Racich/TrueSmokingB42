@@ -71,8 +71,7 @@ function ISEatFoodAction:isValid()
 end
 
 function ISEatFoodAction:stop()
-    if getActivatedMods():contains('\\SmokingSoundsOverhaul') and self.item:getModData().modOnEat
-     and self.item:getModData().modOnEat ~= '' then
+    if getActivatedMods():contains('\\SmokingSoundsOverhaul') and self.item:getModData().SmokeLength then
         self.trueSmoking.lightingEatSound = self.eatSound
         ISBaseTimedAction.stop(self);
         self.item:setJobDelta(0.0);
@@ -82,8 +81,7 @@ function ISEatFoodAction:stop()
 end
 
 function ISEatFoodAction:perform()
-    if getActivatedMods():contains('\\SmokingSoundsOverhaul') and self.item:getModData().modOnEat
-     and self.item:getModData().modOnEat ~= '' then
+    if getActivatedMods():contains('\\SmokingSoundsOverhaul') and self.item:getModData().SmokeLength then
         self.trueSmoking.lightingEatSound = self.eatSound
         self.item:getContainer():setDrawDirty(true);
         self.item:setJobDelta(0.0);
@@ -113,7 +111,7 @@ end
 function ISEatFoodAction:start()
     originalActionStart(self)
     if self.item:getOnEat() == 'OnEat_Hook' then
-        local hasPrimary = self.character:getPrimaryHandItem() and self.character:getPrimaryHandItem():getStaticModel() or nil
+        local hasPrimary = self.character:getPrimaryHandItem()
         if hasPrimary then
             self:setOverrideHandModels(hasPrimary, self.item)
         else

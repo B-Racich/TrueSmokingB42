@@ -21,7 +21,7 @@ function Smokable:new(item, player)
     setmetatable(obj, self)
 
     local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
-    obj.burnMin, obj.burnMax = 0.000135, 0.000365
+    obj.burnMin, obj.burnMax = 0.0000125, 0.000215
 
     obj.player = player
 
@@ -69,11 +69,12 @@ function Smokable:new(item, player)
     item:getModData().OriginalSmokeLength = obj.smokeLength
     if item:getModData().SmokeLength then obj.smokeLength = item:getModData().SmokeLength print(item:getModData().SmokeLength)  end
 
+    print(string.format('Smokable length: %s, original: %s',obj.smokeLength, obj.originalSmokeLength))
+
     obj.smokePercent = 1.0
     obj.smokeLit = false
     obj.burnRate = ZombRandFloat(obj.burnMin,obj.burnMax)
     obj.timeCheck = ZombRand(puffMin,puffMax)
-    obj.removedVisualItem = false
 
     --NnC vals
     obj.NnC_StiffRemoval = 15
@@ -133,6 +134,9 @@ function Smokable:equipVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
     if not self.player:getWornItem('Mask') and self.table.visualItem then
         self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem);
+    elseif self.player:getWornItem('Mask') and TrueSmoking:isVisualItem(self.player:getWornItem('Mask')) then
+        self.player:removeWornItem(self.player:getWornItem('Mask'))
+        self:equipVisualItem()
     end
 end
 
@@ -182,10 +186,8 @@ function Smokable:light()
         Events.OnTick.Add(updateWrapper)
         self.updateWrapper = updateWrapper
 
-        if self.smokeLength == self.originalSmokeLength then
-            self.table.visualItem = self:getVisualItem()
-            self:equipVisualItem()
-        end
+        self.table.visualItem = self:getVisualItem()
+        self:equipVisualItem()
     end
     if not self.smokeLit then
         ISTimedActionQueue.add(LightSmoke:new(self.player))
@@ -194,8 +196,6 @@ end
 
 --Stop smoking and remove the update event
 function Smokable:putOut()
-    -- if self.table.takingPuff then return end
-
     if self.table.isSmoking then
         ISTimedActionQueue.add(PutOut:new(self.player))
     end
@@ -242,7 +242,7 @@ function Smokable:update()
     end
 
     --Smoke went out (burn rate is 0)
-    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.000002 then
+    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000001 then
         self.burnRate = 0
         self.smokeLit = false
     elseif not TrueSmoking.Options.SmokeRelighting and self.burnRate < self.burnMin then
