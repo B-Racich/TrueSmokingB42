@@ -365,13 +365,16 @@ local remainingSmokeTooltip = function(tooltip, layout, item)
         local original = item:getModData().OriginalSmokeLength
         local amt = (current / original)*100
         amt = amt >= 0 and amt or 0
+        amt = string.format("%.1f", amt)
 
-        local label = "Remaining: " .. string.format("%.1f", amt) .. "%"
+        local label = "Remaining: "
+        -- local label = "Remaining: " .. string.format("%.1f", amt) .. "%"
 
-        local layoutItem = LayoutItem.new()
-        layout.items:add(layoutItem)
-        layoutItem:setLabel(label, 1, 1, 1, 1)
+        -- local layoutItem = LayoutItem.new()
+        -- layout.items:add(layoutItem)
+        -- layoutItem:setLabel(label, 1, 1, 1, 1)
 
+        InventoryUI.addTooltipKeyPair(layout, label, amt)
         -- InventoryUI.addTooltipLabel(layout, string.format("Remaining: %.1f%",amt))
         -- InventoryUI.addTooltipBar(layout, "Remaining:", amt)
     end
