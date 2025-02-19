@@ -67,11 +67,11 @@ function Smokable:new(item, player)
     obj.smokeLength = self:getSmokeLength(item)
     obj.originalSmokeLength = obj.smokeLength
     item:getModData().OriginalSmokeLength = obj.smokeLength
-    if item:getModData().SmokeLength then obj.smokeLength = item:getModData().SmokeLength print(item:getModData().SmokeLength)  end
+    if item:getModData().SmokeLength then obj.smokeLength = item:getModData().SmokeLength end
 
     -- print(string.format('Smokable length: %s, original: %s',obj.smokeLength, obj.originalSmokeLength))
 
-    obj.smokePercent = 1.0
+    obj.smokePercent = obj.smokeLength/obj.originalSmokeLength
     obj.smokeLit = false
     obj.burnRate = ZombRandFloat(obj.burnMin,obj.burnMax)
     obj.timeCheck = ZombRand(puffMin,puffMax)

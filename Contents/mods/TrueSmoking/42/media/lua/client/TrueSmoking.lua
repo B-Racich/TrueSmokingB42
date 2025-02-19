@@ -236,7 +236,7 @@ function TrueSmoking:findSmokable(player)
 end
 
 --Checks if the player has a lightable item (lighter, matches, etc)
-function TrueSmoking:hasLightable(item, player)
+function TrueSmoking:hasLightable(item, player, onlyItems)
     --Predicate to check if the item has uses (lighters, matches, etc)
     local function predicateNotEmpty(item)
         return item:getCurrentUsesFloat() > 0
@@ -248,7 +248,7 @@ function TrueSmoking:hasLightable(item, player)
 
     local found = false;
     if item:hasTag("Smokable") and player:getVehicle() and player:getVehicle():canLightSmoke(player) then found = true end
-    if item:hasTag("Smokable") and not found then
+    if item:hasTag("Smokable") and not found and not onlyItems then
        found = ISInventoryPaneContextMenu.hasOpenFlame(player)
     end
     if not found then
@@ -260,14 +260,16 @@ function TrueSmoking:hasLightable(item, player)
                 if item2 then
                     -- local fullType = moduleDotType(item:getModule(), item)
                     local fullType = item2:getFullType()
-                    if player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty) then
-                        found = true;
+                    found = player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
+                    if found then
+                        return found
                     end
                 end
             end
             if not found then
-                if player:getInventory():getFirstEvalRecurse(hasLighterTag) then
-                    found = true
+                found = player:getInventory():getFirstEvalRecurse(hasLighterTag)
+                if found then
+                    return found
                 end
             end
         end
@@ -368,24 +370,13 @@ function TrueSmoking:stop(playerNum, player)
 end
 
 local remainingSmokeTooltip = function(tooltip, layout, item)
-    -- Check if the item has moddata with 'peed = true'
-    if item:getModData().SmokeLength and item:getModData().OriginalSmokeLength then
+    if item and item:getModData().SmokeLength and item:getModData().OriginalSmokeLength then
         local current = item:getModData().SmokeLength
         local original = item:getModData().OriginalSmokeLength
-        local amt = (current / original)*100
+        local amt = (current / original)
         amt = amt >= 0 and amt or 0
-        amt = string.format("%.1f", amt)
 
-        local label = "Remaining:"
-        -- local label = "Remaining: " .. string.format("%.1f", amt) .. "%"
-
-        -- local layoutItem = LayoutItem.new()
-        -- layout.items:add(layoutItem)
-        -- layoutItem:setLabel(label, 1, 1, 1, 1)
-
-        InventoryUI.addTooltipKeyValue(layout, label, amt)
-        -- InventoryUI.addTooltipLabel(layout, string.format("Remaining: %.1f%",amt))
-        -- InventoryUI.addTooltipBar(layout, "Remaining:", amt)
+        InventoryUI.addTooltipBar(layout, "Remaining:", amt)
     end
 end
 

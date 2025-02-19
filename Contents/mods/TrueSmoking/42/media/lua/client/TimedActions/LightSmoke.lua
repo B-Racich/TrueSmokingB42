@@ -27,8 +27,10 @@ function LightSmoke:start()
     -- self:setOverrideHandModels(nil, self.item)
 
     -- Play custom sound when no sound is playing
+    -- print('get lighting sound before check')
     if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
-        local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
+        -- print('get lighting sound')
+        local sound = SmokingSoundsOverhaul:getLightingSound(self.character, self.item)
         if self.eatSound == '' then -- No sound running for first time
             self.eatSound = sound
             -- Check if we previously started a puff and its audio is still playing
