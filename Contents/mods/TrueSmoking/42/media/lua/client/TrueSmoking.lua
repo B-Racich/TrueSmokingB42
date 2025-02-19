@@ -152,8 +152,8 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
         ['Base.Hat_ShemaghFull_Cotton'] = 'Base.Hat_ShemaghFace_Cotton',
     }
     local scarfCovers = {
-        ['Base.ShemaghScarfFace'] = 'Base.Hat_ShemagScarf',
-        ['Base.ShemaghScarfFace_Green'] = 'Base.Hat_ShemagScarf_Green',
+        ['Base.ShemaghScarfFace'] = 'Base.ShemaghScarf',
+        ['Base.ShemaghScarfFace_Green'] = 'Base.ShemaghScarf_Green',
     }
     local fullType = item:getFullType() or ''
 
@@ -162,9 +162,9 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
     local function handleCovers(covers)
         for covered, open in pairs(covers) do
             local setTo = putDown and open or covered
-            if fullType == covered or fullType == open then
+            if (fullType == covered and putDown) or (fullType == open and not putDown) then
+                print(string.format('Adjusted Shegmah: %s - putDown: %s - setTo: %s',fullType, putDown and 'true' or 'false', setTo))
                 ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo))
-                -- print(string.format('Adjusted Shegmah: %s - putDown: %s - setTo: %s',fullType, putDown and 'true' or 'false', setTo))
                 return true
             end
         end
