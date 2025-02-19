@@ -267,7 +267,7 @@ function Smokable:idlePuff()
 
     if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
         local puff = TakePuff:new(self.player)
-        puff.maxTime = 220
+        -- puff.maxTime = 220
         ISTimedActionQueue.add(puff)
     end
 end

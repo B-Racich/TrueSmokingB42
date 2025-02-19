@@ -73,7 +73,7 @@ function TrueSmoking:setHotkeyPacks(list)
     end
 end
 
-function isVisualItem(item)
+function TrueSmoking:isVisualItem(item)
     for key, value in pairs(self.VisualItems) do
         if item:getFullType() == value then
             return true
