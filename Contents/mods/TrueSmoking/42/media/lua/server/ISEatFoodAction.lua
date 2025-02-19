@@ -45,15 +45,15 @@ function ISEatFoodAction:new (character, item, percentage)
         end
 
         --Stop stat changes from item use
-        item:setStressChange(0)
-        item:setBoredomChange(0)
-        item:setUnhappyChange(0)
-        item:setPainReduction(0)
-        item:setHungChange(0)
-        item:setThirstChange(0)
-        item:setFatigueChange(0)
-        item:setEnduranceChange(0)
-        item:setReduceFoodSickness(0)
+        -- item:setStressChange(0)
+        -- item:setBoredomChange(0)
+        -- item:setUnhappyChange(0)
+        -- item:setPainReduction(0)
+        -- item:setHungChange(0)
+        -- item:setThirstChange(0)
+        -- item:setFatigueChange(0)
+        -- item:setEnduranceChange(0)
+        -- item:setReduceFoodSickness(0)
 
         o.item = item
         o.maxTime = TrueSmoking.lightTime;
