@@ -5,6 +5,7 @@ local originalActionIsValid = ISEatFoodAction.isValid
 local originalActionStop = ISEatFoodAction.stop
 local originalActionPerform = ISEatFoodAction.perform
 local originalActionStart = ISEatFoodAction.start
+local originalActionComplete = ISEatFoodAction.complete
 
 --[[
     This file hooks the foodAction, here the Smokable object is created and stored into
@@ -20,7 +21,7 @@ function ISEatFoodAction:new (character, item, percentage)
     local hook = 'OnEat_Hook'
     local hasSmokableTag = item:getTags():contains('Smokable')
     local funcsToHook = {'OnEat_Cigarettes','OnEat_Cigarillo','OnEat_Cigar',
-    'OnEat_WeedSmoke','OnEat_WeedJoint','OnEat_WeedPipe'}
+    'OnEat_WeedSmoke','OnEat_WeedJoint','OnEat_WeedPipe', 'OnEat_Hook'}
     local itemsToSkip = {}
     local hook = 'OnEat_Hook'
 
@@ -92,6 +93,23 @@ function ISEatFoodAction:perform()
     end
 end
 
+function ISEatFoodAction:complete()
+    if self.item:getOnEat() == 'OnEat_Hook' then
+        self.trueSmoking.Smokable.smokeLit = true
+        self.trueSmoking.Smokable.puffTimeMark = os.time()
+
+        if self.trueSmoking.Smokable.burnRate == 0 then
+            self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin, self.trueSmoking.Smokable.burnMax)
+        end
+
+        self.trueSmoking.Smokable:light()
+        return true
+    else
+        originalActionComplete(self)
+    end
+	return true;
+end
+
 function ISEatFoodAction:start()
     originalActionStart(self)
     if self.item:getOnEat() == 'OnEat_Hook' then
@@ -100,6 +118,10 @@ function ISEatFoodAction:start()
             self:setOverrideHandModels(hasPrimary, self.item)
         else
             self:setOverrideHandModels(nil, self.item)
+        end
+
+        if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
+            self.eatSound = self.eatAudio
         end
     end
 end

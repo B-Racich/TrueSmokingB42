@@ -118,3 +118,35 @@ Events.OnCreatePlayer.Add(function()
     TrueSmoking:setHotkeySmokes(TRUE_SMOKING_DEFAULT_HOTKEY_SMOKES)
     TrueSmoking:setHotkeyPacks(TRUE_SMOKING_DEFAULT_HOTKEY_PACKS)
 end)
+
+
+--Kalilynx
+local function appendSample()
+    if not ScriptManager.instance then return end  -- Ensure ScriptManager exists  
+
+    local item = ScriptManager.instance:getItem("Base.Item")
+    if not item then return end  
+
+    local currentTags = item:getTags()
+    local newTagsList = {"Tag1", "Tag2"}
+    local tagsSet = {}  -- use  set to avoid dup tags  
+
+    -- here we add existing tags to the set  
+    if currentTags and not currentTags:isEmpty() then
+        for i = 0, currentTags:size() - 1 do
+            tagsSet[currentTags:get(i)] = true
+        end
+    end
+    -- add new tags  
+    for _, tag in ipairs(newTagsList) do
+        tagsSet[tag] = true
+    end
+    -- convert the set back to a list and update it
+    local mergedTags = {}
+    for tag in pairs(tagsSet) do
+        table.insert(mergedTags, tag)
+    end
+    item:DoParam("Tags = " .. table.concat(mergedTags, ";"))
+end
+
+-- Events.OnGameBoot.Add(appendSample)

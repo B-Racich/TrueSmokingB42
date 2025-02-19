@@ -61,7 +61,7 @@ function OnEat_Hook(food, character, percent)
     local trueSmoking = TrueSmoking:getPlayerReference(character)
     local num = character:getPlayerNum()
 
-    trueSmoking.Smokable:light()
+    -- trueSmoking.Smokable:light()
 end
 
 --Modified OnEat function to cover Smokables and distribute stats over time
@@ -72,6 +72,10 @@ function OnEat_OverTime(smokable)
     local character = smokable.player
     local body = character:getBodyDamage()
     local stats = character:getStats()
+    local gameSpeed = getGameSpeed() == 1 and 1 or
+        getGameSpeed() == 2 and 5 or
+        getGameSpeed() == 3 and 20 or
+        getGameSpeed() == 4 and 40
 
     local function adjustStat(stat, value, name, add)
         local name = name or 'nil'
@@ -92,20 +96,20 @@ function OnEat_OverTime(smokable)
 
     --Mimic vanilla logic for smoker which essentially 0's these stats
     if character:HasTrait("Smoker") then
-        temp = 100 * percent
+        temp = 100 * percent * gameSpeed
         body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp, 'unhappy'))
 
-        temp = 1 * percent
-        stats:setStress(adjustStat(stats:getStress()-stats:getStressFromCigarettes(), percent, 'stress'))
+        temp = 1 * percent * gameSpeed
+        stats:setStress(adjustStat(stats:getStress()-stats:getStressFromCigarettes(), temp, 'stress'))
 
-        temp = 0.51 * percent
+        temp = 0.51 * percent * gameSpeed
         stats:setStressFromCigarettes(adjustStat(stats:getStressFromCigarettes(), temp, 'cigs'))
         -- stats:setStressFromCigarettes(0)
 
-        temp = 10 * percent
-        character:setTimeSinceLastSmoke(character:getTimeSinceLastSmoke() - percent * 10)
+        temp = 10 * percent * gameSpeed
+        character:setTimeSinceLastSmoke(character:getTimeSinceLastSmoke() - temp)
     else --distribute stats for non smoker (stress and sickness)
-        temp = smokable.originalStress * percent
+        temp = smokable.originalStress * percent * gameSpeed
         stats:setStress(adjustStat(stats:getStress(), temp))
         smokable.stress = smokable.stress - temp
 
@@ -118,7 +122,7 @@ function OnEat_OverTime(smokable)
         end
 
         if smokable.foodSick ~= 0 then
-            temp = smokable.originalFoodSick * percent
+            temp = smokable.originalFoodSick * percent * gameSpeed
             body:setFoodSicknessLevel(math.min(body:getFoodSicknessLevel() + temp, 100))
             smokable.foodSick = smokable.foodSick - temp
             if smokable.foodSick < 0 then
@@ -127,7 +131,7 @@ function OnEat_OverTime(smokable)
         end
 
         if smokable.unhappyness ~= 0 then
-            temp = smokable.originalUnhappyness * percent
+            temp = smokable.originalUnhappyness * percent * gameSpeed
             body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp, 'unhappy'))
             smokable.unhappyness = smokable.unhappyness - temp
             -- print(string.format("Smokable unhappyness: %s | temp: %s", smokable.unhappyness, temp))
@@ -143,7 +147,7 @@ function OnEat_OverTime(smokable)
 
     --If smokable has boredom or unhappyness distribute them (these are applied in vanilla outside of OnEat, but we 0'd them earlier.)
     if smokable.boredom ~= 0 then
-        temp = smokable.originalBoredom * percent
+        temp = smokable.originalBoredom * percent * gameSpeed
         body:setBoredomLevel(adjustStat(body:getBoredomLevel(), temp - ZomboidGlobals.BoredomIncrease, 'boredom'))
         smokable.boredom = smokable.boredom - temp
         -- print(string.format("Smokable boredom: %s | temp: %s", smokable.boredom, temp))
@@ -154,7 +158,7 @@ function OnEat_OverTime(smokable)
 
     --Handles hunger
     if smokable.hunger ~= 0 then
-        temp = smokable.originalHunger * percent
+        temp = smokable.originalHunger * percent * gameSpeed
         stats:setHunger(adjustStat(stats:getHunger(), temp, 'hunger', true))
         smokable.hunger = smokable.hunger - temp
         if smokable.hunger < 0 then
@@ -164,7 +168,7 @@ function OnEat_OverTime(smokable)
 
     --Handles thirst
     if smokable.thirst ~= 0 then
-        temp = smokable.originalThirst * percent
+        temp = smokable.originalThirst * percent * gameSpeed
         stats:setThirst(adjustStat(stats:getThirst(), temp, 'thirst', true))
         smokable.thirst = smokable.thirst - temp
         if smokable.thirst < 0 then
@@ -174,7 +178,7 @@ function OnEat_OverTime(smokable)
 
     --Handles pain
     if smokable.pain ~= 0 then
-        temp = smokable.originalPain * percent
+        temp = smokable.originalPain * percent * gameSpeed
         stats:setPain(adjustStat(stats:getPain(), temp, 'pain'))
         smokable.pain = smokable.pain - temp
         if smokable.pain < 0 then
@@ -186,7 +190,7 @@ function OnEat_OverTime(smokable)
     if smokable.endurance ~= 0 then
         local add = false;
         if smokable.endurance > 0 then add = true end
-        temp = smokable.originalEndurance * percent
+        temp = smokable.originalEndurance * percent * gameSpeed
         stats:setEndurance(adjustStat(stats:getEndurance(), temp, 'endurance'))
         smokable.endurance = smokable.endurance - temp
         if add and smokable.endurance < 0 then
@@ -200,7 +204,7 @@ function OnEat_OverTime(smokable)
     if smokable.fatigue ~= 0 then
         local add = false;
         if smokable.fatigue > 0 then add = true end
-        temp = smokable.originalFatigue * percent
+        temp = smokable.originalFatigue * percent * gameSpeed
         stats:setFatigue(adjustStat(stats:getFatigue(), temp, 'fatigue', add))
         smokable.fatigue = smokable.fatigue - temp
         if add and smokable.fatigue < 0 then
@@ -212,7 +216,7 @@ function OnEat_OverTime(smokable)
 
     --Handles reduceFoodSickness
     if smokable.reduceFoodSick ~= 0 then
-        temp = smokable.originalReduceFoodSick * percent
+        temp = smokable.originalReduceFoodSick * percent * gameSpeed
         body:setFoodSicknessLevel(math.min(body:getFoodSicknessLevel() - temp, 100))
         smokable.reduceFoodSick = smokable.reduceFoodSick - temp
         if smokable.reduceFoodSick < 0 then
@@ -224,8 +228,8 @@ function OnEat_OverTime(smokable)
     if getActivatedMods():contains("\\N&CsNarcotics") then
         if smokable.item:getModData().modOnEat == "OnEat_WeedSmoke" then 
             if smokable.NnC_PainThresh ~= 0 or smokable.NnC_StiffRemoval ~= 0 then
-                local stiffRemoval = smokable.NnC_OriginalStiffRemoval * percent
-                local painThresh = smokable.NnC_OriginalPainThresh * percent
+                local stiffRemoval = smokable.NnC_OriginalStiffRemoval * percent * gameSpeed
+                local painThresh = smokable.NnC_OriginalPainThresh * percent * gameSpeed
                 local bodyDamage = character:getBodyDamage()
                 local BodyPartsStiff = {BodyPartType.Head, BodyPartType.Neck, BodyPartType.Torso_Upper,
                                         BodyPartType.Torso_Lower, BodyPartType.Hand_R, BodyPartType.ForeArm_R, BodyPartType.UpperArm_R,
@@ -243,7 +247,7 @@ function OnEat_OverTime(smokable)
                         character:getFitness():removeStiffnessValue(BodyPartType.ToString(BodyPartsStiff[i]))
                     end
                     if currentPain >= 50 then
-                        bodyPart:setAdditionalPain(currentPain - painThresh*percent)
+                        bodyPart:setAdditionalPain(currentPain - painThresh)
                     elseif currentPain < 50 then
                         bodyPart:setAdditionalPain(0);
                     end

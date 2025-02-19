@@ -70,6 +70,7 @@ function TakePuff:start()
 
     --Track puff
     self.trueSmoking.takingPuff = true
+    self.puffTimeMark = os.time()
 
     --2x for 1/2 speed anim
     if anim == 'Smoke_Quiet' then
@@ -118,14 +119,16 @@ function TakePuff:stop()
     self.trueSmoking.Smokable.removedVisualItem = true
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
+    self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
     self:forceComplete()
 end
 
 function TakePuff:perform()
     ISBaseTimedAction.perform(self)
-    --Track puff
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
+end
+
+function TakePuff:complete()
+    return true
 end
 
 function TakePuff:new(character)

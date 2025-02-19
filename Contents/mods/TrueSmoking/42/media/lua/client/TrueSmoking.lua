@@ -4,6 +4,8 @@ require 'Utils'
 require 'Smokable'
 require 'SmokingMoodle'
 
+local InventoryUI = require("Starlit/client/ui/InventoryUI")
+
 --[[
     This class serves as the entry point for the mod and stores references to the moodle and smokable object to retain the same instance.
     Apart from holding a few variables, and options there are a few functions to handle unpacking cigarrettes and finding them. Mostly this
@@ -231,6 +233,10 @@ function TrueSmoking:hasLightable(item, player)
         return item:getCurrentUsesFloat() > 0
     end
 
+    local function hasLighterTag(item)
+        return item:getTags():contains('Lighter') and predicateNotEmpty(item)
+    end
+
     local found = false;
     if item:hasTag("Smokable") and player:getVehicle() and player:getVehicle():canLightSmoke(player) then found = true end
     if item:hasTag("Smokable") and not found then
@@ -238,14 +244,21 @@ function TrueSmoking:hasLightable(item, player)
     end
     if not found then
         local types = item:getRequireInHandOrInventory()
-        for i=1,types:size() do
-            local fullType = moduleDotType(item:getModule(), types:get(i-1))
-            local item2 = player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
-            if item2 then
-                -- local fullType = moduleDotType(item:getModule(), item)
-                local fullType = item2:getFullType()
-                if player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty) then
-                    found = true;
+        if types then
+            for i=1,types:size() do
+                local fullType = moduleDotType(item:getModule(), types:get(i-1))
+                local item2 = player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
+                if item2 then
+                    -- local fullType = moduleDotType(item:getModule(), item)
+                    local fullType = item2:getFullType()
+                    if player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty) then
+                        found = true;
+                    end
+                end
+            end
+            if not found then
+                if player:getInventory():getFirstEvalRecurse(hasLighterTag) then
+                    found = true
                 end
             end
         end
@@ -304,6 +317,7 @@ function TrueSmoking:start(playerNum, player)
 
     -- 460 is vanilla
     self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 400 or 220
+    self.relightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 400 or 120
 
     --Start the update event
     local function keyWrapper(key)
@@ -343,6 +357,27 @@ function TrueSmoking:stop(playerNum, player)
         o.contextWrapper = nil
     end
 end
+
+local remainingSmokeTooltip = function(tooltip, layout, item)
+    -- Check if the item has moddata with 'peed = true'
+    if item:getModData().SmokeLength and item:getModData().OriginalSmokeLength then
+        local current = item:getModData().SmokeLength
+        local original = item:getModData().OriginalSmokeLength
+        local amt = (current / original)*100
+        amt = amt >= 0 and amt or 0
+
+        local label = "Remaining: " .. string.format("%.1f", amt) .. "%"
+
+        local layoutItem = LayoutItem.new()
+        layout.items:add(layoutItem)
+        layoutItem:setLabel(label, 1, 1, 1, 1)
+
+        -- InventoryUI.addTooltipLabel(layout, string.format("Remaining: %.1f%",amt))
+        -- InventoryUI.addTooltipBar(layout, "Remaining:", amt)
+    end
+end
+
+InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
 --Events.OnGameBoot.Add(init)
 Events.OnCreatePlayer.Add(function(playerNum, player)

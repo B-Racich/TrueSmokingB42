@@ -20,8 +20,9 @@ end
 
 function LightSmoke:start()
     --Set the animation
-    local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
-    self:setActionAnim(anim)
+    -- local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
+    -- self:setActionAnim(anim)
+    self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable("FoodType", self.item:getEatType())
     -- self:setOverrideHandModels(nil, self.item)
 
@@ -46,6 +47,22 @@ end
 
 function LightSmoke:perform()
     ISBaseTimedAction.perform(self)
+    self.trueSmoking.Smokable.smokeLit = true
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
+
+    if self.trueSmoking.Smokable.burnRate == 0 then
+        self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin, self.trueSmoking.Smokable.burnMax)
+    end
+end
+
+function LightSmoke:complete()
+    self.trueSmoking.Smokable.smokeLit = true
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
+
+    if self.trueSmoking.Smokable.burnRate == 0 then
+        self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin, self.trueSmoking.Smokable.burnMax)
+    end
+    return true
 end
 
 function LightSmoke:new(character)
@@ -61,7 +78,7 @@ function LightSmoke:new(character)
     o.item = o.trueSmoking.Smokable.item
     o.eatSound = ''
     o.eatAudio = 0
-    o.maxTime = 120
+    o.maxTime = TrueSmoking.relightTime
 
     setmetatable(o, self)
     self.__index = self
