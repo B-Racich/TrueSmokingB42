@@ -98,6 +98,15 @@ end
 function TakePuff:stop()
     ISBaseTimedAction.stop(self)
 
+    if self.character:getEmitter():isPlaying(self.eatSound) then
+        self.character:getEmitter():stopSound(self.eatAudio)
+    end
+
+    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
+    self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
+
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
         if self.character:HasTrait("Smoker") then
@@ -111,22 +120,18 @@ function TakePuff:stop()
         end
     end
 
-    if self.character:getEmitter():isPlaying(self.eatSound) then
-        self.character:getEmitter():stopSound(self.eatAudio)
-    end
-
-    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
-    self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
     self:forceComplete()
 end
 
 function TakePuff:perform()
     ISBaseTimedAction.perform(self)
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
 end
 
 function TakePuff:complete()
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
     return true
 end
 

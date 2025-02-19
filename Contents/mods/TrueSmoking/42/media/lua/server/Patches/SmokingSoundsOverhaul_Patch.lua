@@ -12,7 +12,7 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
             SSO_last_puff_sound = sound_rand
         end
 
-        print("Smoking_puff" .. sound_rand .. gender)
+        -- print("Smoking_puff" .. sound_rand .. gender)
 
         return "Smoking_puff" .. sound_rand .. gender
     end

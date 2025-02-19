@@ -69,7 +69,7 @@ function Smokable:new(item, player)
     item:getModData().OriginalSmokeLength = obj.smokeLength
     if item:getModData().SmokeLength then obj.smokeLength = item:getModData().SmokeLength print(item:getModData().SmokeLength)  end
 
-    print(string.format('Smokable length: %s, original: %s',obj.smokeLength, obj.originalSmokeLength))
+    -- print(string.format('Smokable length: %s, original: %s',obj.smokeLength, obj.originalSmokeLength))
 
     obj.smokePercent = 1.0
     obj.smokeLit = false
