@@ -164,7 +164,7 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
             local setTo = putDown and open or covered
             if (fullType == covered and putDown) or (fullType == open and not putDown) then
                 print(string.format('Adjusted Shegmah: %s - putDown: %s - setTo: %s',fullType, putDown and 'true' or 'false', setTo))
-                ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo))
+                ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo, 30))
                 return true
             end
         end
