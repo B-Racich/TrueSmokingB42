@@ -21,7 +21,7 @@ option TrueSmoking.PuffFactor
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 1.55,
+    default = 1.75,
     page = TrueSmoking, translation=TrueSmoking_PuffFactor,
 }
 option TrueSmoking.RunningFactor

@@ -227,7 +227,7 @@ function Smokable:update()
             self.burnRate = self.burnRate - self.burnRate * 0.001 * TrueSmoking.Options.RunningFactor * gameSpeed
         else
             --change burn rate with idleFactor
-            self.burnRate = self.burnRate - self.burnRate * 0.001 * gameSpeed
+            self.burnRate = self.burnRate - self.burnRate * 0.001 * TrueSmoking.Options.IdleFactor * gameSpeed
         end
 
         --How much % we smoked this tick
