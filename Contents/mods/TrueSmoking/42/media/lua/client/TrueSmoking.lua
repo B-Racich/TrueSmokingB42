@@ -231,7 +231,8 @@ function TrueSmoking:findSmokable(player)
     if cigarette and self:hasLightable(cigarette, player) then
         -- cigarette:
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
-        ISTimedActionQueue.add(ISEatFoodAction:new(player, cigarette, 1))
+        ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
+        -- ISTimedActionQueue.add(ISEatFoodAction:new(player, cigarette, 1))
     end
 end
 
