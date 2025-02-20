@@ -383,6 +383,8 @@ end
 
 InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
+BodyLocations.getGroup("Human"):getOrCreateLocation("Mask_Smoke")
+
 --Events.OnGameBoot.Add(init)
 Events.OnCreatePlayer.Add(function(playerNum, player)
     TrueSmoking:start(playerNum, player)
