@@ -36,7 +36,7 @@ function TakePuff:update()
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
 
-    if not (isKeyDown(TrueSmoking.Config.keySmoke) and not self.trueSmoking.B_HELD) and not self.endAction then
+    if not (isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) and not self.endAction then
         local diffTime = os.difftime(curTime, self.timer)
         local roundedDiffTime = tonumber(string.format("%.1f", diffTime))
         local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % self.visualItemAnimLength))

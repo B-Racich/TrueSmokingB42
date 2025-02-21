@@ -67,8 +67,8 @@ function PutOut:complete()
 
     TrueSmoking:checkForMaskAndEquip(self.character)
 
-    if(self.trueSmoking.Smokable.smokeLength <= 0) then
-        self.character:getInventory():Remove(self.item)
+    if(self.trueSmoking.Smokable.smokeLength > 0) then
+        self.character:getInventory():AddItem(self.item)
     end
 
     self.trueSmoking.Smokable.item = {}  --clear item for safety.

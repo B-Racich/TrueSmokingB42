@@ -21,7 +21,7 @@ function Smokable:new(item, player)
     setmetatable(obj, self)
 
     local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
-    obj.burnMin, obj.burnMax = 0.0000125, 0.000215
+    obj.burnMin, obj.burnMax = 0.0000125, 0.000315
 
     obj.player = player
 
@@ -188,6 +188,7 @@ function Smokable:light()
 
         self.table.visualItem = self:getVisualItem()
         self:equipVisualItem()
+        self.player:getInventory():Remove(self.item)
     end
     if not self.smokeLit then
         ISTimedActionQueue.add(LightSmoke:new(self.player))
@@ -216,15 +217,15 @@ function Smokable:update()
         if self.table.takingPuff then
             --change burn rate with puffFactor
             if self.burnRate < self.burnMin then
-                self.burnRate = self.burnRate + self.burnRate * 0.01 * TrueSmoking.Options.PuffFactor * gameSpeed
+                self.burnRate = self.burnRate + self.burnRate * 0.1 * TrueSmoking.Options.PuffFactor * gameSpeed
             elseif self.burnRate < self.burnMax then
                 self.burnRate = self.burnRate + self.burnRate * 0.001 * TrueSmoking.Options.PuffFactor * gameSpeed
             else
-                self.burnRate = self.burnRate + self.burnRate * 0.00001 * TrueSmoking.Options.PuffFactor * gameSpeed
+                self.burnRate = self.burnRate + self.burnRate * 0.0001 * TrueSmoking.Options.PuffFactor * gameSpeed
             end
         elseif self.player:isRunning() or self.player:isSprinting() then
             --change burn rate with runningFactor
-            self.burnRate = self.burnRate - self.burnRate * 0.001 * TrueSmoking.Options.RunningFactor * gameSpeed
+            self.burnRate = self.burnRate + self.burnRate * 0.001 * TrueSmoking.Options.RunningFactor * gameSpeed
         else
             --change burn rate with idleFactor
             self.burnRate = self.burnRate - self.burnRate * 0.001 * TrueSmoking.Options.IdleFactor * gameSpeed
