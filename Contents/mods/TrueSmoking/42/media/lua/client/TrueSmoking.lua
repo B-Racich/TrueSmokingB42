@@ -349,7 +349,7 @@ function TrueSmoking:start(playerNum, player)
 end
 
 --Stop our event listeners on player death
-function TrueSmoking:stop(playerNum, player)
+function TrueSmoking:stop(player)
     local o = self:getPlayerReference(player)
 
     o.Moodle:stop()
@@ -390,8 +390,8 @@ Events.OnCreatePlayer.Add(function(playerNum, player)
     TrueSmoking:start(playerNum, player)
 end)
 
-Events.OnPlayerDeath.Add(function(playerNum, player)
-    TrueSmoking:stop(playerNum, player)
+Events.OnPlayerDeath.Add(function(player)
+    TrueSmoking:stop(player)
 end)
 
 --Load SandboxVars

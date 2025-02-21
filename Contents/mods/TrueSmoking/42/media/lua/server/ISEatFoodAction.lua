@@ -1,23 +1,13 @@
 require 'TimedActions/ISEatFoodAction'
 
 local originalActionNew = ISEatFoodAction.new
--- local originalActionIsValid = ISEatFoodAction.isValid
--- local originalActionStop = ISEatFoodAction.stop
--- local originalActionPerform = ISEatFoodAction.perform
 local originalActionStart = ISEatFoodAction.start
 local originalActionComplete = ISEatFoodAction.complete
 
---[[
-    This file hooks the foodAction, here the Smokable object is created and stored into
-    the global TrueSmoking object.
-]]
-
---Hook the ISEatFoodAction to grab smokable items and make our changes, stop the vanilla actions and call our own.
-function ISEatFoodAction:new (character, item, percentage)
+--Hook the ISEatFoodAction to grab smokable items and make our changes
+function ISEatFoodAction:new(character, item, percentage)
     local o = {}
     local onEat = item:getOnEat() or ''
-    local modOnEat = item:getModData().modOnEat or ''
-    local name = item:getFullType() or ''
     local hook = 'OnEat_Hook'
     local hasSmokableTag = item:getTags():contains('Smokable')
     local funcsToHook = {'OnEat_Cigarettes','OnEat_Cigarillo','OnEat_Cigar',
