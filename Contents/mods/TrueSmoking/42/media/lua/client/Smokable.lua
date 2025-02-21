@@ -251,7 +251,7 @@ function Smokable:update()
     end
 
     --Smoke is finished (smokeLength is 0)
-    if self.smokeLength < 0 then
+    if self.smokeLength <= 0 then
         self.smokeLength = 0
         self:putOut()
     end
