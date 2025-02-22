@@ -1,15 +1,10 @@
-require 'TrueSmoking'
-
-TrueSmoking = TrueSmoking or {}
-TrueSmoking.ISWearClothing = TrueSmoking.ISWearClothing or {}
-
 --[[
     Hook the complete method to mark when our mask actually equipped, this allows the keybind to try again
     if it was interrupted
 ]]
-TrueSmoking.ISWearClothing.complete = ISWearClothing.complete
+local originalComplete = ISWearClothing.complete
 function ISWearClothing:complete()
-    local rtn = TrueSmoking.ISWearClothing.complete(self)
+    local rtn = originalComplete(self)
     local o = TrueSmoking:getPlayerReference(self.character)
     if self.item == o.mask then
         o.mask = false
@@ -20,9 +15,9 @@ end
 --[[
     Added in a time param, not really needed now as we can directly call setWornItem, will leave for now...
 ]]
-TrueSmoking.ISWearClothing.new = ISWearClothing.new
+local originalNew = ISWearClothing.new
 function ISWearClothing:new(character, item, time)
-    local o = TrueSmoking.ISWearClothing.new(self, character, item)
+    local o = originalNew(self, character, item)
     if time then o.maxTime = time end
     return o
 end

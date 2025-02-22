@@ -19,21 +19,20 @@ function ISEatFoodAction:new(character, item, percentage)
     local trueSmoking = TrueSmoking:getPlayerReference(character)
     o.trueSmoking = trueSmoking
 
-    trueSmoking.mask = false
-    trueSmoking.shemagh = false
-    TrueSmoking:checkForMaskAndRemove(character)
-
     if isInList(onEat, funcsToHook) or hasSmokableTag then
         print('Hooking: '..onEat..' -> '..hook)
-        if not trueSmoking.isSmoking then trueSmoking.Smokable = Smokable:new(item, character) end
-        -- print('Made new smokable')
-        item:setReplaceOnUse(nil) --nil this fields to avoid consuming the item 
+        if not trueSmoking.isSmoking then
+            print('setting up smokable')
+            trueSmoking.Smokable = Smokable:new(item, character)
+            -- print('Made new smokable')
+            item:setReplaceOnUse(nil) --nil this fields to avoid consuming the item 
 
-        item:getModData().modOnEat = onEat
-        item:setOnEat(hook)
+            item:getModData().modOnEat = onEat
+            item:setOnEat(hook)
 
-        o.item = item
-        o.maxTime = TrueSmoking.lightTime;
+            o.item = item
+            o.maxTime = TrueSmoking.lightTime;
+        end
     end
 
     return o
@@ -51,6 +50,7 @@ function ISEatFoodAction:complete()
             self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin, self.trueSmoking.Smokable.burnMax)
         end
 
+        -- print('call light')
         self.trueSmoking.Smokable:light()
         return true
     else

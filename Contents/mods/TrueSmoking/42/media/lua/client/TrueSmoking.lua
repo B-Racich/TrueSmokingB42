@@ -27,6 +27,9 @@ TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
 TrueSmoking.Player_3 = TrueSmoking.Player_3 or {}
 TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
+TrueSmoking.originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
+TrueSmoking.originalEatItem = ISInventoryPaneContextMenu.eatItem
+
 --[[
     For modders use this to set smoke lengths on your smokables
     { [item:getFullType()] = <Smoke Length> }
@@ -82,43 +85,10 @@ function TrueSmoking:isVisualItem(item)
     return false
 end
 
---Mask helper functions
-function TrueSmoking:checkForMaskAndRemove(player)
-    if not TrueSmoking.Options.ManageHeadGear then return end
-    local o = self:getPlayerReference(player)
-    self:getWornMask(player)
-    if o.mask then
-        self:removeItem(player, o.mask, 50)
-    end
-    if o.shemagh then
-        self:adjustShemagh(player, o.shemagh, true)
-    end
-end
-
-function TrueSmoking:checkForMaskAndEquip(player)
-    local o = self:getPlayerReference(player)
-    if o.mask then
-        self:equipItem(player, o.mask, 50)
-    end
-    if o.shemagh then
-        self:getWornMask(player, true)
-        self:adjustShemagh(player, o.shemagh, false)
-    end
-end
-
---[[
-    Nothing is easy, have to rewrite this and find every item that makes sense.
-    Shemagh support would be nice to reveal face to smoke.
-
-    strip out some checks to be more liberal here for now.
-]]
-function TrueSmoking:getWornMask(player, reCover)
+function TrueSmoking:getShemagh(player, reCover)
     local o = self:getPlayerReference(player)
     local items = {}
-    items['Mask'] = player:getWornItem('Mask') or ''
-    items['MaskEyes'] = player:getWornItem('MaskEyes') or ''
     items['FullHat'] = player:getWornItem('FullHat') or ''
-    items['MaskFull'] = player:getWornItem('MaskFull') or ''
     items['Hat'] = player:getWornItem('Hat') or ''
     items['Neck'] = player:getWornItem('Neck') or ''
     for _, item in pairs(items) do
@@ -129,8 +99,6 @@ function TrueSmoking:getWornMask(player, reCover)
                     o.shemagh = item
                     return item
                 end
-                o.mask = item
-                return item
             elseif reCover and type:contains('Shemagh') then
                 o.shemagh = item
                 return item
@@ -138,6 +106,19 @@ function TrueSmoking:getWornMask(player, reCover)
         end
     end
     return false
+end
+
+function TrueSmoking:checkForMaskAndEquip(player)
+    local o = self:getPlayerReference(player)
+    if o.mask then
+        self:equipItem(player, o.mask, 50)
+    end
+    if o.shemagh then
+        o.shemagh = self:getShemagh(player, true)
+        if o.shemagh then
+            self:adjustShemagh(player, o.shemagh, false)
+        end
+    end
 end
 
 --Wrappers for mask actions
@@ -232,8 +213,37 @@ function TrueSmoking:findSmokable(player)
         -- cigarette:
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
         ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
-        -- ISTimedActionQueue.add(ISEatFoodAction:new(player, cigarette, 1))
     end
+end
+
+ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
+    if item:getTags():contains('Smokable') then
+        TrueSmoking:getPlayerReference(player).CheckMaskSmoking = true
+    else
+        TrueSmoking:getPlayerReference(player).CheckMaskSmoking = false
+    end
+    TrueSmoking.originalEatItem(item, percentage, player)
+end
+
+--Cleaner implementation for detecting masks and shemaghs and doing our own logic to re-equip and adjust
+ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
+    local o = TrueSmoking:getPlayerReference(playerObj)
+
+    local mask = TrueSmoking.originalGetEatingMask(playerObj, false)
+
+    if mask and mask:getFullType():contains('Shemagh') and mask:getTags():contains('CantSmoke') and o.CheckMaskSmoking then
+        o.shemagh = mask
+        TrueSmoking:adjustShemagh(playerObj, mask, true)
+    else
+        mask = TrueSmoking.originalGetEatingMask(playerObj, removeMask)
+        o.mask = mask
+    end
+
+    if getActivatedMods():contains('\\P4TidyUpMeister') and o.CheckMaskSmoking then
+        return false
+    end
+
+    return mask
 end
 
 --Checks if the player has a lightable item (lighter, matches, etc)
