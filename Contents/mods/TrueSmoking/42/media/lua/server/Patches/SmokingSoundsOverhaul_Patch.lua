@@ -26,13 +26,6 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
         local SM_foil_lighter = playerInv:getFirstType("SM.SMFoil_Lighter")
         local SM_Matchbox = playerInv:getFirstType("SM.Matches")
 
-        local lightable = TrueSmoking:hasLightable(item, player, true)
-        if lightable then
-            lightable = lightable:getFullType()
-        else
-            lightable = ''
-        end
-
         local sound_rand = 0;
         local current_sound = "";
 
