@@ -18,13 +18,13 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
 
     function SmokingSoundsOverhaul:getLightingSound(player, item)
         local playerInv = player:getInventory()
-        -- local lighter = playerInv:getFirstTag("Lighter") or playerInv:getFirstType("Base.Lighter");
-        -- local matches = playerInv:getFirstTag("Matches") or playerInv:getFirstType("Base.Matches");
-        -- local matchbox = playerInv:getFirstTag("MatchBox") or playerInv:getFirstType("Base.Matchbox");
+        local lighter = playerInv:getFirstTag("Lighter") or playerInv:getFirstType("Base.Lighter");
+        local matches = playerInv:getFirstTag("Matches") or playerInv:getFirstType("Base.Matches");
+        local matchbox = playerInv:getFirstTag("MatchBox") or playerInv:getFirstType("Base.Matchbox");
         
         --Smoker support
-        -- local SM_foil_lighter = playerInv:getFirstType("SM.SMFoil_Lighter")
-        -- local SM_Matchbox = playerInv:getFirstType("SM.Matches")
+        local SM_foil_lighter = playerInv:getFirstType("SM.SMFoil_Lighter")
+        local SM_Matchbox = playerInv:getFirstType("SM.Matches")
 
         local lightable = TrueSmoking:hasLightable(item, player, true)
         if lightable then
@@ -33,17 +33,11 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
             lightable = ''
         end
 
-        local lighter = string.find(lightable, 'Lighter')
-        local matches = string.find(lightable, 'Matches')
-        local matchbox = string.find(lightable, 'MatchBox')
-
         local sound_rand = 0;
         local current_sound = "";
 
-        -- print('checks')
-        -- print(lighter)
         --Randomly select one of the 3 sounds
-        if lighter then
+        if lighter or SM_foil_lighter then
             -- print('found lighter')
             while sound_rand == SSO_last_lighter_sound or sound_rand == 0 do
                 -- print('got sound')
@@ -53,7 +47,7 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
             SSO_last_lighter_sound = sound_rand
 
             current_sound = "Smoking_lighter" .. sound_rand
-        elseif matches or matchbox then
+        elseif matches or matchbox or SM_Matchbox then
             while sound_rand == SSO_last_match_sound or sound_rand == 0 do
                 sound_rand = ZombRand(1, 4)
             end

@@ -53,7 +53,7 @@ if getActivatedMods():contains('\\IMightNeedALighter') then
 
         --Now it's lit, let's smoke it
         if luautils.walkAdj(_player, stove:getSquare(), true) then
-            ISInventoryPaneContextMenu.eatItem(_cigarette,1,_player:getPlayerNum())
+            ISInventoryPaneContextMenu.eatItem(_cigarette, 1, _player:getPlayerNum())
         end
     end
 end

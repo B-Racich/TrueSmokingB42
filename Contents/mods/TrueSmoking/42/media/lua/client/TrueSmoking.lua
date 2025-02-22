@@ -209,8 +209,7 @@ function TrueSmoking:findSmokable(player)
             cigarette = player:getInventory():getFirstTypeRecurse(value)
         end
     end
-    if cigarette and self:hasLightable(cigarette, player) then
-        -- cigarette:
+    if cigarette then
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
         ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
     end
@@ -239,53 +238,11 @@ ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
         o.mask = mask
     end
 
-    if getActivatedMods():contains('\\P4TidyUpMeister') and o.CheckMaskSmoking then
+    if o.CheckMaskSmoking then
         return false
     end
 
     return mask
-end
-
---Checks if the player has a lightable item (lighter, matches, etc)
-function TrueSmoking:hasLightable(item, player, onlyItems)
-    --Predicate to check if the item has uses (lighters, matches, etc)
-    local function predicateNotEmpty(item)
-        return item:getCurrentUsesFloat() > 0
-    end
-
-    local function hasLighterTag(item)
-        return item:getTags():contains('Lighter') and predicateNotEmpty(item)
-    end
-
-    local found = false;
-    if item:hasTag("Smokable") and player:getVehicle() and player:getVehicle():canLightSmoke(player) then found = true end
-    if item:hasTag("Smokable") and not found and not onlyItems then
-       found = ISInventoryPaneContextMenu.hasOpenFlame(player)
-    end
-    if not found then
-        local types = item:getRequireInHandOrInventory()
-        if types then
-            for i=1,types:size() do
-                local fullType = moduleDotType(item:getModule(), types:get(i-1))
-                local item2 = player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
-                if item2 then
-                    -- local fullType = moduleDotType(item:getModule(), item)
-                    local fullType = item2:getFullType()
-                    found = player:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
-                    if found then
-                        return found
-                    end
-                end
-            end
-            if not found then
-                found = player:getInventory():getFirstEvalRecurse(hasLighterTag)
-                if found then
-                    return found
-                end
-            end
-        end
-    end
-    return found
 end
 
 --Key Event Listener
@@ -323,7 +280,7 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         if hasSmoke then
             if o.isSmoking then
                 hasSmoke.notAvailable = true
-            elseif not o.isSmoking and self:hasLightable(item, getSpecificPlayer(player)) then
+            elseif not o.isSmoking then
                 hasSmoke.notAvailable = false
             end
         end
