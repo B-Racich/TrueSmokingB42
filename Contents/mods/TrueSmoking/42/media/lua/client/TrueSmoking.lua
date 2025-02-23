@@ -67,22 +67,13 @@ end
 
 --[[
     For modders use this to set smoke packs for the hotkey
-    { [item:getFullType()] = <Name of item> }
-    ex. { ['Base.CigaretteSingle'] = 'Base.Mask_Cigarette' }
+    { [item:getFullType()] = recipeString }
+    ex. { ['Base.CigarettePack'] = 'TakeACigarette' }
 ]]
 function TrueSmoking:setHotkeyPacks(list)
-    for _, item in ipairs(list) do
-        table.insert(self.HotkeyPacks, item)
+    for key, item in pairs(list) do
+        self.HotkeyPacks[key] = item
     end
-end
-
-function TrueSmoking:isVisualItem(item)
-    for key, value in pairs(self.VisualItems) do
-        if item:getFullType() == value then
-            return true
-        end
-    end
-    return false
 end
 
 function TrueSmoking:getShemagh(player, reCover)
@@ -106,24 +97,6 @@ function TrueSmoking:getShemagh(player, reCover)
         end
     end
     return false
-end
-
-function TrueSmoking:checkForMaskAndEquip(player)
-    local o = self:getPlayerReference(player)
-    if o.mask then
-        self:equipItem(player, o.mask, 50)
-    end
-    if o.shemagh then
-        o.shemagh = self:getShemagh(player, true)
-        if o.shemagh then
-            self:adjustShemagh(player, o.shemagh, false)
-        end
-    end
-end
-
---Wrappers for mask actions
-function TrueSmoking:removeItem(player, item, time)
-    ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
 end
 
 function TrueSmoking:adjustShemagh(player, item, putDown)
@@ -154,6 +127,24 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
 
     if handleCovers(fullCovers) then return end
     handleCovers(scarfCovers)
+end
+
+function TrueSmoking:checkForMaskAndEquip(player)
+    local o = self:getPlayerReference(player)
+    if o.mask then
+        self:equipItem(player, o.mask, 50)
+    end
+    if o.shemagh then
+        o.shemagh = self:getShemagh(player, true)
+        if o.shemagh then
+            self:adjustShemagh(player, o.shemagh, false)
+        end
+    end
+end
+
+--Wrappers for mask actions
+function TrueSmoking:removeItem(player, item, time)
+    ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
 end
 
 function TrueSmoking:equipItem(player, item, time)
@@ -198,13 +189,15 @@ function TrueSmoking:findSmokable(player)
     end
 
     local pack = false
-    for _, value in ipairs(self.HotkeyPacks) do
-        pack = player:getInventory():getFirstTypeRecurse(value)
+    local recipe = false
+    for key, val in pairs(self.HotkeyPacks) do
+        pack = player:getInventory():getFirstTypeRecurse(key)
+        recipe = val
         if pack then break end
     end
 
-    if not cigarette and pack then
-        self:useRecipe(pack, player, 'TakeACigarette')
+    if not cigarette and pack and recipe then
+        self:useRecipe(pack, player, recipe)
         for index, value in ipairs(self.HotkeySmokes) do
             cigarette = player:getInventory():getFirstTypeRecurse(value)
         end
@@ -215,6 +208,7 @@ function TrueSmoking:findSmokable(player)
     end
 end
 
+--Check if we are eating a smokable and set our mask flag
 ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
     if item:getTags():contains('Smokable') then
         TrueSmoking:getPlayerReference(player).CheckMaskSmoking = true
@@ -228,16 +222,18 @@ end
 ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
     local o = TrueSmoking:getPlayerReference(playerObj)
 
+    --use native function to get blocking mask
     local mask = TrueSmoking.originalGetEatingMask(playerObj, false)
 
     if mask and mask:getFullType():contains('Shemagh') and mask:getTags():contains('CantSmoke') and o.CheckMaskSmoking then
         o.shemagh = mask
         TrueSmoking:adjustShemagh(playerObj, mask, true)
-    else
+    else --let the game handle it normally
         mask = TrueSmoking.originalGetEatingMask(playerObj, removeMask)
         o.mask = mask
     end
 
+    --If we want to handle re-equipping tell the game we took nothing off
     if o.CheckMaskSmoking then
         return false
     end

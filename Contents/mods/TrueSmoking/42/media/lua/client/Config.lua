@@ -110,7 +110,7 @@ Events.OnCreatePlayer.Add(function()
     }
 
     local TRUE_SMOKING_DEFAULT_HOTKEY_PACKS = {
-        'Base.CigarettePack',
+        ['Base.CigarettePack'] = 'TakeACigarette',
     }
 
     TrueSmoking:setSmokeLengths(TRUE_SMOKING_DEFAULT_SMOKE_LENGTHS)
