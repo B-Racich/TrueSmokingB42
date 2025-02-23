@@ -259,17 +259,17 @@ function Smokable:checkDropSmoke()
     end
 end
 
---Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
+-- Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
 function Smokable:update()
-    --Checks if we are falling and dropped the smoke
+    -- Checks if we are falling and dropped the smoke
     self:checkDropSmoke()
     -- If smoke is lit, update burnRate
     if self.smokeLit then
         -- Calculate game speed (unchanged from original)
         local gameSpeed = getGameSpeed() == 1 and 1 or
-                        getGameSpeed() == 2 and 5 or
-                        getGameSpeed() == 3 and 20 or
-                        getGameSpeed() == 4 and 40
+                          getGameSpeed() == 2 and 5 or
+                          getGameSpeed() == 3 and 20 or
+                          getGameSpeed() == 4 and 40
 
         -- Try to take idle puff before calculating burn changes (unchanged)
         self:idlePuff()
@@ -280,27 +280,31 @@ function Smokable:update()
         local isStrafing = self.player:isStrafing()
         local inVehicle = self.player:isSeatedInVehicle()
 
-        -- Define target burn rate based on current activity
+        -- Define target burn rate for active states only
         local targetBurnRate
         if self.table.takingPuff then
             targetBurnRate = self.burnMax * TrueSmoking.Options.PuffFactor
-        -- elseif (isMoving) or isStrafing then
-        --     print('walking')
-        --     targetBurnRate = self.burnMin * TrueSmoking.Options.WalkingFactor
-        elseif isRunning then
-            targetBurnRate = self.burnMin * TrueSmoking.Options.RunningFactor
         elseif isSprinting then
             targetBurnRate = self.burnMin * TrueSmoking.Options.SprintingFactor
-        else
-            targetBurnRate = self.burnMin * TrueSmoking.Options.IdleFactor
+        elseif isRunning then
+            targetBurnRate = self.burnMin * TrueSmoking.Options.RunningFactor
+        -- Note: Walking condition is commented out in the original; omitted here
+        -- elseif (isMoving) or isStrafing then
+        --     targetBurnRate = self.burnMin * TrueSmoking.Options.WalkingFactor
         end
 
-        -- Smoothly adjust burnRate toward targetBurnRate
-        local adjustmentSpeed = 0.01  -- Controls transition speed (tune this value)
-        self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
-
-        -- Optional: clamp burnRate to prevent it from going too low (e.g., below burnMin * 0.1)
-        -- self.burnRate = math.max(self.burnRate, self.burnMin * 0.1)
+        if targetBurnRate then
+            -- Smoothly adjust burnRate toward targetBurnRate for active states
+            local adjustmentSpeed = 0.0025  -- Controls transition speed (tune this value)
+            if self.burnRate > self.burnMax then
+                adjustmentSpeed = adjustmentSpeed * 0.25  -- Slower adjustment beyond burnMax
+            end
+            self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
+        else
+            -- Apply exponential decay when idling
+            local decayFactor = 0.9988  -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
+            self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
+        end
 
         -- Calculate how much % was smoked this tick (unchanged)
         self.puffPercent = self.burnRate / self.originalSmokeLength
@@ -318,17 +322,17 @@ function Smokable:update()
         self.item:getModData().SmokeLength = self.smokeLength
     end
 
-    print(string.format('Burn Rate: %.8f',self.burnRate))
+    -- print(string.format('Burn Rate: %.8f', self.burnRate))
 
-    --Smoke went out (burn rate is 0)
-    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000489 then
+    -- Smoke went out (burn rate is very low)
+    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000025 then
         self.burnRate = 0
         self.smokeLit = false
     elseif not TrueSmoking.Options.SmokeRelighting and self.burnRate < self.burnMin then
         self.burnRate = self.burnMin
     end
 
-    --Smoke is finished (smokeLength is 0)
+    -- Smoke is finished (smokeLength is 0)
     if self.smokeLength <= 0 then
         self.smokeLength = 0
         self:putOut()

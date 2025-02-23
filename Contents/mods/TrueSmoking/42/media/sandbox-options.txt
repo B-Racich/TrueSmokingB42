@@ -21,7 +21,7 @@ option TrueSmoking.PuffFactor
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 2.0,
+    default = 1.25,
     page = TrueSmoking, translation=TrueSmoking_PuffFactor,
 }
 option TrueSmoking.WalkingFactor
@@ -37,7 +37,7 @@ option TrueSmoking.RunningFactor
     type = double,
     min = -10.0,
     max = 10.0,
-    default = 1.25,
+    default = 1.15,
     page = TrueSmoking, translation=TrueSmoking_RunningFactor,
 }
 option TrueSmoking.SprintingFactor
@@ -53,7 +53,7 @@ option TrueSmoking.IdleFactor
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 1.0,
+    default = 0.85,
     page = TrueSmoking, translation=TrueSmoking_IdleFactor,
 }
 

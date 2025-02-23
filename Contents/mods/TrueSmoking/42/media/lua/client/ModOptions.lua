@@ -8,8 +8,8 @@ options:addKeyBind("keySmoke", "Puff/Relight/Find Smoke", Keyboard.KEY_K, "Take 
 options:addTickBox("FindSmoke", "Unpack/Light Smoke", true, "Enables/Disables the find/light smoke feature")
 options:addKeyBind("keyStopSmoke", "Stop Smoking", Keyboard.KEY_SEMICOLON, "Stop smoking")
 options:addTickBox("PassiveSmoking", "Passive Puffing", true, "Enable automatic passive puffing")
-options:addSlider("PassiveMinTime",  getText("Passive Puffing Min Time"), 0, 60, 1, 15, getText("UI_options_UNIQUEID_slider_tooltip"))
-options:addSlider("PassiveMaxTime",  getText("Passive Puffing Max Time"), 0, 120, 1, 30, getText("UI_options_UNIQUEID_slider_tooltip"))
+options:addSlider("PassiveMinTime",  getText("Passive Puffing Min Time"), 0, 60, 1, 45, getText("UI_options_UNIQUEID_slider_tooltip"))
+options:addSlider("PassiveMaxTime",  getText("Passive Puffing Max Time"), 0, 120, 1, 80, getText("UI_options_UNIQUEID_slider_tooltip"))
 options:addSeparator()
 
 -- This is a helper function that will automatically populate the "config" table.
