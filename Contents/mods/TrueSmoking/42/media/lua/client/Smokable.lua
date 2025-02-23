@@ -73,7 +73,7 @@ function Smokable:new(item, player)
 
     obj.smokePercent = obj.smokeLength/obj.originalSmokeLength
     obj.smokeLit = false
-    obj.burnRate = ZombRandFloat(obj.burnMin,obj.burnMax)
+    obj.burnRate = ZombRandFloat(obj.burnMax*.75,obj.burnMax*1.25)
     obj.timeCheck = ZombRand(puffMin,puffMax)
 
     --NnC vals

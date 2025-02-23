@@ -13,8 +13,8 @@ Sandbox_EN = {
     Sandbox_TrueSmoking_PuffFactor = "Burn rate increase while puffing",
     Sandbox_TrueSmoking_PuffFactor_tooltip = "How much the burn rate increases when puffing",
 
-    Sandbox_TrueSmoking_RunningFactor = "Burn rate decrease while running",
-    Sandbox_TrueSmoking_RunningFactor_tooltip = "How much the burn rate decreases when running/sprinting",
+    Sandbox_TrueSmoking_RunningFactor = "Burn rate change while running",
+    Sandbox_TrueSmoking_RunningFactor_tooltip = "Tthe burn rate change when running/sprinting",
 
     Sandbox_TrueSmoking_IdleFactor = "Burn rate decrease while idle",
     Sandbox_TrueSmoking_IdleFactor_tooltip = "How much the burn rate decreases when idle",
