@@ -230,6 +230,7 @@ function Smokable:stop()
 
         if(self.smokeLength > 0) then
             self.player:getInventory():AddItem(self.item)
+            self.player:getModData().Smokable = false
         end
 
         self.item = false  --clear item for safety.
@@ -254,6 +255,7 @@ function Smokable:checkDropSmoke()
             local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
             self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
             self.item = false
+            self.player:getModData().Smokable = false
             self:stop()
         end
     end
@@ -320,6 +322,7 @@ function Smokable:update()
 
         -- Update item mod data (unchanged)
         self.item:getModData().SmokeLength = self.smokeLength
+        self.player:getModData().Smokable = {self.item:getFullType(), self.smokeLength}
     end
 
     -- print(string.format('Burn Rate: %.8f', self.burnRate))

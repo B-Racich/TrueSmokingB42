@@ -306,6 +306,12 @@ function TrueSmoking:start(playerNum, player)
     end
     o.contextWrapper = contextWrapper
 
+    --If player closed game while smoking, give back the smoke
+    if player:getModData().Smokable then
+        local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
+        smokable:getModData().SmokeLength = player:getModData().Smokable[2]
+    end
+
     --Keybinds
     Events.OnKeyStartPressed.Add(o.keyWrapper)
     --Toggles the Smoke option in the context menu
