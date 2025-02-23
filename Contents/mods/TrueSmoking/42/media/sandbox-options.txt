@@ -24,13 +24,29 @@ option TrueSmoking.PuffFactor
     default = 2.0,
     page = TrueSmoking, translation=TrueSmoking_PuffFactor,
 }
+option TrueSmoking.WalkingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.15,
+    page = TrueSmoking, translation=TrueSmoking_WalkingFactor,
+}
 option TrueSmoking.RunningFactor
 {
     type = double,
     min = -10.0,
     max = 10.0,
-    default = 1.0,
+    default = 1.25,
     page = TrueSmoking, translation=TrueSmoking_RunningFactor,
+}
+option TrueSmoking.SprintingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmoking, translation=TrueSmoking_SprintingFactor,
 }
 option TrueSmoking.IdleFactor
 {
@@ -87,6 +103,30 @@ option TrueSmoking.CoughingChanceNonSmoker
     max = 100.0,
     default = 15.0,
     page = TrueSmoking, translation=TrueSmoking_CoughingChanceNonSmoker,
+}
+
+
+option TrueSmoking.Dropping
+{
+    type = boolean,
+	default = true,
+	page = TrueSmoking, translation=TrueSmoking_Coughing,
+}
+option TrueSmoking.DroppingChanceSmoker
+{
+    type = double,
+    min = 0.0,
+    max = 100.0,
+    default = 4.0,
+    page = TrueSmoking, translation=TrueSmoking_DroppingChanceSmoker,
+}
+option TrueSmoking.DroppingChanceNonSmoker
+{
+    type = double,
+    min = 0.0,
+    max = 100.0,
+    default = 25.0,
+    page = TrueSmoking, translation=TrueSmoking_DroppingChanceNonSmoker,
 }
 
 

@@ -53,7 +53,7 @@ function LightSmoke:perform()
     self.trueSmoking.Smokable.puffTimeMark = os.time()
 
     if self.trueSmoking.Smokable.burnRate == 0 then
-        self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin, self.trueSmoking.Smokable.burnMax)
+        self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMax*.75, self.trueSmoking.Smokable.burnMax*1.15)
     end
 end
 

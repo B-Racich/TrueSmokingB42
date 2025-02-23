@@ -202,6 +202,7 @@ function TrueSmoking:findSmokable(player)
             cigarette = player:getInventory():getFirstTypeRecurse(value)
         end
     end
+
     if cigarette then
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
         ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
@@ -363,7 +364,9 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
 
     TrueSmoking.Options.PuffFactor = SandboxVars.TrueSmoking.PuffFactor
+    TrueSmoking.Options.WalkingFactor = SandboxVars.TrueSmoking.WalkingFactor
     TrueSmoking.Options.RunningFactor = SandboxVars.TrueSmoking.RunningFactor
+    TrueSmoking.Options.SprintingFactor = SandboxVars.TrueSmoking.SprintingFactor
     TrueSmoking.Options.IdleFactor = SandboxVars.TrueSmoking.IdleFactor
 
     TrueSmoking.Options.ManageHeadGear = SandboxVars.TrueSmoking.ManageHeadGear
@@ -375,6 +378,10 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.Coughing = SandboxVars.TrueSmoking.Coughing
     TrueSmoking.Options.CoughingChanceSmoker = SandboxVars.TrueSmoking.CoughingChanceSmoker
     TrueSmoking.Options.CoughingChanceNonSmoker = SandboxVars.TrueSmoking.CoughingChanceNonSmoker
+
+    TrueSmoking.Options.Dropping = SandboxVars.TrueSmoking.Dropping
+    TrueSmoking.Options.DroppingChanceSmoker = SandboxVars.TrueSmoking.DroppingChanceSmoker
+    TrueSmoking.Options.DroppingChanceNonSmoker = SandboxVars.TrueSmoking.DroppingChanceNonSmoker
 
     TrueSmoking.Options.CigaretteLength = SandboxVars.TrueSmoking.CigaretteLength
     TrueSmoking.Options.CigarilloLength = SandboxVars.TrueSmoking.CigarilloLength

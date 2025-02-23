@@ -46,32 +46,8 @@ function PutOut:stop()
 end
 
 function PutOut:complete()
-    self.trueSmoking.isSmoking = false
-    self.trueSmoking.visualItem = false
-
-    -- self.table.isSmoking = false
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.smokeLit = false
-
-    self.trueSmoking.Moodle:stop()
-
-    if self.trueSmoking.Smokable.updateWrapper then
-        Events.OnTick.Remove(self.trueSmoking.Smokable.updateWrapper)
-        self.trueSmoking.Smokable.updateWrapper = nil
-    end
-
-    local onUse = self.trueSmoking.Smokable.replaceOnUse
-    if onUse and onUse ~= '' then
-        addOnUseItem(self.character)
-    end
-
-    TrueSmoking:checkForMaskAndEquip(self.character)
-
-    if(self.trueSmoking.Smokable.smokeLength > 0) then
-        self.character:getInventory():AddItem(self.item)
-    end
-
-    self.trueSmoking.Smokable.item = {}  --clear item for safety.
+    self.trueSmoking.Smokable:stop()
+    return true
 end
 
 function PutOut:perform()

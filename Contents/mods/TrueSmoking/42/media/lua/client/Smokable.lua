@@ -21,7 +21,7 @@ function Smokable:new(item, player)
     setmetatable(obj, self)
 
     local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
-    obj.burnMin, obj.burnMax = 0.0000125, 0.000315
+    obj.burnMin, obj.burnMax = 0.000125, 0.000315
 
     obj.player = player
 
@@ -73,8 +73,9 @@ function Smokable:new(item, player)
 
     obj.smokePercent = obj.smokeLength/obj.originalSmokeLength
     obj.smokeLit = false
-    obj.burnRate = ZombRandFloat(obj.burnMax*.75,obj.burnMax*1.25)
+    obj.burnRate = ZombRandFloat(obj.burnMax*.75,obj.burnMax*1.15)
     obj.timeCheck = ZombRand(puffMin,puffMax)
+    obj.hasRolledForDrop = false
 
     --NnC vals
     obj.NnC_StiffRemoval = 15
@@ -142,8 +143,8 @@ end
 
 function Smokable:removeVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
-    if self.table.visualItem and self.player:getWornItem('Mask_Smoke') == self.table.visualItem then
-        self.player:removeWornItem(self.table.visualItem)
+    if self.player:getWornItem('Mask_Smoke') then
+        self.player:removeWornItem(self.player:getWornItem('Mask_Smoke'))
     end
 end
 
@@ -202,48 +203,125 @@ function Smokable:putOut()
     end
 end
 
---Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
-function Smokable:update()
-    --If smoke is lit update burnRate
-    if self.smokeLit then
-        local gameSpeed = getGameSpeed() == 1 and 1 or
-        getGameSpeed() == 2 and 5 or
-        getGameSpeed() == 3 and 20 or
-        getGameSpeed() == 4 and 40
+function Smokable:stop()
+    self.table.isSmoking = false
+    self.table.visualItem = false
 
-        --Try to take idle puff before calculate burn changes
-        self:idlePuff()
-        -- print(string.format('Smokable is lit - Burn Rate: %.6f', self.burnRate))
-        if self.table.takingPuff then
-            --change burn rate with puffFactor
-            if self.burnRate < self.burnMin then
-                self.burnRate = self.burnRate + self.burnRate * 0.1 * TrueSmoking.Options.PuffFactor * gameSpeed
-            elseif self.burnRate < self.burnMax then
-                self.burnRate = self.burnRate + self.burnRate * 0.001 * TrueSmoking.Options.PuffFactor * gameSpeed
-            else
-                self.burnRate = self.burnRate + self.burnRate * 0.0001 * TrueSmoking.Options.PuffFactor * gameSpeed
-            end
-        elseif self.player:isRunning() or self.player:isSprinting() then
-            --change burn rate with runningFactor
-            self.burnRate = self.burnRate + self.burnRate * 0.001 * TrueSmoking.Options.RunningFactor * gameSpeed
-        else
-            --change burn rate with idleFactor
-            self.burnRate = self.burnRate - self.burnRate * 0.001 * TrueSmoking.Options.IdleFactor * gameSpeed
+    -- self.table.isSmoking = false
+    self.table.takingPuff = false
+    self.smokeLit = false
+    self.hasDropped = false
+    self.table.Moodle:stop()
+
+    self:removeVisualItem()
+
+    if self.updateWrapper then
+        Events.OnTick.Remove(self.updateWrapper)
+        self.updateWrapper = nil
+    end
+
+    TrueSmoking:checkForMaskAndEquip(self.player)
+
+    if self.item then
+        local onUse = self.replaceOnUse
+        if onUse and onUse ~= '' and self.smokeLength <= 0 then
+            addOnUseItem(self.player)
         end
 
-        --How much % we smoked this tick
+        if(self.smokeLength > 0) then
+            self.player:getInventory():AddItem(self.item)
+        end
+
+        self.item = false  --clear item for safety.
+    end
+end
+
+function Smokable:checkDropSmoke()
+    if not TrueSmoking.Options.Dropping then return end
+    local ClimbFenceOutcome = self.player:GetVariable("ClimbFenceOutcome")
+    local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or TrueSmoking.Options.DroppingChanceNonSmoker
+    if not self.hasRolledForDrop and ClimbFenceOutcome == 'fall' then
+        local roll = ZombRandFloat(0.0,100.0)
+        self.hasRolledForDrop = true
+        if dropChance >= roll then
+            self.hasDropped = true
+        end
+    end
+
+    if self.hasRolledForDrop and ClimbFenceOutcome ~= 'fall' then
+        self.hasRolledForDrop = false
+        if self.hasDropped then
+            local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
+            self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
+            self.item = false
+            self:stop()
+        end
+    end
+end
+
+--Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
+function Smokable:update()
+    --Checks if we are falling and dropped the smoke
+    self:checkDropSmoke()
+    -- If smoke is lit, update burnRate
+    if self.smokeLit then
+        -- Calculate game speed (unchanged from original)
+        local gameSpeed = getGameSpeed() == 1 and 1 or
+                        getGameSpeed() == 2 and 5 or
+                        getGameSpeed() == 3 and 20 or
+                        getGameSpeed() == 4 and 40
+
+        -- Try to take idle puff before calculating burn changes (unchanged)
+        self:idlePuff()
+
+        local isMoving = self.player:isMoving()
+        local isRunning = self.player:isRunning()
+        local isSprinting = self.player:isSprinting()
+        local isStrafing = self.player:isStrafing()
+        local inVehicle = self.player:isSeatedInVehicle()
+
+        -- Define target burn rate based on current activity
+        local targetBurnRate
+        if self.table.takingPuff then
+            targetBurnRate = self.burnMax * TrueSmoking.Options.PuffFactor
+        -- elseif (isMoving) or isStrafing then
+        --     print('walking')
+        --     targetBurnRate = self.burnMin * TrueSmoking.Options.WalkingFactor
+        elseif isRunning then
+            targetBurnRate = self.burnMin * TrueSmoking.Options.RunningFactor
+        elseif isSprinting then
+            targetBurnRate = self.burnMin * TrueSmoking.Options.SprintingFactor
+        else
+            targetBurnRate = self.burnMin * TrueSmoking.Options.IdleFactor
+        end
+
+        -- Smoothly adjust burnRate toward targetBurnRate
+        local adjustmentSpeed = 0.01  -- Controls transition speed (tune this value)
+        self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
+
+        -- Optional: clamp burnRate to prevent it from going too low (e.g., below burnMin * 0.1)
+        -- self.burnRate = math.max(self.burnRate, self.burnMin * 0.1)
+
+        -- Calculate how much % was smoked this tick (unchanged)
         self.puffPercent = self.burnRate / self.originalSmokeLength
-        --Update Smoke Length
+
+        -- Update smoke length (unchanged)
         self.smokeLength = self.smokeLength - self.burnRate
-        --Update smoke % left
+
+        -- Update smoke % left (unchanged)
         self.smokePercent = self.smokeLength / self.originalSmokeLength
-        --Apply stat changes
+
+        -- Apply stat changes (unchanged)
         OnEat_OverTime(self)
+
+        -- Update item mod data (unchanged)
         self.item:getModData().SmokeLength = self.smokeLength
     end
 
+    print(string.format('Burn Rate: %.8f',self.burnRate))
+
     --Smoke went out (burn rate is 0)
-    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000001 then
+    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000489 then
         self.burnRate = 0
         self.smokeLit = false
     elseif not TrueSmoking.Options.SmokeRelighting and self.burnRate < self.burnMin then
