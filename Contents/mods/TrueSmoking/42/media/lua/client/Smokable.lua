@@ -211,6 +211,7 @@ function Smokable:stop()
     self.table.takingPuff = false
     self.smokeLit = false
     self.hasDropped = false
+    self.dropState = false
     self.table.Moodle:stop()
 
     self:removeVisualItem()
@@ -228,8 +229,13 @@ function Smokable:stop()
             addOnUseItem(self.player)
         end
 
-        if(self.smokeLength > 0) then
+        if self.smokeLength > 0 then
             self.player:getInventory():AddItem(self.item)
+            self.player:getModData().Smokable = false
+        end
+
+        if self.smokeLength <= 0 then
+            self.item:getModData().SmokeLength = 0
             self.player:getModData().Smokable = false
         end
 
@@ -239,17 +245,23 @@ end
 
 function Smokable:checkDropSmoke()
     if not TrueSmoking.Options.Dropping then return end
+    local state = TrueSmokingUtils:getPlayerState(self.player)
+    local dropStates = {['CollideWithWallState'] = true}
+
     local ClimbFenceOutcome = self.player:GetVariable("ClimbFenceOutcome")
     local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or TrueSmoking.Options.DroppingChanceNonSmoker
-    if not self.hasRolledForDrop and ClimbFenceOutcome == 'fall' then
-        local roll = ZombRandFloat(0.0,100.0)
+    if not self.hasRolledForDrop and (ClimbFenceOutcome == 'fall' or dropStates[state]) then
+        local roll = ZombRandFloat(0.0, 100.0)
         self.hasRolledForDrop = true
         if dropChance >= roll then
             self.hasDropped = true
+            if dropStates[state] then
+                self.dropState = true
+            end
         end
     end
 
-    if self.hasRolledForDrop and ClimbFenceOutcome ~= 'fall' then
+    if self.hasRolledForDrop and ((ClimbFenceOutcome ~= 'fall' and not self.dropState) or (not dropStates[state] and self.dropState)) then
         self.hasRolledForDrop = false
         if self.hasDropped then
             local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
@@ -276,11 +288,11 @@ function Smokable:update()
         -- Try to take idle puff before calculating burn changes (unchanged)
         self:idlePuff()
 
-        local isMoving = self.player:isMoving()
+        local isWalking = self.player:isWalking()
         local isRunning = self.player:isRunning()
         local isSprinting = self.player:isSprinting()
         local isStrafing = self.player:isStrafing()
-        local inVehicle = self.player:isSeatedInVehicle()
+        -- local inVehicle = self.player:isSeatedInVehicle()
 
         -- Define target burn rate for active states only
         local targetBurnRate
@@ -290,9 +302,8 @@ function Smokable:update()
             targetBurnRate = self.burnMin * TrueSmoking.Options.SprintingFactor
         elseif isRunning then
             targetBurnRate = self.burnMin * TrueSmoking.Options.RunningFactor
-        -- Note: Walking condition is commented out in the original; omitted here
-        -- elseif (isMoving) or isStrafing then
-        --     targetBurnRate = self.burnMin * TrueSmoking.Options.WalkingFactor
+        elseif isWalking or isStrafing then
+            targetBurnRate = self.burnMin * TrueSmoking.Options.WalkingFactor
         end
 
         if targetBurnRate then

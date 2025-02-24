@@ -1,3 +1,12 @@
+TrueSmokingUtils = TrueSmokingUtils or {}
+
+function TrueSmokingUtils:getPlayerState(player)
+    local PlayerState = tostring(player:getCurrentState())
+    local state = string.match(PlayerState, '([^%.]+)@')
+    -- print(string.format('Character State: %s',state))
+    return state or false
+end
+
 function isInList(str, list)
     if str == "" then
         return false
