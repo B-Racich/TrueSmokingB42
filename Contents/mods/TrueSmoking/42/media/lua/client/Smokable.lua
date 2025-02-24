@@ -358,7 +358,9 @@ function Smokable:update()
     -- Smoke is finished (smokeLength is 0)
     if self.smokeLength <= 0 then
         self.smokeLength = 0
-        self:putOut()
+        if TrueSmoking.Config.AutoPutOut then
+            self:putOut()
+        end
     end
 end
 

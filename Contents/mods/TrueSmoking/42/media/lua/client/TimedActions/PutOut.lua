@@ -42,6 +42,10 @@ end
 
 function PutOut:stop()
     ISBaseTimedAction.stop(self)
+    -- If we are cancelling the action and the smoke is finished just get rid of it
+    if self.item:getModData().SmokeLength <= 0 then
+        self.trueSmoking.Smokable:stop()
+    end
     self:forceComplete()
 end
 
@@ -57,7 +61,7 @@ end
 function PutOut:new(character)
     local o = {
         stopOnWalk = false,
-        stopOnRun = false,
+        stopOnRun = true,
         stopOnAim = true,
         forceProgressBar = false,
         character = character,

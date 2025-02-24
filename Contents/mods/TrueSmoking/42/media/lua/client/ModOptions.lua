@@ -10,6 +10,7 @@ options:addKeyBind("keyStopSmoke", "Stop Smoking", Keyboard.KEY_SEMICOLON, "Stop
 options:addTickBox("PassiveSmoking", "Passive Puffing", true, "Enable automatic passive puffing")
 options:addSlider("PassiveMinTime",  getText("Passive Puffing Min Time"), 0, 60, 1, 30, getText("UI_options_UNIQUEID_slider_tooltip"))
 options:addSlider("PassiveMaxTime",  getText("Passive Puffing Max Time"), 0, 120, 1, 80, getText("UI_options_UNIQUEID_slider_tooltip"))
+options:addTickBox("AutoPutOut", "Automatically Put Out Smoke", true, "Will automatically try to put out the smoke when its finished")
 options:addSeparator()
 
 -- This is a helper function that will automatically populate the "config" table.
