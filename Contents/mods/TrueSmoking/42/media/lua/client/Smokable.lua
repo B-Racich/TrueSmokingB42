@@ -249,8 +249,11 @@ function Smokable:checkDropSmoke()
     local dropStates = {['CollideWithWallState'] = true}
 
     local ClimbFenceOutcome = self.player:GetVariable("ClimbFenceOutcome")
+    local bumpType = self.player:getBumpType()
+    local bumpTypes = {['left'] = 'tree',['right'] = 'zombie'}
+
     local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or TrueSmoking.Options.DroppingChanceNonSmoker
-    if not self.hasRolledForDrop and (ClimbFenceOutcome == 'fall' or dropStates[state]) then
+    if not self.hasRolledForDrop and (ClimbFenceOutcome == 'fall' or dropStates[state] or bumpTypes[bumpType]) then
         local roll = ZombRandFloat(0.0, 100.0)
         self.hasRolledForDrop = true
         if dropChance >= roll then
@@ -258,10 +261,13 @@ function Smokable:checkDropSmoke()
             if dropStates[state] then
                 self.dropState = true
             end
+            if bumpTypes[bumpType] then
+                self.dropBump = true
+            end
         end
     end
 
-    if self.hasRolledForDrop and ((ClimbFenceOutcome ~= 'fall' and not self.dropState) or (not dropStates[state] and self.dropState)) then
+    if self.hasRolledForDrop and ((ClimbFenceOutcome ~= 'fall' and not self.dropState and not self.dropBump) or (not dropStates[state] and self.dropState) or (not bumpTypes[bumpType] and self.dropBump)) then
         self.hasRolledForDrop = false
         if self.hasDropped then
             local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
