@@ -18,7 +18,27 @@ function LightSmoke:waitToStart()
     then return false else return true end
 end
 
+function LightSmoke:getRequiredItem()
+	if not self.item:getRequireInHandOrInventory() then
+		return
+	end
+	local types = self.item:getRequireInHandOrInventory()
+	for i=1,types:size() do
+		local fullType = moduleDotType(self.item:getModule(), types:get(i-1))
+		local item2 = self.character:getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
+		if item2 then
+			return item2
+		end
+	end
+	return nil
+end
+
 function LightSmoke:start()
+    if self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
+        local lighter = self:getRequiredItem()
+        lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
+	end
+
     --Set the animation
     -- local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
     -- self:setActionAnim(anim)
@@ -81,6 +101,9 @@ function LightSmoke:new(character)
     o.eatSound = ''
     o.eatAudio = 0
     o.maxTime = TrueSmoking.relightTime
+    o.carLighter = o.item:hasTag("Smokable") and o.character:getVehicle() and o.character:getVehicle():canLightSmoke(o.character)
+    o.openFlame = false
+    if o.item:hasTag("Smokable") then o.openFlame = ISInventoryPaneContextMenu.hasOpenFlame(o.character) end
 
     setmetatable(o, self)
     self.__index = self

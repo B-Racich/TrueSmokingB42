@@ -1,4 +1,5 @@
 TrueSmokingUtils = TrueSmokingUtils or {}
+TrueSmokingUtils.__index = TrueSmokingUtils
 
 function TrueSmokingUtils:getPlayerState(player)
     local PlayerState = tostring(player:getCurrentState())

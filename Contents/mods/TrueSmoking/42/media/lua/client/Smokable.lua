@@ -243,48 +243,49 @@ function Smokable:stop()
     end
 end
 
-function Smokable:checkDropSmoke()
-    if not TrueSmoking.Options.Dropping then return end
+function Smokable:dropSmoke()
+    self.hasRolledForDrop = false
+    local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
+    self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
+    self.item = false
+    self.player:getModData().Smokable = false
+    self:stop()
+end
+
+function Smokable:checkDropConditions()
     local state = TrueSmokingUtils:getPlayerState(self.player)
     local dropStates = {['CollideWithWallState'] = true}
 
     local ClimbFenceOutcome = self.player:GetVariable("ClimbFenceOutcome")
     local bumpType = self.player:getBumpType()
-    local bumpTypes = {['left'] = 'tree',['right'] = 'zombie'}
+    local bumpTypes = {['left'] = true, ['right'] = true}
 
-    local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or TrueSmoking.Options.DroppingChanceNonSmoker
-    if not self.hasRolledForDrop and (ClimbFenceOutcome == 'fall' or dropStates[state] or bumpTypes[bumpType]) then
-        local roll = ZombRandFloat(0.0, 100.0)
-        self.hasRolledForDrop = true
-        if dropChance >= roll then
-            self.hasDropped = true
-            if dropStates[state] then
-                self.dropState = true
-            end
-            if bumpTypes[bumpType] then
-                self.dropBump = true
-            end
-        end
-    end
+    local result = ClimbFenceOutcome == 'fall' or dropStates[state] or bumpTypes[bumpType] or false
 
-    if self.hasRolledForDrop and ((ClimbFenceOutcome ~= 'fall' and not self.dropState and not self.dropBump)
-    or (not dropStates[state] and self.dropState)
-    or (not bumpTypes[bumpType] and self.dropBump)) then
-        self.hasRolledForDrop = false
-        if self.hasDropped then
-            local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
-            self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
-            self.item = false
-            self.player:getModData().Smokable = false
-            self:stop()
-        end
-    end
+    return result
 end
 
 -- Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
 function Smokable:update()
     -- Checks if we are falling and dropped the smoke
-    self:checkDropSmoke()
+    if TrueSmoking.Options.Dropping then
+        if not self.hasRolledForDrop and self:checkDropConditions() then
+            self.hasRolledForDrop = true
+            local roll = ZombRandFloat(0.0, 100.0)
+            local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or TrueSmoking.Options.DroppingChanceNonSmoker
+            -- print(string.format('rolled drop: %s -- %s', roll, dropChance))
+            if dropChance >= roll then
+                self.hasDropped = true
+            end
+        end
+        if self.hasRolledForDrop and not self:checkDropConditions() then
+            self.hasRolledForDrop = false
+            if self.hasDropped then
+                self.hasDropped = false
+                self:dropSmoke()
+            end
+        end
+    end
     -- If smoke is lit, update burnRate
     if self.smokeLit then
         -- Calculate game speed (unchanged from original)

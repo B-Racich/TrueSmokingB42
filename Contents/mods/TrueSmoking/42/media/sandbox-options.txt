@@ -117,7 +117,7 @@ option TrueSmoking.DroppingChanceSmoker
     type = double,
     min = 0.0,
     max = 100.0,
-    default = 4.0,
+    default = 6.0,
     page = TrueSmoking, translation=TrueSmoking_DroppingChanceSmoker,
 }
 option TrueSmoking.DroppingChanceNonSmoker
@@ -125,7 +125,7 @@ option TrueSmoking.DroppingChanceNonSmoker
     type = double,
     min = 0.0,
     max = 100.0,
-    default = 25.0,
+    default = 35.0,
     page = TrueSmoking, translation=TrueSmoking_DroppingChanceNonSmoker,
 }
 
