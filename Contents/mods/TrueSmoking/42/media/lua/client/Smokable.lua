@@ -267,7 +267,9 @@ function Smokable:checkDropSmoke()
         end
     end
 
-    if self.hasRolledForDrop and ((ClimbFenceOutcome ~= 'fall' and not self.dropState and not self.dropBump) or (not dropStates[state] and self.dropState) or (not bumpTypes[bumpType] and self.dropBump)) then
+    if self.hasRolledForDrop and ((ClimbFenceOutcome ~= 'fall' and not self.dropState and not self.dropBump)
+    or (not dropStates[state] and self.dropState)
+    or (not bumpTypes[bumpType] and self.dropBump)) then
         self.hasRolledForDrop = false
         if self.hasDropped then
             local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
