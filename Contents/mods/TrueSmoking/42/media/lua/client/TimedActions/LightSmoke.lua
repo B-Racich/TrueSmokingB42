@@ -18,6 +18,10 @@ function LightSmoke:waitToStart()
     then return false else return true end
 end
 
+local function predicateNotEmpty(item)
+	return item:getCurrentUsesFloat() > 0
+end
+
 function LightSmoke:getRequiredItem()
 	if not self.item:getRequireInHandOrInventory() then
 		return
