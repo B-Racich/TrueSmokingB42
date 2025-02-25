@@ -41,6 +41,8 @@ description=[*]Coughing mechanic configurable in sandbox options (chance to coug
 description=[*]Headgear management (anything that restricts smoking is unequipped and re-equipped after smoking)
 description=[/list]
 description=
+description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
+description=
 description=[h3]Controls[/h3]
 description=[code]
 description=[h3]Keyboard[/h3]
@@ -117,8 +119,6 @@ description=I have added functions to set SmokeLengths and VisualItems for modde
 description=
 description=You can also reach me on discord if needed.
 description=[/code]
-description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
-description=
 description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
 description=
 description=[code]Do not modify or redistribute my mod/code without consent, ask for permission. Treat this mod as on 'lockdown'[/code]
