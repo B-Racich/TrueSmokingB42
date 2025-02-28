@@ -73,8 +73,9 @@ function ISEatFoodAction:start()
         end
 
         if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
-            -- print('set eat sound')
-            if (self.eatAudio == nil or self.eatAudio == '') then
+            -- print('eatAudio '..self.eatAudio)
+            -- print('eatSound '..self.eatSound)
+            if (self.eatAudio == 0 and self.eatSound == '') then
                 self.eatSound = SmokingSoundsOverhaul:getLightingSound(self.character, self.item)
                 self.trueSmoking.lightingEatSound = self.eatSound
                 self.eatAudio = self.eatSound
