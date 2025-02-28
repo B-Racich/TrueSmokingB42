@@ -11,7 +11,7 @@ end
 function TakePuff:update()
     -- Sync up the anim to remove the visualItem when the hand reaches the mouth
     local curTime = os.time()
-    if not self.visualItemFlag then
+    if self.trueSmoking.visualItem and not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
             self.trueSmoking.Smokable:removeVisualItem()
             self.visualItemFlag = true
@@ -76,6 +76,15 @@ function TakePuff:start()
     if anim == 'Smoke_Quiet' then
         self.visualItemTimer = self.visualItemTimer*2
         self.visualItemAnimLength = self.visualItemAnimLength*2
+    end
+
+    if not self.trueSmoking.visualItem then
+        local hasPrimary = self.character:getPrimaryHandItem()
+        if hasPrimary then
+            self:setOverrideHandModels(hasPrimary, self.item)
+        else
+            self:setOverrideHandModels(nil, self.item)
+        end
     end
 
     -- TODO base this off of anim instead for future expansion

@@ -64,6 +64,7 @@ function LightSmoke:start()
             end
         end
     end
+    self.character:reportEvent("EventEating");
 end
 
 function LightSmoke:stop()
@@ -108,6 +109,9 @@ function LightSmoke:new(character)
     o.carLighter = o.item:hasTag("Smokable") and o.character:getVehicle() and o.character:getVehicle():canLightSmoke(o.character)
     o.openFlame = false
     if o.item:hasTag("Smokable") then o.openFlame = ISInventoryPaneContextMenu.hasOpenFlame(o.character) end
+
+    o.ignoreHandsWounds = true
+    o.isEating = true
 
     setmetatable(o, self)
     self.__index = self

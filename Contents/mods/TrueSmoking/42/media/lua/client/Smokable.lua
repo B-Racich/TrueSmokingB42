@@ -71,10 +71,10 @@ function Smokable:new(item, player)
 
     -- print(string.format('Smokable length: %s, original: %s',obj.smokeLength, obj.originalSmokeLength))
 
-    obj.smokePercent = obj.smokeLength/obj.originalSmokeLength
+    obj.smokePercent = obj.smokeLength / obj.originalSmokeLength
     obj.smokeLit = false
-    obj.burnRate = ZombRandFloat(obj.burnMax*.75,obj.burnMax*1.15)
-    obj.timeCheck = ZombRand(puffMin,puffMax)
+    obj.burnRate = ZombRandFloat(obj.burnMax * .75, obj.burnMax * 1.15)
+    obj.timeCheck = ZombRand(puffMin, puffMax)
     obj.hasRolledForDrop = false
 
     --NnC vals
@@ -164,6 +164,24 @@ function Smokable:getVisualItem()
             ['OnEat_Cigar'] = 'Mask_Cigar',
         }
 
+        local typeMatches = {
+            ['smokingpipe'] = 'Mask_Pipe',
+            ['joint'] = 'Mask_Cigarette',
+            ['blunt'] = 'Mask_Cigarillo',
+            ['spliff'] = 'Mask_Cigarillo',
+            ['can'] = false,
+            ['bong'] = false,
+        }
+
+        local itemType = self.item:getFullType():lower()
+
+        -- Then try partial match
+        for pattern, itemName in pairs(typeMatches) do
+            if itemType:find(pattern) then
+                return itemName and instanceItem(itemName) or false
+            end
+        end
+
         --If we can find a default use that
         for key, value in pairs(OnEat_Defaults) do
             if self.onEat == key then return instanceItem(value) end
@@ -239,13 +257,14 @@ function Smokable:stop()
             self.player:getModData().Smokable = false
         end
 
-        self.item = false  --clear item for safety.
+        self.item = false --clear item for safety.
     end
 end
 
 function Smokable:dropSmoke()
     self.hasRolledForDrop = false
-    local dropX,dropY,dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self.item)
+    local dropX, dropY, dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self
+    .item)
     self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
     self.item = false
     self.player:getModData().Smokable = false
@@ -254,11 +273,11 @@ end
 
 function Smokable:checkDropConditions()
     local state = TrueSmokingUtils:getPlayerState(self.player)
-    local dropStates = {['CollideWithWallState'] = true}
+    local dropStates = { ['CollideWithWallState'] = true }
 
     local ClimbFenceOutcome = self.player:GetVariable("ClimbFenceOutcome")
     local bumpType = self.player:getBumpType()
-    local bumpTypes = {['left'] = true, ['right'] = true}
+    local bumpTypes = { ['left'] = true, ['right'] = true }
 
     local result = ClimbFenceOutcome == 'fall' or dropStates[state] or bumpTypes[bumpType] or false
 
@@ -272,7 +291,8 @@ function Smokable:update()
         if not self.hasRolledForDrop and self:checkDropConditions() then
             self.hasRolledForDrop = true
             local roll = ZombRandFloat(0.0, 100.0)
-            local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or TrueSmoking.Options.DroppingChanceNonSmoker
+            local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or
+            TrueSmoking.Options.DroppingChanceNonSmoker
             -- print(string.format('rolled drop: %s -- %s', roll, dropChance))
             if dropChance >= roll then
                 self.hasDropped = true
@@ -290,9 +310,9 @@ function Smokable:update()
     if self.smokeLit then
         -- Calculate game speed (unchanged from original)
         local gameSpeed = getGameSpeed() == 1 and 1 or
-                          getGameSpeed() == 2 and 5 or
-                          getGameSpeed() == 3 and 20 or
-                          getGameSpeed() == 4 and 40
+            getGameSpeed() == 2 and 5 or
+            getGameSpeed() == 3 and 20 or
+            getGameSpeed() == 4 and 40
 
         -- Try to take idle puff before calculating burn changes (unchanged)
         self:idlePuff()
@@ -317,14 +337,14 @@ function Smokable:update()
 
         if targetBurnRate then
             -- Smoothly adjust burnRate toward targetBurnRate for active states
-            local adjustmentSpeed = 0.0025  -- Controls transition speed (tune this value)
+            local adjustmentSpeed = 0.0025               -- Controls transition speed (tune this value)
             if self.burnRate > self.burnMax then
-                adjustmentSpeed = adjustmentSpeed * 0.25  -- Slower adjustment beyond burnMax
+                adjustmentSpeed = adjustmentSpeed * 0.25 -- Slower adjustment beyond burnMax
             end
             self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
         else
             -- Apply exponential decay when idling
-            local decayFactor = 0.9988  -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
+            local decayFactor = 0.9988 -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
             self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
         end
 
@@ -342,7 +362,7 @@ function Smokable:update()
 
         -- Update item mod data (unchanged)
         self.item:getModData().SmokeLength = self.smokeLength
-        self.player:getModData().Smokable = {self.item:getFullType(), self.smokeLength}
+        self.player:getModData().Smokable = { self.item:getFullType(), self.smokeLength }
     end
 
     -- print(string.format('Burn Rate: %.8f', self.burnRate))
@@ -379,4 +399,3 @@ function Smokable:idlePuff()
         ISTimedActionQueue.add(puff)
     end
 end
-
