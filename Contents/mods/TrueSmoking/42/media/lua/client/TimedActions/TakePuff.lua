@@ -61,6 +61,9 @@ function TakePuff:waitToStart()
 end
 
 function TakePuff:start()
+    if TrueSmoking.Config.HideActionBar then
+        self.action:setUseProgressBar(false)
+    end
     self.timer = os.time()
     -- set the anim for vanilla or modded
     local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
