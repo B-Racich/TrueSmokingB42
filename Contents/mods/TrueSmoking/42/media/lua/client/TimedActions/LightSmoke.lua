@@ -38,6 +38,10 @@ function LightSmoke:getRequiredItem()
 end
 
 function LightSmoke:start()
+    if TrueSmoking.Config.HideAllActionBars then
+        self.action:setUseProgressBar(false)
+    end
+
     if self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
         local lighter = self:getRequiredItem()
         lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())

@@ -33,6 +33,9 @@ function PutOut:waitToStart()
 end
 
 function PutOut:start()
+    if TrueSmoking.Config.HideAllActionBars then
+        self.action:setUseProgressBar(false)
+    end
     self.timer = os.time()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)

@@ -64,6 +64,9 @@ function ISEatFoodAction:start()
     -- print('starting original')
     originalActionStart(self)
     if self.item:getOnEat() == 'OnEat_Hook' then
+        if TrueSmoking.Config.HideAllActionBars then
+            self.action:setUseProgressBar(false)
+        end
         -- print('starting hook')
         local hasPrimary = self.character:getPrimaryHandItem()
         if hasPrimary then

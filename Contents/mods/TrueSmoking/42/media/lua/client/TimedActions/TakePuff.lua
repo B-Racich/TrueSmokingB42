@@ -61,7 +61,7 @@ function TakePuff:waitToStart()
 end
 
 function TakePuff:start()
-    if TrueSmoking.Config.HideActionBar then
+    if TrueSmoking.Config.HideActionBar or TrueSmoking.Config.HideAllActionBars then
         self.action:setUseProgressBar(false)
     end
     self.timer = os.time()
