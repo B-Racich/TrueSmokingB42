@@ -165,6 +165,7 @@ function TakePuff:new(character)
     o.eatAudio = 0
     o.maxTime = -1 -- -1 means it will never finish
     o.endAction = false
+    -- These are not accurate i just manually timed it a few times and it worked with this.
     o.visualItemAnimLength = 3.7
     o.visualItemTimer = 0.7
     o.visualItemFlag = false

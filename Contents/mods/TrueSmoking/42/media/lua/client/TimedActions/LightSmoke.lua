@@ -8,7 +8,7 @@ function LightSmoke:isValid()
 end
 
 function LightSmoke:update()
-    -- Trigger every game update when the action is performs
+    -- Trigger every game update when the action is performed
 end
 
 function LightSmoke:waitToStart()

@@ -8,7 +8,7 @@ function PutOut:isValid()
 end
 
 function PutOut:update()
-    -- Trigger every game update when the action is performs
+    -- Take smoke from mouth sync timer
     local curTime = os.time()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then

@@ -20,6 +20,7 @@ TrueSmoking.VisualItems = TrueSmoking.VisualItems or {}
 TrueSmoking.SmokeLengths = TrueSmoking.SmokeLengths or {}
 TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
+TrueSmoking.Callbacks = TrueSmoking.Callbacks or {}
 TrueSmoking.Config = require 'ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
@@ -74,6 +75,33 @@ function TrueSmoking:setHotkeyPacks(list)
     for key, item in pairs(list) do
         self.HotkeyPacks[key] = item
     end
+end
+
+--[[
+    For modders use this to set a callback on the Smokable:update() method
+    This will allow you to hook into the update method and do your own logic for effects as the item is smoked.
+]]
+function TrueSmoking:setCallback(func)
+    table.insert(self.Callbacks, func)
+end
+
+function TrueSmoking:hasRequiredItem(smokable)
+    local function predicateNotEmpty(smokable)
+        return smokable:getCurrentUsesFloat() > 0
+    end
+
+	if not smokable:getRequireInHandOrInventory() then
+		return true
+	end
+	local types = smokable:getRequireInHandOrInventory()
+	for i=1,types:size() do
+		local fullType = moduleDotType(smokable:getModule(), types:get(i-1))
+		local item2 = getPlayer():getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
+		if item2 then
+			return true
+		end
+	end
+	return false
 end
 
 function TrueSmoking:getShemagh(player, reCover)
@@ -203,7 +231,7 @@ function TrueSmoking:findSmokable(player)
         end
     end
 
-    if cigarette then
+    if cigarette and self:hasRequiredItem(cigarette) then
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
         ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
     end
@@ -275,9 +303,9 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         --Context Menu Hook
         hasSmoke = context:getOptionFromName(getText('ContextMenu_Smoke'))
         if hasSmoke then
-            if o.isSmoking then
+            if o.isSmoking or not self:hasRequiredItem(item) then
                 hasSmoke.notAvailable = true
-            elseif not o.isSmoking then
+            elseif not o.isSmoking and self:hasRequiredItem(item) then
                 hasSmoke.notAvailable = false
             end
         end

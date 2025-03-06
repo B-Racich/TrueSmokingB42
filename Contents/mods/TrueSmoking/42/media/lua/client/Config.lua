@@ -117,6 +117,12 @@ Events.OnCreatePlayer.Add(function()
     TrueSmoking:setVisualItems(TRUE_SMOKING_DEFAULT_VISUAL_ITEMS)
     TrueSmoking:setHotkeySmokes(TRUE_SMOKING_DEFAULT_HOTKEY_SMOKES)
     TrueSmoking:setHotkeyPacks(TRUE_SMOKING_DEFAULT_HOTKEY_PACKS)
+
+    -- TrueSmoking:setCallback(
+    --     function()
+    --         print('Callback inside smokable update')
+    --     end
+    -- )
 end)
 
 

@@ -13,11 +13,32 @@ function ISWearClothing:complete()
 end
 
 --[[
-    Added in a time param, not really needed now as we can directly call setWornItem, will leave for now...
+   Added a time param and check for putting out smoke on equipping headgear
 ]]
 local originalNew = ISWearClothing.new
 function ISWearClothing:new(character, item, time)
     local o = originalNew(self, character, item)
     if time then o.maxTime = time end
+
+    local smokableBlacklist = {
+        Mask = true,
+        MaskEyes = true,
+        MaskFull = true,
+        FullHat = true,
+        FullSuitHead = true,
+        SCBA = true,
+        SCBAnotank = true
+    }
+
+    local playerRef = TrueSmoking:getPlayerReference(character)
+
+    print('Checking if we need to put out the smokable')
+    print(item:getBodyLocation())
+    print(item:getTags())
+    if smokableBlacklist[item:getBodyLocation()] and not item:hasTag("CanEat") and playerRef.isSmoking then
+        print('Putting out the smokable')
+        playerRef.Smokable:putOut()
+    end
+
     return o
 end

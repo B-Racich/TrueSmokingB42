@@ -360,6 +360,10 @@ function Smokable:update()
         -- Apply stat changes (unchanged)
         OnEat_OverTime(self)
 
+        for _, func in ipairs(TrueSmoking.Callbacks) do
+            func(self)
+        end
+
         -- Update item mod data (unchanged)
         self.item:getModData().SmokeLength = self.smokeLength
         self.player:getModData().Smokable = { self.item:getFullType(), self.smokeLength }
