@@ -32,11 +32,7 @@ function ISWearClothing:new(character, item, time)
 
     local playerRef = TrueSmoking:getPlayerReference(character)
 
-    print('Checking if we need to put out the smokable')
-    print(item:getBodyLocation())
-    print(item:getTags())
     if smokableBlacklist[item:getBodyLocation()] and not item:hasTag("CanEat") and playerRef.isSmoking then
-        print('Putting out the smokable')
         playerRef.Smokable:putOut()
     end
 

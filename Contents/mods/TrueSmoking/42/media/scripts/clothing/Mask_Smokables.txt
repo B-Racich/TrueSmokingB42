@@ -4,7 +4,7 @@ module Base
     {
     	DisplayCategory = Accessory,
 		Type = Clothing,
-		DisplayName = Wearable Cigarette,
+		DisplayName = Cigarette,
 		ClothingItem = Mask_Cigarette,
 		BodyLocation = Mask_Smoke,
 		Icon = cigi,
@@ -19,7 +19,7 @@ module Base
     {
     	DisplayCategory = Accessory,
 		Type = Clothing,
-		DisplayName = Wearable Smoking Pipe,
+		DisplayName = Smoking Pipe,
 		ClothingItem = Mask_Pipe,
 		BodyLocation = Mask_Smoke,
 		Icon = pipe,
@@ -34,7 +34,7 @@ module Base
     {
     	DisplayCategory = Accessory,
 		Type = Clothing,
-		DisplayName = Wearable Cheroot,
+		DisplayName = Cheroot,
 		ClothingItem = Mask_Cigarillo,
 		BodyLocation = Mask_Smoke,
 		Icon = cigarillo,
@@ -49,7 +49,7 @@ module Base
     {
     	DisplayCategory = Accessory,
 		Type = Clothing,
-		DisplayName = Wearable Cigar,
+		DisplayName = Cigar,
 		ClothingItem = Mask_Cigar,
 		BodyLocation = Mask_Smoke,
 		Icon = cigar,
