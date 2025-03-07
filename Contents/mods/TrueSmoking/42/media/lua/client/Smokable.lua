@@ -21,7 +21,7 @@ function Smokable:new(item, player)
     setmetatable(obj, self)
 
     local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
-    obj.burnMin, obj.burnMax = 0.000125, 0.000315
+    obj.burnMin, obj.burnMax = 0.000125, 0.000300
 
     obj.player = player
 
@@ -344,7 +344,7 @@ function Smokable:update()
             self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
         else
             -- Apply exponential decay when idling
-            local decayFactor = 0.9988 -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
+            local decayFactor = 0.998 -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
             self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
         end
 
