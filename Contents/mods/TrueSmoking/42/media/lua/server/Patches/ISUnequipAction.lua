@@ -14,9 +14,12 @@ end
 local originalComplete = ISUnequipAction.complete
 function ISUnequipAction:complete()
     originalComplete(self)
+
     local playerRef = TrueSmoking:getPlayerReference(self.character)
+
     if self.item:getBodyLocation() == "Mask_Smoke" and playerRef.isSmoking then
         playerRef.Smokable:putOut()
     end
+
     return true
 end

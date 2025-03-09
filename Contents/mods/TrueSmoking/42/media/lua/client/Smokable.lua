@@ -67,7 +67,7 @@ function Smokable:new(item, player)
     obj.smokeLength = self:getSmokeLength(item)
     obj.originalSmokeLength = obj.smokeLength
     item:getModData().OriginalSmokeLength = obj.smokeLength
-    if item:getModData().SmokeLength then obj.smokeLength = item:getModData().SmokeLength end
+    -- if item:getModData().SmokeLength then obj.smokeLength = item:getModData().SmokeLength end
 
     -- print(string.format('Smokable length: %s, original: %s',obj.smokeLength, obj.originalSmokeLength))
 
@@ -108,6 +108,10 @@ end
 function Smokable:getSmokeLength(item)
     -- 1. If our override is set return that
     if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
+
+
+    -- 1.2 If the item has SmokeLength set use that
+    if item:getModData().SmokeLength then return item:getModData().SmokeLength end
 
     -- 2. If we have a value set return that
     for fullType, length in pairs(TrueSmoking.SmokeLengths) do
@@ -151,6 +155,11 @@ end
 function Smokable:getVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return false end
     if self.item and not self.table.visualItem then
+
+        if self.item:getModData().VisualItem then
+            return instanceItem(self.item:getModData().VisualItem)
+        end
+
         for fullType, item in pairs(TrueSmoking.VisualItems) do
             -- print(string.format('item: %s - fullType: %s - item: %s',self.fullType, fullType, item))
             if self.fullType == fullType then
