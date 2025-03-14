@@ -80,8 +80,8 @@ function Smokable:new(item, player)
     obj.reduceFoodSick = item:getReduceFoodSickness() or 0
     obj.originalReduceFoodSick = obj.reduceFoodSick
 
-    obj.replaceOnUse = item:getReplaceOnUseFullType() or ''
-    print('set item: '..obj.replaceOnUse)
+    obj.replaceOnUse = item:getModData().replaceOnUse or ''
+    -- print('set item: '..obj.replaceOnUse)
 
     obj.smokePercent = obj.smokeLength / obj.originalSmokeLength
     obj.smokeLit = false
@@ -249,6 +249,7 @@ function Smokable:putOut()
 end
 
 function Smokable:stop()
+    if not self.table.isSmoking then return end
     self.table.isSmoking = false
     self.table.visualItem = false
 
