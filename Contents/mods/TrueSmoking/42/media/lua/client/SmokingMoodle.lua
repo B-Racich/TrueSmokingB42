@@ -45,7 +45,8 @@ function SmokingMoodle:update()
     if moodle == nil then return end
     local item = self.table.Smokable
     local smokeLit = item.smokeLit
-    local percentVal = item.smokePercent >= 0 and item.smokePercent or 0
+    local percent = item.smokeLength / item.originalSmokeLength
+    local percentVal = percent >= 0 and percent or 0
     local displayedPercentage = string.format('%.1f', percentVal * 100)
 
     local smokeLitText = smokeLit and 'lit' or 'out'

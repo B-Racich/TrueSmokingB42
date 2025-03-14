@@ -31,8 +31,8 @@ function addOnUseItem(player)
 end
 
 function callModFunction(func)
-    return function(item, player, percent)
-        func(item, player, percent)
+    return function(...)
+        func(...)
     end
 end
 
@@ -242,39 +242,39 @@ function OnEat_OverTime(smokable)
         end
     end
 
-    --NnC pain code
-    if getActivatedMods():contains("\\N&CsNarcotics") then
-        if smokable.item:getModData().modOnEat == "OnEat_WeedSmoke" then 
-            if smokable.NnC_PainThresh ~= 0 or smokable.NnC_StiffRemoval ~= 0 then
-                local stiffRemoval = smokable.NnC_OriginalStiffRemoval * percent * gameSpeed
-                local painThresh = smokable.NnC_OriginalPainThresh * percent * gameSpeed
-                local bodyDamage = character:getBodyDamage()
-                local BodyPartsStiff = {BodyPartType.Head, BodyPartType.Neck, BodyPartType.Torso_Upper,
-                                        BodyPartType.Torso_Lower, BodyPartType.Hand_R, BodyPartType.ForeArm_R, BodyPartType.UpperArm_R,
-                                        BodyPartType.Hand_L, BodyPartType.ForeArm_L, BodyPartType.UpperArm_L, BodyPartType.Groin,
-                                        BodyPartType.UpperLeg_L, BodyPartType.LowerLeg_L, BodyPartType.Foot_L, BodyPartType.UpperLeg_R,
-                                        BodyPartType.LowerLeg_R, BodyPartType.Foot_R}
-                for i=1, #BodyPartsStiff do
-                    local bodyPart = bodyDamage:getBodyPart(BodyPartsStiff[i])
-                    local stiffness = bodyPart:getStiffness()
-                    local currentPain = bodyPart:getPain()
-                    if stiffness and stiffness > stiffRemoval then
-                        bodyPart:setStiffness(stiffness - stiffRemoval)
-                    elseif stiffness and stiffness < stiffRemoval and stiffness > 0 then
-                        bodyPart:setStiffness(0)
-                        character:getFitness():removeStiffnessValue(BodyPartType.ToString(BodyPartsStiff[i]))
-                    end
-                    if currentPain >= 50 then
-                        bodyPart:setAdditionalPain(currentPain - painThresh)
-                    elseif currentPain < 50 then
-                        bodyPart:setAdditionalPain(0);
-                    end
-                end
-                smokable.NnC_StiffRemoval = smokable.NnC_StiffRemoval - stiffRemoval
-                smokable.NnC_PainThresh = smokable.NnC_PainThresh - painThresh
-            end
-        end
-    end
+    -- --NnC pain code
+    -- if getActivatedMods():contains("\\N&CsNarcotics") then
+    --     if smokable.item:getModData().modOnEat == "OnEat_WeedSmoke" then 
+    --         if smokable.NnC_PainThresh ~= 0 or smokable.NnC_StiffRemoval ~= 0 then
+    --             local stiffRemoval = smokable.NnC_OriginalStiffRemoval * percent * gameSpeed
+    --             local painThresh = smokable.NnC_OriginalPainThresh * percent * gameSpeed
+    --             local bodyDamage = character:getBodyDamage()
+    --             local BodyPartsStiff = {BodyPartType.Head, BodyPartType.Neck, BodyPartType.Torso_Upper,
+    --                                     BodyPartType.Torso_Lower, BodyPartType.Hand_R, BodyPartType.ForeArm_R, BodyPartType.UpperArm_R,
+    --                                     BodyPartType.Hand_L, BodyPartType.ForeArm_L, BodyPartType.UpperArm_L, BodyPartType.Groin,
+    --                                     BodyPartType.UpperLeg_L, BodyPartType.LowerLeg_L, BodyPartType.Foot_L, BodyPartType.UpperLeg_R,
+    --                                     BodyPartType.LowerLeg_R, BodyPartType.Foot_R}
+    --             for i=1, #BodyPartsStiff do
+    --                 local bodyPart = bodyDamage:getBodyPart(BodyPartsStiff[i])
+    --                 local stiffness = bodyPart:getStiffness()
+    --                 local currentPain = bodyPart:getPain()
+    --                 if stiffness and stiffness > stiffRemoval then
+    --                     bodyPart:setStiffness(stiffness - stiffRemoval)
+    --                 elseif stiffness and stiffness < stiffRemoval and stiffness > 0 then
+    --                     bodyPart:setStiffness(0)
+    --                     character:getFitness():removeStiffnessValue(BodyPartType.ToString(BodyPartsStiff[i]))
+    --                 end
+    --                 if currentPain >= 50 then
+    --                     bodyPart:setAdditionalPain(currentPain - painThresh)
+    --                 elseif currentPain < 50 then
+    --                     bodyPart:setAdditionalPain(0);
+    --                 end
+    --             end
+    --             smokable.NnC_StiffRemoval = smokable.NnC_StiffRemoval - stiffRemoval
+    --             smokable.NnC_PainThresh = smokable.NnC_PainThresh - painThresh
+    --         end
+    --     end
+    -- end
 end
 
 --Function to wrap and call original OnEat methods

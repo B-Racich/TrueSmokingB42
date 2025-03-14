@@ -52,18 +52,24 @@ function LightSmoke:start()
     -- self:setActionAnim(anim)
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable("FoodType", self.item:getEatType())
-    -- self:setOverrideHandModels(nil, self.item)
+
+    if not self.trueSmoking.visualItem then
+        self:setOverrideHandModels(nil, self.item)
+    end
 
     -- Play custom sound when no sound is playing
     -- print('get lighting sound before check')
     if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
         -- print('get lighting sound')
-        local sound = SmokingSoundsOverhaul:getLightingSound(self.character, self.item)
-        if self.eatSound == '' then -- No sound running for first time
+        local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
+        print(self.eatSound)
+        if self.eatSound == '' or self.eatSound == nil then -- No sound running for first time
             self.eatSound = sound
             -- Check if we previously started a puff and its audio is still playing
+            print(self.trueSmoking.lightingEatSound)
             if not self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound) then
-                self.trueSmoking.lightingEatSound = sound
+                print('here')
+                self.trueSmoking.lightingEatSound = self.eatSound
                 self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
             end
         end
@@ -89,6 +95,8 @@ end
 function LightSmoke:complete()
     self.trueSmoking.Smokable.smokeLit = true
     self.trueSmoking.Smokable.puffTimeMark = os.time()
+
+    self.trueSmoking.lightingEatSound = ''
 
     if self.trueSmoking.Smokable.burnRate == 0 then
         self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin, self.trueSmoking.Smokable.burnMax)

@@ -40,7 +40,9 @@ function PutOut:start()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable("FoodType", self.item:getEatType())
-    -- self:setOverrideHandModels(nil, self.item)
+    if not self.trueSmoking.visualItem then
+        self:setOverrideHandModels(nil, self.item)
+    end
 end
 
 function PutOut:stop()

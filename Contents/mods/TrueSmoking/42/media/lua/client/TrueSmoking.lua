@@ -20,6 +20,7 @@ TrueSmoking.VisualItems = TrueSmoking.VisualItems or {}
 TrueSmoking.SmokeLengths = TrueSmoking.SmokeLengths or {}
 TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
+TrueSmoking.SmokableObjects = TrueSmoking.SmokableObjects or {}
 TrueSmoking.Callbacks = TrueSmoking.Callbacks or {}
 TrueSmoking.Config = require 'ModOptions'
 --To support splitscreen we need to store each player seperately
@@ -83,6 +84,12 @@ end
 ]]
 function TrueSmoking:setCallback(func)
     table.insert(self.Callbacks, func)
+end
+
+function TrueSmoking:setSmokableObjects(table)
+    for index, value in pairs(table) do
+        self.SmokableObjects[index] = value
+    end
 end
 
 function TrueSmoking:hasRequiredItem(smokable)
@@ -338,6 +345,7 @@ function TrueSmoking:start(playerNum, player)
     if player:getModData().Smokable then
         local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
         smokable:getModData().SmokeLength = player:getModData().Smokable[2]
+        player:getModData().Smokable = false
     end
 
     --Keybinds
@@ -397,7 +405,9 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.OverrideSmokeLength = SandboxVars.TrueSmoking.OverrideSmokeLength
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
 
-    TrueSmoking.Options.PuffFactor = SandboxVars.TrueSmoking.PuffFactor
+    local puffFactorMultiplier = getActivatedMods():contains('\\SmokingSoundsOverhaul') and SandboxVars.TrueSmoking.PuffFactor/2 or SandboxVars.TrueSmoking.PuffFactor
+
+    TrueSmoking.Options.PuffFactor = SandboxVars.TrueSmoking.PuffFactor*puffFactorMultiplier
     TrueSmoking.Options.WalkingFactor = SandboxVars.TrueSmoking.WalkingFactor
     TrueSmoking.Options.RunningFactor = SandboxVars.TrueSmoking.RunningFactor
     TrueSmoking.Options.SprintingFactor = SandboxVars.TrueSmoking.SprintingFactor

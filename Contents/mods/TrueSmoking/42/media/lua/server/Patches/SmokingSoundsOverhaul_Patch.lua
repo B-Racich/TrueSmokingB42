@@ -16,12 +16,12 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
         return "Smoking_puff" .. sound_rand .. gender
     end
 
-    function SmokingSoundsOverhaul:getLightingSound(player, item)
+    function SmokingSoundsOverhaul:getLightingSound(player)
         local playerInv = player:getInventory()
         local lighter = playerInv:getFirstTag("Lighter") or playerInv:getFirstType("Base.Lighter");
         local matches = playerInv:getFirstTag("Matches") or playerInv:getFirstType("Base.Matches");
         local matchbox = playerInv:getFirstTag("MatchBox") or playerInv:getFirstType("Base.Matchbox");
-        
+
         --Smoker support
         local SM_foil_lighter = playerInv:getFirstType("SM.SMFoil_Lighter")
         local SM_Matchbox = playerInv:getFirstType("SM.Matches")
@@ -57,7 +57,7 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
             gender = "f";
         end
 
-        print('lighting sound selected: '..current_sound..gender)
+        print('lighting sound selected: ' .. current_sound .. gender)
 
         return current_sound .. gender
     end

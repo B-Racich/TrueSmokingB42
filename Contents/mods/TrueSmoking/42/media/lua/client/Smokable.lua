@@ -20,8 +20,15 @@ function Smokable:new(item, player)
     local obj = {}
     setmetatable(obj, self)
 
+    obj.smokableObject = TrueSmoking.SmokableObjects[item:getFullType()] or false
+
+    obj.conditions = obj.smokableObject and obj.smokableObject.conditions or { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true }
+
+    obj.canDrop = obj.conditions.canDrop or false
+
     local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
-    obj.burnMin, obj.burnMax = 0.000125, 0.000300
+    obj.burnMin = obj.smokableObject and obj.smokableObject.burnMin or 0.000125
+    obj.burnMax = obj.smokableObject and obj.smokableObject.burnMax or 0.000300
 
     obj.player = player
 
@@ -77,12 +84,6 @@ function Smokable:new(item, player)
     obj.timeCheck = ZombRand(puffMin, puffMax)
     obj.hasRolledForDrop = false
 
-    --NnC vals
-    obj.NnC_StiffRemoval = 15
-    obj.NnC_OriginalStiffRemoval = obj.NnC_StiffRemoval
-    obj.NnC_PainThresh = 50
-    obj.NnC_OriginalPainThresh = obj.NnC_PainThresh
-
     return obj
 end
 
@@ -109,6 +110,8 @@ function Smokable:getSmokeLength(item)
     -- 1. If our override is set return that
     if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
 
+    -- 1.1 If the item has a smokableObject set use that
+    if self.smokableObject and self.smokableObject.smokeLength then return self.smokableObject.smokeLength end
 
     -- 1.2 If the item has SmokeLength set use that
     if item:getModData().SmokeLength then return item:getModData().SmokeLength end
@@ -155,6 +158,10 @@ end
 function Smokable:getVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return false end
     if self.item and not self.table.visualItem then
+
+        if self.smokableObject and self.smokableObject.VisualItem then
+            return instanceItem(self.smokableObject.VisualItem)
+        end
 
         if self.item:getModData().VisualItem then
             return instanceItem(self.item:getModData().VisualItem)
@@ -296,7 +303,7 @@ end
 -- Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
 function Smokable:update()
     -- Checks if we are falling and dropped the smoke
-    if TrueSmoking.Options.Dropping then
+    if TrueSmoking.Options.Dropping and self.canDrop then
         if not self.hasRolledForDrop and self:checkDropConditions() then
             self.hasRolledForDrop = true
             local roll = ZombRandFloat(0.0, 100.0)
@@ -326,11 +333,13 @@ function Smokable:update()
         -- Try to take idle puff before calculating burn changes (unchanged)
         self:idlePuff()
 
-        local isWalking = self.player:isWalking()
-        local isRunning = self.player:isRunning()
-        local isSprinting = self.player:isSprinting()
-        local isStrafing = self.player:isStrafing()
+        local isWalking = self.player:isWalking() and self.conditions['walking']
+        local isRunning = self.player:isRunning() and self.conditions['running']
+        local isSprinting = self.player:isSprinting() and self.conditions['sprinting']
+        local isStrafing = self.player:isStrafing() and self.conditions['strafing']
         -- local inVehicle = self.player:isSeatedInVehicle()
+
+        local conditions = self.smokableObject and self.smokableObject.conditions or {true}
 
         -- Define target burn rate for active states only
         local targetBurnRate
@@ -346,14 +355,15 @@ function Smokable:update()
 
         if targetBurnRate then
             -- Smoothly adjust burnRate toward targetBurnRate for active states
-            local adjustmentSpeed = 0.0025               -- Controls transition speed (tune this value)
+            local adjustmentSpeed = self.smokableObject and self.smokableObject.burnSpeed or 0.0025
+            local adjustmentSpeedDecay = self.smokableObject and self.smokableObject.burnSpeedDecay or 0.20
             if self.burnRate > self.burnMax then
-                adjustmentSpeed = adjustmentSpeed * 0.25 -- Slower adjustment beyond burnMax
+                adjustmentSpeed = adjustmentSpeed * adjustmentSpeedDecay -- Slower adjustment beyond burnMax
             end
             self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
         else
             -- Apply exponential decay when idling
-            local decayFactor = 0.998 -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
+            local decayFactor = self.smokableObject and self.smokableObject.decayRate or 0.998 -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
             self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
         end
 
@@ -372,6 +382,11 @@ function Smokable:update()
         for _, func in ipairs(TrueSmoking.Callbacks) do
             func(self)
         end
+
+        print(string.format('Smoke Length: %f', self.smokeLength))
+        print(string.format('Smoke Length Org: %f', self.originalSmokeLength))
+        print(string.format('burnMin: %f', self.burnMin))
+        print(string.format('burnMax: %f', self.burnMax))
 
         -- Update item mod data (unchanged)
         self.item:getModData().SmokeLength = self.smokeLength
