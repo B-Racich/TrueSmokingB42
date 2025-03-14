@@ -23,6 +23,7 @@ function addOnUseItem(player)
         if item and item ~= '' then
             print('add item: '..str)
             player:getInventory():AddItem(str)
+            trueSmoking.Smokable.replaceOnUse = ''
         end
     end
 end

@@ -23,14 +23,16 @@ function ISEatFoodAction:new(character, item, percentage)
         print('Hooking: '..onEat..' -> '..hook)
         if not trueSmoking.isSmoking then
             print('setting up smokable')
-            trueSmoking.Smokable = Smokable:new(item, character)
-            item:getModData().modOnEat = hook
-
             local replace = item:getReplaceOnUseFullType()
-            if replace and replace ~= nil then
+
+            if replace and (replace ~= nil and replace ~= '') then
+                print('Has replace on use: '..replace)
                 item:getModData().replaceOnUse = replace
                 item:setReplaceOnUse(nil)
             end
+            
+            trueSmoking.Smokable = Smokable:new(item, character)
+            item:getModData().modOnEat = hook
 
             o.item = item
             o.maxTime = TrueSmoking.lightTime;
