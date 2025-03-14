@@ -15,9 +15,6 @@ local InventoryUI = require("Starlit/client/ui/InventoryUI")
 TrueSmoking = TrueSmoking or {}
 TrueSmoking.__index = TrueSmoking
 TrueSmoking.Options = TrueSmoking.Options or {}
-TrueSmoking.Mods = TrueSmoking.Mods or {}
-TrueSmoking.VisualItems = TrueSmoking.VisualItems or {}
-TrueSmoking.SmokeLengths = TrueSmoking.SmokeLengths or {}
 TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
 TrueSmoking.SmokableObjects = TrueSmoking.SmokableObjects or {}
@@ -29,32 +26,8 @@ TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
 TrueSmoking.Player_3 = TrueSmoking.Player_3 or {}
 TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
-TrueSmoking.originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
-TrueSmoking.originalEatItem = ISInventoryPaneContextMenu.eatItem
-
---[[
-    For modders use this to set smoke lengths on your smokables
-    { [item:getFullType()] = <Smoke Length> }
-    ex. { ['Base.CigaretteSingle'] = 1.5 }
-]]
-function TrueSmoking:setSmokeLengths(table)
-    for index, value in pairs(table) do
-        -- print(string.format('Smoke Lengths Setting: %s - %s',index, value))
-        self.SmokeLengths[index] = value
-    end
-end
-
---[[
-    For modders use this to set visualItems for your smokables
-    { [item:getFullType()] = <Name of item> }
-    ex. { ['Base.CigaretteSingle'] = 'Base.Mask_Cigarette' }
-]]
-function TrueSmoking:setVisualItems(table)
-    for index, value in pairs(table) do
-        -- print(string.format('Setting: %s - %s',index, value))
-        self.VisualItems[index] = value
-    end
-end
+local originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
+local originalEatItem = ISInventoryPaneContextMenu.eatItem
 
 --[[
     For modders use this to set smokes for the hotkey
@@ -86,6 +59,9 @@ function TrueSmoking:setCallback(func)
     table.insert(self.Callbacks, func)
 end
 
+--[[
+    Set SmokableObjects that contain definitions for the different smokables
+]]
 function TrueSmoking:setSmokableObjects(table)
     for index, value in pairs(table) do
         self.SmokableObjects[index] = value
@@ -251,7 +227,7 @@ ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
     else
         TrueSmoking:getPlayerReference(player).CheckMaskSmoking = false
     end
-    TrueSmoking.originalEatItem(item, percentage, player)
+    originalEatItem(item, percentage, player)
 end
 
 --Cleaner implementation for detecting masks and shemaghs and doing our own logic to re-equip and adjust
@@ -259,13 +235,13 @@ ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
     local o = TrueSmoking:getPlayerReference(playerObj)
 
     --use native function to get blocking mask
-    local mask = TrueSmoking.originalGetEatingMask(playerObj, false)
+    local mask = originalGetEatingMask(playerObj, false)
 
     if mask and mask:getFullType():contains('Shemagh') and mask:getTags():contains('CantSmoke') and o.CheckMaskSmoking then
         o.shemagh = mask
         TrueSmoking:adjustShemagh(playerObj, mask, true)
     else --let the game handle it normally
-        mask = TrueSmoking.originalGetEatingMask(playerObj, removeMask)
+        mask = originalGetEatingMask(playerObj, removeMask)
         o.mask = mask
     end
 
@@ -405,6 +381,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.OverrideSmokeLength = SandboxVars.TrueSmoking.OverrideSmokeLength
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
 
+    -- SSO anims are 2x so just /2 the value so we arn't turbo smoking when puffing
     local puffFactorMultiplier = getActivatedMods():contains('\\SmokingSoundsOverhaul') and SandboxVars.TrueSmoking.PuffFactor/2 or SandboxVars.TrueSmoking.PuffFactor
 
     TrueSmoking.Options.PuffFactor = SandboxVars.TrueSmoking.PuffFactor*puffFactorMultiplier

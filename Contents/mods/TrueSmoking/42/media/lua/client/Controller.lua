@@ -5,17 +5,13 @@
 
     This could be configured through a combo box and options later.
 ]]
-require 'TrueSmoking'
-
-TrueSmoking = TrueSmoking or {}
-TrueSmoking.ISButtonPrompt = TrueSmoking.ISButtonPrompt or {}
-TrueSmoking.ISButtonPrompt.onJoypadButtonReleased = ISButtonPrompt.onJoypadButtonReleased
-TrueSmoking.ISButtonPrompt.onLBPress = ISButtonPrompt.onLBPress
-TrueSmoking.ISButtonPrompt.onBPress = ISButtonPrompt.onBPress
-TrueSmoking.ISButtonPrompt.getBestBButtonAction = ISButtonPrompt.getBestBButtonAction
+local originalOnJoypadButtonReleased = ISButtonPrompt.onJoypadButtonReleased
+local originalOnLBPress = ISButtonPrompt.onLBPress
+local originalOnBPress = ISButtonPrompt.onBPress
+local originalGetBestBButtonAction = ISButtonPrompt.getBestBButtonAction
 
 function ISButtonPrompt:onJoypadButtonReleased(button)
-    TrueSmoking.ISButtonPrompt.onJoypadButtonReleased(self, button)
+    originalOnJoypadButtonReleased(self, button)
 
     local o = TrueSmoking:getPlayerReference(self.player)
 
@@ -28,7 +24,7 @@ function ISButtonPrompt:onJoypadButtonReleased(button)
 end
 
 function ISButtonPrompt:onLBPress()
-    TrueSmoking.ISButtonPrompt.onLBPress(self)
+    originalOnLBPress(self)
 
     local o = TrueSmoking:getPlayerReference(self.player)
 
@@ -36,7 +32,7 @@ function ISButtonPrompt:onLBPress()
 end
 
 function ISButtonPrompt:onBPress()
-    TrueSmoking.ISButtonPrompt.onBPress(self)
+    originalOnBPress(self)
 
     local o = TrueSmoking:getPlayerReference(self.player)
 
@@ -44,7 +40,7 @@ function ISButtonPrompt:onBPress()
 end
 
 function ISButtonPrompt:getBestBButtonAction(dir)
-    TrueSmoking.ISButtonPrompt.getBestBButtonAction(self, dir)
+    originalGetBestBButtonAction(self, dir)
 
     local grab = getText("UI_GrabAndDrop_GrabAction")
     local drop = getText("UI_GrabAndDrop_DropAction")
