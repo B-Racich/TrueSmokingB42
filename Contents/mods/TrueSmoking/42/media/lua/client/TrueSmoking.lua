@@ -32,7 +32,7 @@ local originalEatItem = ISInventoryPaneContextMenu.eatItem
 --[[
     For modders use this to set smokes for the hotkey
     { [item:getFullType()] = <Name of item> }
-    ex. { ['Base.CigaretteSingle'] = 'Base.Mask_Cigarette' }
+    ex. { 'Base.CigaretteSingle' }
 ]]
 function TrueSmoking:setHotkeySmokes(list)
     for _, item in ipairs(list) do
@@ -45,8 +45,8 @@ end
     { [item:getFullType()] = recipeString }
     ex. { ['Base.CigarettePack'] = 'TakeACigarette' }
 ]]
-function TrueSmoking:setHotkeyPacks(list)
-    for key, item in pairs(list) do
+function TrueSmoking:setHotkeyPacks(table)
+    for key, item in pairs(table) do
         self.HotkeyPacks[key] = item
     end
 end
@@ -63,8 +63,10 @@ end
     Set SmokableObjects that contain definitions for the different smokables
 ]]
 function TrueSmoking:setSmokableObjects(table)
-    for index, value in pairs(table) do
-        self.SmokableObjects[index] = value
+    for key, value in pairs(table) do
+        print('Smokable Object: '..key)
+        print(value)
+        self.SmokableObjects[key] = value
     end
 end
 

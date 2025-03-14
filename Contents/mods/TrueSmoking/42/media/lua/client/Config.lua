@@ -2,7 +2,7 @@ Events.OnLoad.Add(function()
     --[[
         The smokable object defines settings and properties for each smokable item that should be hooked into the TrueSmoking system.
         The following settings can be used to tweak how each item behaves when smoked:
-        
+
         burnMin: the minimum burn rate the smokable tries to reach when walking/running/sprinting
         burnMax: the maximum burn rate the smokable tries to reach when puffing
         burnSpeed: the acceleration towards burnMax when puffing
@@ -16,7 +16,6 @@ Events.OnLoad.Add(function()
     ]]
     local smokableObjects = {
         ['Base.CigaretteSingle'] = {
-            fullType = 'Base.CigaretteSingle',
             visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.CigaretteLength, -- Length of smoke
             burnMin = 0.000125,                                -- Minimum burn rate target
@@ -32,7 +31,6 @@ Events.OnLoad.Add(function()
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
         },
         ['Base.CigaretteRolled'] = {
-            fullType = 'Base.CigaretteRolled',
             visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.CigaretteLength, -- Length of smoke
             burnMin = 0.000125,                                -- Minimum burn rate target
@@ -48,7 +46,6 @@ Events.OnLoad.Add(function()
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
         },
         ['Base.Cigarillo'] = {
-            fullType = 'Base.Cigarillo',
             visualItem = 'Mask_Cigarillo',                     -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.CigarilloLength, -- Length of smoke
             burnMin = 0.000125,                                -- Minimum burn rate target
@@ -64,7 +61,6 @@ Events.OnLoad.Add(function()
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
         },
         ['Base.Cigar'] = {
-            fullType = 'Base.Cigar',
             visualItem = 'Mask_Cigar',               -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.Cigar, -- Length of smoke
             burnMin = 0.000125,                      -- Minimum burn rate target
@@ -80,7 +76,6 @@ Events.OnLoad.Add(function()
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
         },
         ['Base.SmokingPipe_Tobacco'] = {
-            fullType = 'Base.SmokingPipe_Tobacco',
             visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.PipeLength, -- Length of smoke
             burnMin = 0.000125,                           -- Minimum burn rate target
@@ -96,7 +91,6 @@ Events.OnLoad.Add(function()
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
         },
         ['Base.CanPipe_Tobacco'] = {
-            fullType = 'Base.CanPipe_Tobacco',
             visualItem = false,                          -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.CanLength, -- Length of smoke
             burnMin = 0.000125,                          -- Minimum burn rate target

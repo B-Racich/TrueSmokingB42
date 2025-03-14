@@ -22,9 +22,13 @@ function Smokable:new(item, player)
 
     local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
 
-    obj = self:getObject(item)
+    local data = self:getObject(item)
 
-    obj.conditions = obj.smokableObject.conditions
+    for k, v in pairs(data) do
+        print('Building smokable from data: '..k)
+        print(v)
+        obj[k] = v
+    end
 
     obj.canDrop = obj.conditions.canDrop or false
 
@@ -82,30 +86,31 @@ end
 
 function Smokable:getObject(item)
     local fullType = item:getFullType()
-    local hasObject = TrueSmoking.SmokableObjects[fullType] or false
-
+    print('item type: '..fullType)
+    local o = TrueSmoking.SmokableObjects[fullType]
     -- If we have a object defined use it
-    if hasObject then return hasObject end
+    if not o then
+        o = {
+            smokeLength = self:getSmokeLength(item),
+            burnMin = 0.000125,
+            burnMax = 0.000300,
+            burnSpeed = 0.0025,
+            burnSpeedDecay = 0.20,
+            decayRate = 0.998,
+            callback = false,
+            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
+            idleFactor = TrueSmoking.Options.IdleFactor,
+            walkingFactor = TrueSmoking.Options.WalkingFactor,
+            runningFactor = TrueSmoking.Options.RunningFactor,
+            sprintingFactor = TrueSmoking.Options.SprintingFactor,
+        }
+    end
 
-    -- Begin building our default object
-    local o = {
-        fullType = fullType,
-        visualItem = self:getVisualItem(item),
-        smokeLength = self:getSmokeLength(item),
-        originalSmokeLength = self:getOriginalSmokeLength(item),
-        burnMin = 0.000125,
-        burnMax = 0.000300,
-        burnSpeed = 0.0025,
-        burnSpeedDecay = 0.20,
-        decayRate = 0.998,
-        callback = false,
-        conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-        idleFactor = TrueSmoking.Options.IdleFactor,
-        walkingFactor = TrueSmoking.Options.WalkingFactor,
-        runningFactor = TrueSmoking.Options.RunningFactor,
-        sprintingFactor = TrueSmoking.Options.SprintingFactor,
-    }
-
+    o.fullType = fullType
+    -- Get our instanceItem
+    if o.visualItem then o.visualItem = instanceItem(o.visualItem) else o.visualItem = self:getVisualItem(item) end
+    -- Get our original length
+    o.originalSmokeLength = self:getOriginalSmokeLength(item)
     return o
 end
 
@@ -143,7 +148,7 @@ function Smokable:getSmokeLength(item)
 
     -- 3. If we can find a default use that
     for key, value in pairs(OnEat_Defaults) do
-        if item.getModData().modOnEat == key then return value end
+        if item:getModData().modOnEat == key then return value end
     end
 
     -- 4. Return our default value
@@ -151,6 +156,9 @@ function Smokable:getSmokeLength(item)
 end
 
 function Smokable:getOriginalSmokeLength(item)
+    local data = TrueSmoking.SmokableObjects[item:getFullType()]
+    if data then return data.smokeLength end
+
     local OnEat_Defaults = {
         ['OnEat_Cigarettes'] = TrueSmoking.Options.CigaretteLength,
         ['OnEat_Cigarillo'] = TrueSmoking.Options.CigarilloLength,
@@ -200,7 +208,7 @@ function Smokable:getVisualItem(item)
         ['bong'] = false,
     }
 
-    local itemType = self.item:getFullType():lower()
+    local itemType = item:getFullType():lower()
 
     -- Then try partial match
     for pattern, itemName in pairs(typeMatches) do
@@ -211,7 +219,7 @@ function Smokable:getVisualItem(item)
 
     --If we can find a default use that
     for key, value in pairs(OnEat_Defaults) do
-        if self.onEat == key then return instanceItem(value) end
+        if item:getOnEat() == key then return instanceItem(value) end
     end
 
     -- If we found nothing do not display anything
