@@ -24,8 +24,13 @@ function ISEatFoodAction:new(character, item, percentage)
         if not trueSmoking.isSmoking then
             print('setting up smokable')
             trueSmoking.Smokable = Smokable:new(item, character)
-            item:getModData().modOnEat = onEat
-            item:setOnEat(hook)
+            item:getModData().modOnEat = hook
+
+            local replace = item:getReplaceOnUseFullType()
+            if replace and replace ~= nil then
+                item:getModData().replaceOnUse = replace
+                item:setReplaceOnUse(nil)
+            end
 
             o.item = item
             o.maxTime = TrueSmoking.lightTime;
@@ -37,7 +42,7 @@ end
 
 function ISEatFoodAction:complete()
     -- print('inside complete')
-    if self.item:getOnEat() == 'OnEat_Hook' then
+    if self.item:getModData().modOnEat == 'OnEat_Hook' then
         -- print('complete hook')
         self.trueSmoking.Smokable.smokeLit = true
         self.trueSmoking.Smokable.puffTimeMark = os.time()
@@ -60,7 +65,7 @@ end
 function ISEatFoodAction:start()
     -- print('starting original')
     originalActionStart(self)
-    if self.item:getOnEat() == 'OnEat_Hook' then
+    if self.item:getModData().modOnEat == 'OnEat_Hook' then
         if TrueSmoking.Config.HideAllActionBars then
             self.action:setUseProgressBar(false)
         end

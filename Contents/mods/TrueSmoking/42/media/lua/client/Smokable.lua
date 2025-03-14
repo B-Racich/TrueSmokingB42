@@ -49,7 +49,6 @@ function Smokable:new(item, player)
 
     obj.item = item
     obj.onEat = item:getOnEat() or ''
-    obj.replaceOnUse = item:getReplaceOnUse() or ''
 
     obj.stress = item:getStressChange() or -5
     obj.originalStress = obj.stress
@@ -82,6 +81,7 @@ function Smokable:new(item, player)
     obj.originalReduceFoodSick = obj.reduceFoodSick
 
     obj.replaceOnUse = item:getReplaceOnUseFullType() or ''
+    print('set item: '..obj.replaceOnUse)
 
     obj.smokePercent = obj.smokeLength / obj.originalSmokeLength
     obj.smokeLit = false
@@ -97,8 +97,8 @@ function Smokable:getObject(item)
     local o = TrueSmoking.SmokableObjects[fullType]
     -- If we have a object defined use it
     if not o then
+        print('rolling default')
         o = {
-            smokeLength = self:getSmokeLength(item, false),
             burnMin = 0.000125,
             burnMax = 0.000300,
             burnSpeed = 0.0025,
@@ -110,12 +110,16 @@ function Smokable:getObject(item)
             walkingFactor = TrueSmoking.Options.WalkingFactor,
             runningFactor = TrueSmoking.Options.RunningFactor,
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
+            puffFactor = TrueSmoking.Options.PuffFactor
         }
     end
 
     o.fullType = fullType
-    -- Get our original length
+    o.smokeLength = self:getSmokeLength(item, false)
     o.originalSmokeLength = self:getSmokeLength(item, true)
+
+    if not o.effectMultiplier then o.effectMultiplier = 1.0 end
+
     return o
 end
 
@@ -139,13 +143,14 @@ end
 
 --Helper function to set smokeLengths
 function Smokable:getSmokeLength(item, original)
+    -- 1.2 If the item has SmokeLength set use that
     if not original then
-        -- 1. If our override is set return that
-        if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
-
-        -- 1.2 If the item has SmokeLength set use that
         if item:getModData().SmokeLength then return item:getModData().SmokeLength end
     end
+
+    -- 1. If our override is set return that
+    if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
+
     local OnEat_Defaults = {
         ['OnEat_Cigarettes'] = TrueSmoking.Options.CigaretteLength,
         ['OnEat_Cigarillo'] = TrueSmoking.Options.CigarilloLength,
@@ -154,7 +159,7 @@ function Smokable:getSmokeLength(item, original)
 
     -- 3. If we can find a default use that
     for key, value in pairs(OnEat_Defaults) do
-        if item:getModData().modOnEat == key then return value end
+        if item:getOnEat() == key then return value end
     end
 
     -- 4. Return our default value
@@ -164,8 +169,6 @@ end
 function Smokable:equipVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
     if not self.player:getWornItem('Mask_Smoke') and self.table.visualItem then
-        print(self.table)
-        print(self.table.visualItem)
         self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem);
     elseif self.player:getWornItem('Mask_Smoke') then
         self.player:removeWornItem(self.player:getWornItem('Mask_Smoke'))
@@ -268,6 +271,7 @@ function Smokable:stop()
     if self.item then
         local onUse = self.replaceOnUse
         if onUse and onUse ~= '' and self.smokeLength <= 0 then
+            print('adding item: '..self.replaceOnUse)
             addOnUseItem(self.player)
         end
 
@@ -280,8 +284,6 @@ function Smokable:stop()
             self.item:getModData().SmokeLength = 0
             self.player:getModData().Smokable = false
         end
-
-        self.item = false --clear item for safety.
     end
 end
 
@@ -296,7 +298,7 @@ function Smokable:dropSmoke()
 end
 
 function Smokable:checkDropConditions()
-    local state = TrueSmokingUtils:getPlayerState(self.player)
+    local state = getPlayerState(self.player)
     local dropStates = { ['CollideWithWallState'] = true }
 
     local ClimbFenceOutcome = self.player:GetVariable("ClimbFenceOutcome")
@@ -370,7 +372,7 @@ function Smokable:update()
         else
             -- Apply exponential decay when idling
             local decayFactor = self
-            .decayRate                         -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
+                .decayRate -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
             self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
         end
 

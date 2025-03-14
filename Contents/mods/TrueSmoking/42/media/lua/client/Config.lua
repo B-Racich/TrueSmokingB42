@@ -30,13 +30,15 @@ Events.OnCreatePlayer.Add(function()
             walking/running/sprinting/strafing = should increase burn while doing
             canDrop = if the smoke should be dropped when falling (trees,zombies,walls)
 
-        idleFactor: the multiplier to decrease the burn rate when idle
+        idleFactor: the multiplier to decrease the burn rate when idle // 0.85
 
-        walkingFactor: the multiplier to increase the burn rate when walking
+        walkingFactor: the multiplier to increase the burn rate to min when walking // 1.0
 
-        runningFactor: the multiplier to increase the burn rate when running
+        runningFactor: the multiplier to increase the burn rate to min when running // 1.15
 
-        sprintingFactor: the multiplier to increase the burn rate when sprinting
+        sprintingFactor: the multiplier to increase the burn rate to min when sprinting // 1.35
+
+        puffFactor: the multiplier to increase the burn rate to max when puffing // 1.35
     ]]
     local smokableObjects = {
         ['Base.CigaretteSingle'] = {
@@ -47,6 +49,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
+            effectMultiplier = 1.0,                             -- smoker effect multiplier
             callback = false,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -63,6 +66,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
+            effectMultiplier = 1.0,                             -- smoker effect multiplier
             callback = false,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -79,6 +83,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
+            effectMultiplier = 2.0,                             -- smoker effect multiplier
             callback = false,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -95,6 +100,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                      -- Acceleration towards burnMax
             burnSpeedDecay = 0.20,                   -- Acceleration decay rate after burnMax
             decayRate = 0.998,                       -- Decay rate when idle
+            effectMultiplier = 3.0,                             -- smoker effect multiplier
             callback = false,                        -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -149,15 +155,6 @@ Events.OnCreatePlayer.Add(function()
 
     TrueSmoking:setHotkeySmokes(TRUE_SMOKING_DEFAULT_HOTKEY_SMOKES)
     TrueSmoking:setHotkeyPacks(TRUE_SMOKING_DEFAULT_HOTKEY_PACKS)
-
-    -- TrueSmoking:setCallback(
-    -- function(smokable)
-    --     if smokable.item:getModData().modOnEat == 'OnEat_WeedSmoke' then
-    --         print('call this')
-    --         OnEat_WeedSmoke(smokable)
-    --     end
-    -- end
-    --     )
 end)
 
 
