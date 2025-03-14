@@ -50,7 +50,7 @@ Events.OnCreatePlayer.Add(function()
             burnMax = 0.000300,                                -- Maximum burn rate target
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
-            decayRate = 0.998,                                 -- Decay rate when idle
+            decayRate = 0.999,                                 -- Decay rate when idle
             effectMultiplier = 1.0,                            -- smoker effect multiplier
             callback = OnEat_OverTime,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
@@ -66,8 +66,8 @@ Events.OnCreatePlayer.Add(function()
             burnMin = 0.000125,                                -- Minimum burn rate target
             burnMax = 0.000300,                                -- Maximum burn rate target
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
-            burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
-            decayRate = 0.998,                                 -- Decay rate when idle
+            burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
+            decayRate = 0.999,                                 -- Decay rate when idle
             effectMultiplier = 1.0,                            -- smoker effect multiplier
             callback = OnEat_OverTime,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
@@ -83,7 +83,7 @@ Events.OnCreatePlayer.Add(function()
             burnMin = 0.000125,                                -- Minimum burn rate target
             burnMax = 0.000300,                                -- Maximum burn rate target
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
-            burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
+            burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
             effectMultiplier = 2.0,                            -- smoker effect multiplier
             callback = OnEat_OverTime,                                  -- Callback function when smoked (mod support)
@@ -100,7 +100,7 @@ Events.OnCreatePlayer.Add(function()
             burnMin = 0.000125,                            -- Minimum burn rate target
             burnMax = 0.000300,                            -- Maximum burn rate target
             burnSpeed = 0.0025,                            -- Acceleration towards burnMax
-            burnSpeedDecay = 0.20,                         -- Acceleration decay rate after burnMax
+            burnSpeedDecay = 0.25,                         -- Acceleration decay rate after burnMax
             decayRate = 0.998,                             -- Decay rate when idle
             effectMultiplier = 3.0,                        -- smoker effect multiplier
             callback = OnEat_OverTime,                              -- Callback function when smoked (mod support)
@@ -117,7 +117,7 @@ Events.OnCreatePlayer.Add(function()
             burnMin = 0.000125,                           -- Minimum burn rate target
             burnMax = 0.000300,                           -- Maximum burn rate target
             burnSpeed = 0.0025,                           -- Acceleration towards burnMax
-            burnSpeedDecay = 0.20,                        -- Acceleration decay rate after burnMax
+            burnSpeedDecay = 0.25,                        -- Acceleration decay rate after burnMax
             decayRate = 0.998,                            -- Decay rate when idle
             callback = OnEat_OverTime,                             -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
@@ -133,7 +133,7 @@ Events.OnCreatePlayer.Add(function()
             burnMin = 0.000125,                          -- Minimum burn rate target
             burnMax = 0.000300,                          -- Maximum burn rate target
             burnSpeed = 0.0025,                          -- Acceleration towards burnMax
-            burnSpeedDecay = 0.20,                       -- Acceleration decay rate after burnMax
+            burnSpeedDecay = 0.25,                       -- Acceleration decay rate after burnMax
             decayRate = 0.998,                           -- Decay rate when idle
             callback = OnEat_OverTime,                            -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
