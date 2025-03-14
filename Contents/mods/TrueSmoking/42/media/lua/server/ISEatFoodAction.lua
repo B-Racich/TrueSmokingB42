@@ -10,8 +10,8 @@ function ISEatFoodAction:new(character, item, percentage)
     local onEat = item:getOnEat() or ''
     local hook = 'OnEat_Hook'
     local hasSmokableTag = item:getTags():contains('Smokable')
-    local funcsToHook = {'OnEat_Cigarettes','OnEat_Cigarillo','OnEat_Cigar',
-    'OnEat_WeedSmoke','OnEat_WeedJoint','OnEat_WeedPipe', hook}
+    local funcsToHook = { 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
+        'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', hook }
 
     --Store the original action to return it if we don't need to hook it
     o = originalActionNew(self, character, item, percentage)
@@ -20,17 +20,17 @@ function ISEatFoodAction:new(character, item, percentage)
     o.trueSmoking = trueSmoking
 
     if isInList(onEat, funcsToHook) or hasSmokableTag then
-        print('Hooking: '..onEat..' -> '..hook)
+        print('Hooking: ' .. onEat .. ' -> ' .. hook)
         if not trueSmoking.isSmoking then
             print('setting up smokable')
             local replace = item:getReplaceOnUseFullType()
 
             if replace and (replace ~= nil and replace ~= '') then
-                print('Has replace on use: '..replace)
+                print('Has replace on use: ' .. replace)
                 item:getModData().replaceOnUse = replace
                 item:setReplaceOnUse(nil)
             end
-            
+
             trueSmoking.Smokable = Smokable:new(item, character)
             item:getModData().modOnEat = hook
 
@@ -51,7 +51,8 @@ function ISEatFoodAction:complete()
         self.trueSmoking.lightingEatSound = ''
 
         if self.trueSmoking.Smokable.burnRate == 0 then
-            self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin, self.trueSmoking.Smokable.burnMax)
+            self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin,
+                self.trueSmoking.Smokable.burnMax)
         end
 
         -- print('call light')
@@ -61,7 +62,7 @@ function ISEatFoodAction:complete()
         -- print('complete non hook')
         originalActionComplete(self)
     end
-	return true;
+    return true;
 end
 
 function ISEatFoodAction:start()
