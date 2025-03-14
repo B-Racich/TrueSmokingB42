@@ -25,8 +25,6 @@ function Smokable:new(item, player)
     local data = self:getObject(item)
 
     for k, v in pairs(data) do
-        print('Building smokable from data: '..k)
-        print(v)
         obj[k] = v
     end
 
@@ -38,6 +36,16 @@ function Smokable:new(item, player)
     obj.player = player
 
     obj.table = TrueSmoking:getPlayerReference(player)
+
+    -- Get our instanceItem
+    if obj.visualItem then
+        obj.table.visualItem = instanceItem(obj.visualItem)
+    else
+        local hasVisualItem = self:getVisualItem(item)
+        if hasVisualItem then
+            obj.table.visualItem = hasVisualItem
+        end
+    end
 
     obj.item = item
     obj.onEat = item:getOnEat() or ''
@@ -86,12 +94,11 @@ end
 
 function Smokable:getObject(item)
     local fullType = item:getFullType()
-    print('item type: '..fullType)
     local o = TrueSmoking.SmokableObjects[fullType]
     -- If we have a object defined use it
     if not o then
         o = {
-            smokeLength = self:getSmokeLength(item),
+            smokeLength = self:getSmokeLength(item, false),
             burnMin = 0.000125,
             burnMax = 0.000300,
             burnSpeed = 0.0025,
@@ -107,10 +114,8 @@ function Smokable:getObject(item)
     end
 
     o.fullType = fullType
-    -- Get our instanceItem
-    if o.visualItem then o.visualItem = instanceItem(o.visualItem) else o.visualItem = self:getVisualItem(item) end
     -- Get our original length
-    o.originalSmokeLength = self:getOriginalSmokeLength(item)
+    o.originalSmokeLength = self:getSmokeLength(item, true)
     return o
 end
 
@@ -133,13 +138,14 @@ function Smokable:getFoodSick(item)
 end
 
 --Helper function to set smokeLengths
-function Smokable:getSmokeLength(item)
-    -- 1. If our override is set return that
-    if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
+function Smokable:getSmokeLength(item, original)
+    if not original then
+        -- 1. If our override is set return that
+        if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
 
-    -- 1.2 If the item has SmokeLength set use that
-    if item:getModData().SmokeLength then return item:getModData().SmokeLength end
-
+        -- 1.2 If the item has SmokeLength set use that
+        if item:getModData().SmokeLength then return item:getModData().SmokeLength end
+    end
     local OnEat_Defaults = {
         ['OnEat_Cigarettes'] = TrueSmoking.Options.CigaretteLength,
         ['OnEat_Cigarillo'] = TrueSmoking.Options.CigarilloLength,
@@ -155,27 +161,11 @@ function Smokable:getSmokeLength(item)
     return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
-function Smokable:getOriginalSmokeLength(item)
-    local data = TrueSmoking.SmokableObjects[item:getFullType()]
-    if data then return data.smokeLength end
-
-    local OnEat_Defaults = {
-        ['OnEat_Cigarettes'] = TrueSmoking.Options.CigaretteLength,
-        ['OnEat_Cigarillo'] = TrueSmoking.Options.CigarilloLength,
-        ['OnEat_Cigar'] = TrueSmoking.Options.CigarLength,
-    }
-
-    for key, value in pairs(OnEat_Defaults) do
-        if item:getModData().modOnEat == key then return value end
-    end
-
-    -- 4. Return our default value
-    return TrueSmoking.Options.SmokeLength -- default smoke length
-end
-
 function Smokable:equipVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
     if not self.player:getWornItem('Mask_Smoke') and self.table.visualItem then
+        print(self.table)
+        print(self.table.visualItem)
         self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem);
     elseif self.player:getWornItem('Mask_Smoke') then
         self.player:removeWornItem(self.player:getWornItem('Mask_Smoke'))
@@ -239,7 +229,7 @@ function Smokable:light()
         Events.OnTick.Add(updateWrapper)
         self.updateWrapper = updateWrapper
 
-        self.table.visualItem = self.visualItem
+        -- self.table.visualItem = self.visualItem
         self:equipVisualItem()
         self.player:getInventory():Remove(self.item)
     end
@@ -379,7 +369,8 @@ function Smokable:update()
             self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
         else
             -- Apply exponential decay when idling
-            local decayFactor = self.decayRate                                                                              -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
+            local decayFactor = self
+            .decayRate                         -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
             self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
         end
 
@@ -405,10 +396,10 @@ function Smokable:update()
             func(self)
         end
 
-        print(string.format('Smoke Length: %f', self.smokeLength))
-        print(string.format('Smoke Length Org: %f', self.originalSmokeLength))
-        print(string.format('burnMin: %f', self.burnMin))
-        print(string.format('burnMax: %f', self.burnMax))
+        -- print(string.format('Smoke Length: %f', self.smokeLength))
+        -- print(string.format('Smoke Length Org: %f', self.originalSmokeLength))
+        -- print(string.format('burnMin: %f', self.burnMin))
+        -- print(string.format('burnMax: %f', self.burnMax))
 
         -- Update item mod data (unchanged)
         self.item:getModData().SmokeLength = self.smokeLength

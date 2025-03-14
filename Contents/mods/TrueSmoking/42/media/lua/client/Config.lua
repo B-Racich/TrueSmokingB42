@@ -1,17 +1,41 @@
-Events.OnLoad.Add(function()
+Events.OnCreatePlayer.Add(function()
     --[[
-        The smokable object defines settings and properties for each smokable item that should be hooked into the TrueSmoking system.
-        The following settings can be used to tweak how each item behaves when smoked:
+        The smokable object defines settings and properties for each smokable item that should be
+            hooked into the TrueSmoking system.
+            
+        ===The following settings can be used to tweak how each item behaves when smoked:===
+
+        visualItem: The item to display on the mouth while smoking. Custom wearable items can be made and should
+            work if the fullType of the item is passed here. They need to be made in the same format as the ones
+            from this mod so reference that.
+
+            ['Mask_Cigarette', 'Mask_Cigarillo', 'Mask_Cigar', 'Mask_Pipe', false]
 
         burnMin: the minimum burn rate the smokable tries to reach when walking/running/sprinting
+
         burnMax: the maximum burn rate the smokable tries to reach when puffing
+
         burnSpeed: the acceleration towards burnMax when puffing
+
         burnSpeedDecay: the acceleration decay rate after reaching burnMax
-        callback: the callback function that happens onTick while smoking (for modded onEat methods, this will pass in a reference of the Smokable object)
-        conditions: If the various factor states should apply, also a toggle for if the item should be dropped when falling
+
+        callback: the callback function that happens onTick while smoking
+            For modded onEat methods, this will pass in a reference of the Smokable object to use
+
+            Functions that are designed for the vanilla system can be made to user the Smokable.puffPercent value to
+            calculate how much of a change should happen
+        
+        conditions: Flags to set certain logic/settings per item
+            idle = should go out when idle
+            walking/running/sprinting/strafing = should increase burn while doing
+            canDrop = if the smoke should be dropped when falling (trees,zombies,walls)
+
         idleFactor: the multiplier to decrease the burn rate when idle
+
         walkingFactor: the multiplier to increase the burn rate when walking
+
         runningFactor: the multiplier to increase the burn rate when running
+
         sprintingFactor: the multiplier to increase the burn rate when sprinting
     ]]
     local smokableObjects = {
@@ -29,6 +53,7 @@ Events.OnLoad.Add(function()
             walkingFactor = TrueSmoking.Options.WalkingFactor,
             runningFactor = TrueSmoking.Options.RunningFactor,
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
+            puffFactor = TrueSmoking.Options.PuffFactor
         },
         ['Base.CigaretteRolled'] = {
             visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
@@ -44,6 +69,7 @@ Events.OnLoad.Add(function()
             walkingFactor = TrueSmoking.Options.WalkingFactor,
             runningFactor = TrueSmoking.Options.RunningFactor,
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
+            puffFactor = TrueSmoking.Options.PuffFactor
         },
         ['Base.Cigarillo'] = {
             visualItem = 'Mask_Cigarillo',                     -- Visual item to be displayed on mouth
@@ -59,10 +85,11 @@ Events.OnLoad.Add(function()
             walkingFactor = TrueSmoking.Options.WalkingFactor,
             runningFactor = TrueSmoking.Options.RunningFactor,
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
+            puffFactor = TrueSmoking.Options.PuffFactor
         },
         ['Base.Cigar'] = {
             visualItem = 'Mask_Cigar',               -- Visual item to be displayed on mouth
-            smokeLength = TrueSmoking.Options.Cigar, -- Length of smoke
+            smokeLength = TrueSmoking.Options.CigarLength, -- Length of smoke
             burnMin = 0.000125,                      -- Minimum burn rate target
             burnMax = 0.000300,                      -- Maximum burn rate target
             burnSpeed = 0.0025,                      -- Acceleration towards burnMax
@@ -74,6 +101,7 @@ Events.OnLoad.Add(function()
             walkingFactor = TrueSmoking.Options.WalkingFactor,
             runningFactor = TrueSmoking.Options.RunningFactor,
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
+            puffFactor = TrueSmoking.Options.PuffFactor
         },
         ['Base.SmokingPipe_Tobacco'] = {
             visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
@@ -89,6 +117,7 @@ Events.OnLoad.Add(function()
             walkingFactor = TrueSmoking.Options.WalkingFactor,
             runningFactor = TrueSmoking.Options.RunningFactor,
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
+            puffFactor = TrueSmoking.Options.PuffFactor
         },
         ['Base.CanPipe_Tobacco'] = {
             visualItem = false,                          -- Visual item to be displayed on mouth
@@ -104,6 +133,7 @@ Events.OnLoad.Add(function()
             walkingFactor = TrueSmoking.Options.WalkingFactor,
             runningFactor = TrueSmoking.Options.RunningFactor,
             sprintingFactor = TrueSmoking.Options.SprintingFactor,
+            puffFactor = TrueSmoking.Options.PuffFactor
         },
     }
 

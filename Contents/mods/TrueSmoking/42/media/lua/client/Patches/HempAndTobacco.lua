@@ -1,5 +1,5 @@
 if getActivatedMods():contains("\\B42Hemp&Tobacco") then
-    Events.OnLoad.Add(function()
+    Events.OnCreatePlayer.Add(function()
         local smokableObjects = {
             -- Hemp & Tobacco items
             ['Base.HempCigarette'] = {
@@ -16,6 +16,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.HempCigar'] = {
                 visualItem = 'Mask_Cigar',                     -- Visual item to be displayed on mouth
@@ -31,6 +32,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.HempCigarillo'] = {
                 visualItem = 'Mask_Cigarillo',                     -- Visual item to be displayed on mouth
@@ -46,6 +48,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.SmokingPipe_Hemp'] = {
                 visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
@@ -61,6 +64,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.CanPipe_Hemp'] = {
                 visualItem = false,                          -- Visual item to be displayed on mouth
@@ -76,6 +80,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.GlassSmokingPipe_Hemp'] = {
                 visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
@@ -91,6 +96,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.GlassSmokingPipe_Tobacco'] = {
                 visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
@@ -106,6 +112,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
         }
 

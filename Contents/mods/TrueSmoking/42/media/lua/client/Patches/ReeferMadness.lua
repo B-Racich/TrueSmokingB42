@@ -1,5 +1,5 @@
 if getActivatedMods():contains('\\ReeferMadness') then
-    Events.OnLoad.Add(function()
+    Events.OnCreatePlayer.Add(function()
         local smokableObjects = {
             ['ReeferMadness.SmokingPipe_marijuana'] = {
                 visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
@@ -15,6 +15,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.CanPipe_marijuana'] = {
                 visualItem = false,                          -- Visual item to be displayed on mouth
@@ -30,6 +31,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.WeedCigarette'] = {
                 visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
@@ -45,6 +47,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.Joint'] = {
                 visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
@@ -60,6 +63,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.blunt'] = {
                 visualItem = 'Mask_Cigarillo',                     -- Visual item to be displayed on mouth
@@ -75,6 +79,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.WeedCigarette2'] = {
                 visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
@@ -90,6 +95,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.SmokingPipe_hash'] = {
                 visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
@@ -105,6 +111,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.CanPipe_hash'] = {
                 visualItem = false,                          -- Visual item to be displayed on mouth
@@ -120,6 +127,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.WeedCigarette2Kief'] = {
                 visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
@@ -135,6 +143,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.bluntKief'] = {
                 visualItem = 'Mask_Cigarillo',                     -- Visual item to be displayed on mouth
@@ -150,6 +159,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.jointKief'] = {
                 visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
@@ -165,6 +175,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.SmokingPipe_marijuanaKief'] = {
                 visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
@@ -180,6 +191,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.CanPipe_marijuanaKief'] = {
                 visualItem = false,                          -- Visual item to be displayed on mouth
@@ -195,6 +207,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['ReeferMadness.WeedCigaretteKief'] = {
                 visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
@@ -210,6 +223,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
+                puffFactor = TrueSmoking.Options.PuffFactor
             },
         }
 

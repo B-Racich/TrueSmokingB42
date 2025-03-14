@@ -64,8 +64,6 @@ end
 ]]
 function TrueSmoking:setSmokableObjects(table)
     for key, value in pairs(table) do
-        print('Smokable Object: '..key)
-        print(value)
         self.SmokableObjects[key] = value
     end
 end

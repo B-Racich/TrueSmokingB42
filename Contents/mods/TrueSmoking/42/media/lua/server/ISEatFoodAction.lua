@@ -24,9 +24,6 @@ function ISEatFoodAction:new(character, item, percentage)
         if not trueSmoking.isSmoking then
             print('setting up smokable')
             trueSmoking.Smokable = Smokable:new(item, character)
-            -- print('Made new smokable')
-            item:setReplaceOnUse(nil) --nil this fields to avoid consuming the item 
-
             item:getModData().modOnEat = onEat
             item:setOnEat(hook)
 
