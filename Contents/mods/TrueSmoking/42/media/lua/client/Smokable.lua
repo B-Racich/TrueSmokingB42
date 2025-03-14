@@ -95,6 +95,7 @@ end
 function Smokable:getObject(item)
     local fullType = item:getFullType()
     local o = TrueSmoking.SmokableObjects[fullType]
+
     -- If we have a object defined use it
     if not o then
         print('rolling default')
@@ -118,7 +119,13 @@ function Smokable:getObject(item)
     o.smokeLength = self:getSmokeLength(item, false)
     o.originalSmokeLength = self:getSmokeLength(item, true)
 
-    if not o.effectMultiplier then o.effectMultiplier = 1.0 end
+    if not o.effectMultiplier then
+        local onEat = item:getOnEat()
+        o.effectMultiplier = onEat == 'OnEat_Cigarettes' and 1.0 or
+            onEat == 'OnEat_Cigarillo' and 2.0 or
+            onEat == 'OnEat_Cigar' and 3.0 or
+            0.0 --not a standard tobacco item
+    end
 
     return o
 end
