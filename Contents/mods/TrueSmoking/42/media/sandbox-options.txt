@@ -110,7 +110,7 @@ option TrueSmoking.Dropping
 {
     type = boolean,
 	default = true,
-	page = TrueSmoking, translation=TrueSmoking_Coughing,
+	page = TrueSmoking, translation=TrueSmoking_Dropping,
 }
 option TrueSmoking.DroppingChanceSmoker
 {

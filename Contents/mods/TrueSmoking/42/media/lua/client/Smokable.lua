@@ -28,7 +28,7 @@ function Smokable:new(item, player)
         obj[k] = v
     end
 
-    obj.canDrop = obj.conditions.canDrop or false
+    obj.canDrop = obj.conditions and obj.conditions.canDrop or false
 
     item:getModData().SmokeLength = obj.smokeLength
     item:getModData().OriginalSmokeLength = obj.originalSmokeLength
