@@ -119,12 +119,21 @@ function Smokable:getObject(item)
     o.smokeLength = self:getSmokeLength(item, false)
     o.originalSmokeLength = self:getSmokeLength(item, true)
 
+    local onEat = item:getOnEat()
     if not o.effectMultiplier then
-        local onEat = item:getOnEat()
         o.effectMultiplier = onEat == 'OnEat_Cigarettes' and 1.0 or
             onEat == 'OnEat_Cigarillo' and 2.0 or
             onEat == 'OnEat_Cigar' and 3.0 or
             0.0 --not a standard tobacco item
+    end
+
+    if not o.callback then
+        if onEat == 'OnEat_Cigarettes' or
+            onEat == 'OnEat_Cigarillo' or
+            onEat == 'OnEat_Cigar'
+        then
+            o.callback = OnEat_OverTime
+        end
     end
 
     return o
@@ -392,9 +401,6 @@ function Smokable:update()
 
         -- Update smoke % left (unchanged)
         self.smokePercent = self.smokeLength / self.originalSmokeLength
-
-        -- Apply stat changes (unchanged)
-        OnEat_OverTime(self)
 
         -- Item callback
         if self.callback then
