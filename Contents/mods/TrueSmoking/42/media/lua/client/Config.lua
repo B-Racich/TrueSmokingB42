@@ -2,7 +2,7 @@ Events.OnCreatePlayer.Add(function()
     --[[
         The smokable object defines settings and properties for each smokable item that should be
             hooked into the TrueSmoking system.
-            
+
         ===The following settings can be used to tweak how each item behaves when smoked:===
 
         visualItem: The item to display on the mouth while smoking. Custom wearable items can be made and should
@@ -19,12 +19,14 @@ Events.OnCreatePlayer.Add(function()
 
         burnSpeedDecay: the acceleration decay rate after reaching burnMax
 
+        effectMultiplier: multiplier for smoking effects (stress, unhappyness, etc)
+
         callback: the callback function that happens onTick while smoking
             For modded onEat methods, this will pass in a reference of the Smokable object to use
 
             Functions that are designed for the vanilla system can be made to user the Smokable.puffPercent value to
             calculate how much of a change should happen
-        
+
         conditions: Flags to set certain logic/settings per item
             idle = should go out when idle
             walking/running/sprinting/strafing = should increase burn while doing
@@ -49,7 +51,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
-            effectMultiplier = 1.0,                             -- smoker effect multiplier
+            effectMultiplier = 1.0,                            -- smoker effect multiplier
             callback = false,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -66,7 +68,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
-            effectMultiplier = 1.0,                             -- smoker effect multiplier
+            effectMultiplier = 1.0,                            -- smoker effect multiplier
             callback = false,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -83,7 +85,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
-            effectMultiplier = 2.0,                             -- smoker effect multiplier
+            effectMultiplier = 2.0,                            -- smoker effect multiplier
             callback = false,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -93,15 +95,15 @@ Events.OnCreatePlayer.Add(function()
             puffFactor = TrueSmoking.Options.PuffFactor
         },
         ['Base.Cigar'] = {
-            visualItem = 'Mask_Cigar',               -- Visual item to be displayed on mouth
+            visualItem = 'Mask_Cigar',                     -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.CigarLength, -- Length of smoke
-            burnMin = 0.000125,                      -- Minimum burn rate target
-            burnMax = 0.000300,                      -- Maximum burn rate target
-            burnSpeed = 0.0025,                      -- Acceleration towards burnMax
-            burnSpeedDecay = 0.20,                   -- Acceleration decay rate after burnMax
-            decayRate = 0.998,                       -- Decay rate when idle
-            effectMultiplier = 3.0,                             -- smoker effect multiplier
-            callback = false,                        -- Callback function when smoked (mod support)
+            burnMin = 0.000125,                            -- Minimum burn rate target
+            burnMax = 0.000300,                            -- Maximum burn rate target
+            burnSpeed = 0.0025,                            -- Acceleration towards burnMax
+            burnSpeedDecay = 0.20,                         -- Acceleration decay rate after burnMax
+            decayRate = 0.998,                             -- Decay rate when idle
+            effectMultiplier = 3.0,                        -- smoker effect multiplier
+            callback = false,                              -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
