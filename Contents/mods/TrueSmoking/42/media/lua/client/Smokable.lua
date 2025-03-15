@@ -120,6 +120,7 @@ function Smokable:getObject(item)
     end
 
     o.fullType = fullType
+    o.smokeLength = TrueSmoking.Options.OverrideSmokeLength and TrueSmoking.Options.SmokeLength or o.smokeLength
     o.originalSmokeLength = o.smokeLength
     local savedSmoke = self:getSavedSmokeLength(item)
     o.smokeLength = savedSmoke and savedSmoke or o.smokeLength
