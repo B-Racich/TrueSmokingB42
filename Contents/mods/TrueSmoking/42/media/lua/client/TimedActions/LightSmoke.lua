@@ -68,7 +68,7 @@ function LightSmoke:start()
             -- Check if we previously started a puff and its audio is still playing
             print(self.trueSmoking.lightingEatSound)
             if not self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound) then
-                print('here')
+                -- print('here')
                 self.trueSmoking.lightingEatSound = self.eatSound
                 self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
             end

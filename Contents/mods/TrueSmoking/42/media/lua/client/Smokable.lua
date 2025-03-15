@@ -30,9 +30,6 @@ function Smokable:new(item, player)
 
     obj.canDrop = obj.conditions and obj.conditions.canDrop or false
 
-    item:getModData().SmokeLength = obj.smokeLength
-    item:getModData().OriginalSmokeLength = obj.originalSmokeLength
-
     obj.player = player
 
     obj.table = TrueSmoking:getPlayerReference(player)
@@ -81,7 +78,7 @@ function Smokable:new(item, player)
     obj.originalReduceFoodSick = obj.reduceFoodSick
 
     obj.replaceOnUse = item:getModData().replaceOnUse or ''
-    print('set item: '..obj.replaceOnUse)
+    print('Smokable Item ReplaceOnUse: '..obj.replaceOnUse)
 
     obj.smokePercent = obj.smokeLength / obj.originalSmokeLength
     obj.smokeLit = false
@@ -94,12 +91,19 @@ end
 
 function Smokable:getObject(item)
     local fullType = item:getFullType()
-    local o = TrueSmoking.SmokableObjects[fullType]
+    print('Looking for: '..fullType)
+    local ob = TrueSmoking.SmokableObjects[fullType]
+    local o = {}
+    if ob then
+        print('Retrieved Smokable Object')
+        o = deepCopy(ob)
+    end
 
     -- If we have a object defined use it
-    if not o then
-        print('rolling default')
+    if not ob then
+        print('Making Default Smokable Object')
         o = {
+            smokeLength = TrueSmoking.Options.SmokeLength,
             burnMin = 0.000125,
             burnMax = 0.000300,
             burnSpeed = 0.0025,
@@ -116,8 +120,12 @@ function Smokable:getObject(item)
     end
 
     o.fullType = fullType
-    o.smokeLength = self:getSmokeLength(item, false)
-    o.originalSmokeLength = self:getSmokeLength(item, true)
+    o.originalSmokeLength = o.smokeLength
+    local savedSmoke = self:getSavedSmokeLength(item)
+    o.smokeLength = savedSmoke and savedSmoke or o.smokeLength
+
+    item:getModData().SmokeLength = o.smokeLength
+    item:getModData().OriginalSmokeLength = o.originalSmokeLength
 
     local onEat = item:getOnEat()
     if not o.effectMultiplier then
@@ -135,6 +143,16 @@ function Smokable:getObject(item)
             o.callback = OnEat_OverTime
         end
     end
+
+    print("=== Smoke Object Details ===")
+    print('Smoke Length '..o.smokeLength)
+    print('Original Smoke Length '..o.originalSmokeLength)
+    print('Burn Min '..o.burnMin)
+    print('Burn Max '..o.burnMax)
+    print('Burn Speed '..o.burnSpeed)
+    print('Burn Speed Decay '..o.burnSpeedDecay)
+    print('Decay Rate '..o.decayRate)
+    print("======================")
 
     return o
 end
@@ -157,29 +175,13 @@ function Smokable:getFoodSick(item)
     return 0
 end
 
---Helper function to set smokeLengths
-function Smokable:getSmokeLength(item, original)
-    -- 1.2 If the item has SmokeLength set use that
-    if not original then
-        if item:getModData().SmokeLength then return item:getModData().SmokeLength end
+function Smokable:getSavedSmokeLength(item)
+    local modData = item:getModData()
+    if modData.SmokeLength then
+        return modData.SmokeLength
+    else
+        return false
     end
-
-    -- 1. If our override is set return that
-    if TrueSmoking.Options.OverrideSmokeLength then return TrueSmoking.Options.SmokeLength end
-
-    local OnEat_Defaults = {
-        ['OnEat_Cigarettes'] = TrueSmoking.Options.CigaretteLength,
-        ['OnEat_Cigarillo'] = TrueSmoking.Options.CigarilloLength,
-        ['OnEat_Cigar'] = TrueSmoking.Options.CigarLength,
-    }
-
-    -- 3. If we can find a default use that
-    for key, value in pairs(OnEat_Defaults) do
-        if item:getOnEat() == key then return value end
-    end
-
-    -- 4. Return our default value
-    return TrueSmoking.Options.SmokeLength -- default smoke length
 end
 
 function Smokable:equipVisualItem()

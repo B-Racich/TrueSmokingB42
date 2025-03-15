@@ -47,7 +47,7 @@ Events.OnCreatePlayer.Add(function()
             visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.CigaretteLength, -- Length of smoke
             burnMin = 0.000125,                                -- Minimum burn rate target
-            burnMax = 0.000300,                                -- Maximum burn rate target
+            burnMax = 0.000275,                                -- Maximum burn rate target
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
             decayRate = 0.999,                                 -- Decay rate when idle
@@ -63,11 +63,11 @@ Events.OnCreatePlayer.Add(function()
         ['Base.CigaretteRolled'] = {
             visualItem = 'Mask_Cigarette',                     -- Visual item to be displayed on mouth
             smokeLength = TrueSmoking.Options.CigaretteLength, -- Length of smoke
-            burnMin = 0.000125,                                -- Minimum burn rate target
+            burnMin = 0.000100,                                -- Minimum burn rate target
             burnMax = 0.000300,                                -- Maximum burn rate target
             burnSpeed = 0.0025,                                -- Acceleration towards burnMax
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
-            decayRate = 0.999,                                 -- Decay rate when idle
+            decayRate = 0.996,                                 -- Decay rate when idle
             effectMultiplier = 1.0,                            -- smoker effect multiplier
             callback = OnEat_OverTime,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },

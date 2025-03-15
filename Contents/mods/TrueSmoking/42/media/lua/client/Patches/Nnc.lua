@@ -89,12 +89,12 @@ if getActivatedMods():contains('\\N&CsNarcotics') then
 
         local bluntSettings = {
             visualItem = 'Mask_Cigarillo',
-            smokeLength = TrueSmoking.Options.CigarilloLength,
-            burnMin = 0.000125,
-            burnMax = 0.000300,
-            burnSpeed = 0.0025,
+            smokeLength = 2.0,
+            burnMin = 0.000165,
+            burnMax = 0.000295,
+            burnSpeed = 0.0030,
             burnSpeedDecay = 0.20,
-            decayRate = 0.998,
+            decayRate = 0.992,
             callback = WeedSmoke_Callback,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -105,12 +105,12 @@ if getActivatedMods():contains('\\N&CsNarcotics') then
         }
         local jointSettings = {
             visualItem = 'Mask_Cigarette',
-            smokeLength = TrueSmoking.Options.CigaretteLength,
-            burnMin = 0.000125,
-            burnMax = 0.000300,
-            burnSpeed = 0.0025,
+            smokeLength = 1.3,
+            burnMin = 0.000165,
+            burnMax = 0.000295,
+            burnSpeed = 0.0030,
             burnSpeedDecay = 0.20,
-            decayRate = 0.998,
+            decayRate = 0.992,
             callback = WeedSmoke_Callback,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
@@ -153,6 +153,7 @@ if getActivatedMods():contains('\\N&CsNarcotics') then
         }
 
         for _, item in ipairs(NnC_Items) do
+            print('Building Item for: '..item)
             if string.match(item:lower(), 'joint') then
                 smokableObjects[item] = jointSettings
             elseif string.match(item:lower(), 'blunt') then

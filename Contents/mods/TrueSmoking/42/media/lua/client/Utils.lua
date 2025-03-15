@@ -13,6 +13,18 @@ function isInList(str, list)
     return string.find(listString, str) ~= nil
 end
 
+function deepCopy(original)
+    local copy = {}
+    for key, value in pairs(original) do
+        if type(value) == "table" then
+            copy[key] = deepCopy(value)  -- Recursively copy nested tables
+        else
+            copy[key] = value  -- Copy primitive values directly
+        end
+    end
+    return copy
+end
+
 function addOnUseItem(player)
     local trueSmoking = TrueSmoking:getPlayerReference(player)
     local type = trueSmoking.Smokable.fullType
