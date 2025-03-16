@@ -56,4 +56,31 @@ if getActivatedMods():contains('\\IMightNeedALighter') then
             ISInventoryPaneContextMenu.eatItem(_cigarette, 1, _player:getPlayerNum())
         end
     end
+
+    --This is the function starting the car smoking sequence
+    function OnCarSmoking(_player, _cigarette)
+        if (_player:getVehicle() == nill) then return end
+        local carlighterBaseTimer = SandboxVars.IMNAL.carLighterBaseTimer
+        local batteryDurabilityMult = _player:getVehicle():getBattery():getCondition() / 100
+
+        --BROKEN BY B42 UPDATED - removing the battery drain for the time being
+        --local batteryChargeMult = _player:getVehicle():getBattery():getInventoryItem():getUsedDelta()
+
+        local carlighterFinalTimer = (carlighterBaseTimer / batteryDurabilityMult)
+
+        --Do we need to transfer cigarette from a bag first ?
+        if _cigarette:getContainer() ~= _player:getInventory() then
+            ISTimedActionQueue.add(ISInventoryTransferAction:new(_player, _cigarette, _cigarette:getContainer(),
+                _player:getInventory(), 5))
+        end
+
+        --TODO : We need to decide here if the attempt failed and broke the car lighter and/or the socket
+
+
+        --We need some time for the lighter to heat
+        ISTimedActionQueue.add(IsCarLighting:new(_player, _cigarette, carlighterFinalTimer))
+
+        --Let's smoke now
+        ISTimedActionQueue.add(ISEatFoodAction:new(_player, _cigarette, 1))
+    end
 end

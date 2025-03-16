@@ -33,8 +33,10 @@ if getActivatedMods():contains('\\NoLighterNeeded') then
                 for i = 0, stove:getSquare():getMovingObjects():size() - 1 do
                     local o = stove:getSquare():getMovingObjects():get(i)
                     if instanceof(o, "IsoPlayer") and (o ~= playerObj) then
-                        if string.match(o:getAnimationDebug(), "foodtype : Cigarettes") then ISTimedActionQueue.add(
-                            IsStoveLighting:new(_player, stove, _cigarette, 10)) end
+                        if string.match(o:getAnimationDebug(), "foodtype : Cigarettes") then
+                            ISTimedActionQueue.add(
+                                IsStoveLighting:new(_player, stove, _cigarette, 10))
+                        end
                     end
                 end
             end
@@ -44,5 +46,20 @@ if getActivatedMods():contains('\\NoLighterNeeded') then
         if luautils.walkAdj(_player, stove:getSquare(), true) then
             ISInventoryPaneContextMenu.eatItem(_cigarette, 1, _player:getPlayerNum())
         end
+    end
+
+    --This is the function starting the car smoking sequence
+    function OnCarSmoking(_player, _cigarette)
+        --Do we need to transfer cigarette from a bag first ?
+        if _cigarette:getContainer() ~= _player:getInventory() then
+            ISTimedActionQueue.add(ISInventoryTransferAction:new(_player, _cigarette, _cigarette:getContainer(),
+                _player:getInventory(), 5))
+        end
+
+        --We need some time for the lighter to heat
+        ISTimedActionQueue.add(IsCarLighting:new(_player, _cigarette, 300))
+
+        --Let's smoke now
+        ISTimedActionQueue.add(ISEatFoodAction:new(_player, _cigarette, 1))
     end
 end
