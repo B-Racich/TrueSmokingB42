@@ -52,7 +52,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
             decayRate = 0.999,                                 -- Decay rate when idle
             effectMultiplier = 1.0,                            -- smoker effect multiplier
-            callback = OnEat_OverTime,                                  -- Callback function when smoked (mod support)
+            callback = OnEat_Tobacco,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -69,7 +69,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
             decayRate = 0.996,                                 -- Decay rate when idle
             effectMultiplier = 1.0,                            -- smoker effect multiplier
-            callback = OnEat_OverTime,                                  -- Callback function when smoked (mod support)
+            callback = OnEat_Tobacco,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -86,7 +86,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
             decayRate = 0.998,                                 -- Decay rate when idle
             effectMultiplier = 2.0,                            -- smoker effect multiplier
-            callback = OnEat_OverTime,                                  -- Callback function when smoked (mod support)
+            callback = OnEat_Tobacco,                                  -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -103,7 +103,7 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = 0.25,                         -- Acceleration decay rate after burnMax
             decayRate = 0.998,                             -- Decay rate when idle
             effectMultiplier = 3.0,                        -- smoker effect multiplier
-            callback = OnEat_OverTime,                              -- Callback function when smoked (mod support)
+            callback = OnEat_Tobacco,                              -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -119,7 +119,8 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                           -- Acceleration towards burnMax
             burnSpeedDecay = 0.25,                        -- Acceleration decay rate after burnMax
             decayRate = 0.998,                            -- Decay rate when idle
-            callback = OnEat_OverTime,                             -- Callback function when smoked (mod support)
+            effectMultiplier = 2.5,
+            callback = OnEat_Tobacco,                             -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -135,7 +136,8 @@ Events.OnCreatePlayer.Add(function()
             burnSpeed = 0.0025,                          -- Acceleration towards burnMax
             burnSpeedDecay = 0.25,                       -- Acceleration decay rate after burnMax
             decayRate = 0.998,                           -- Decay rate when idle
-            callback = OnEat_OverTime,                            -- Callback function when smoked (mod support)
+            effectMultiplier = 1.5,
+            callback = OnEat_Tobacco,                            -- Callback function when smoked (mod support)
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,

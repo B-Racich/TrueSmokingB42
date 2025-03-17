@@ -102,14 +102,20 @@ function Smokable:getObject(item)
     -- If we have a object defined use it
     if not ob then
         print('Making Default Smokable Object')
+        local onEat = item:getOnEat()
+        local defaultCallback = (onEat == 'OnEat_Cigarettes' or onEat == 'OnEat_Cigarillo' or onEat == 'OnEat_Cigar') and OnEat_Tobacco or false
+        local defaultSmokeLength = onEat == 'OnEat_Cigarettes' and TrueSmoking.Options.CigaretteLength or
+            onEat == 'OnEat_Cigarillo' and TrueSmoking.Options.CigarilloLength or
+            onEat == 'OnEat_Cigar' and TrueSmoking.Options.CigarLength or
+            TrueSmoking.Options.SmokeLength
         o = {
-            smokeLength = TrueSmoking.Options.SmokeLength,
+            smokeLength = defaultSmokeLength,
             burnMin = 0.000125,
             burnMax = 0.000300,
             burnSpeed = 0.0025,
             burnSpeedDecay = 0.20,
             decayRate = 0.998,
-            callback = false,
+            callback = defaultCallback,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -404,6 +410,9 @@ function Smokable:update()
 
         -- Update smoke % left (unchanged)
         self.smokePercent = self.smokeLength / self.originalSmokeLength
+
+        -- Apply stat changes from item
+        OnEat_ItemStats(self)
 
         -- Item callback
         if self.callback then

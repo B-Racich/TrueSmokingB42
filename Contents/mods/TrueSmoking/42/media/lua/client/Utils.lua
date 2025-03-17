@@ -40,8 +40,7 @@ function addOnUseItem(player)
     end
 end
 
---Modified OnEat function to cover Smokables and distribute stats over time
-function OnEat_OverTime(smokable)
+function OnEat_ItemStats(smokable)
     local percent = smokable.puffPercent
     local character = smokable.player
     local body = character:getBodyDamage()
@@ -50,9 +49,6 @@ function OnEat_OverTime(smokable)
         getGameSpeed() == 2 and 5 or
         getGameSpeed() == 3 and 20 or
         getGameSpeed() == 4 and 40
-
-    --Multiplier for how much stats different smokables give (vanilla stats only)
-    local effectMultiplier = smokable.effectMultiplier
 
     local function adjustStat(stat, value, name, add)
         local name = name or 'nil'
@@ -68,59 +64,6 @@ function OnEat_OverTime(smokable)
     end
 
     local temp  --Store temp values for calculations
-
-    --===Vanilla logic starts here
-
-    --Mimic vanilla logic for smoker which essentially 0's these stats
-    if character:HasTrait("Smoker") then
-        temp = 100 * percent * gameSpeed * effectMultiplier
-        body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp, 'unhappy'))
-
-        temp = 1 * percent * gameSpeed * effectMultiplier
-        stats:setStress(adjustStat(stats:getStress()-stats:getStressFromCigarettes(), temp, 'stress'))
-
-        temp = 0.51 * percent * gameSpeed * effectMultiplier
-        stats:setStressFromCigarettes(adjustStat(stats:getStressFromCigarettes(), temp, 'cigs'))
-        -- stats:setStressFromCigarettes(0)
-
-        temp = 10 * percent * gameSpeed * effectMultiplier
-        character:setTimeSinceLastSmoke(character:getTimeSinceLastSmoke() - temp)
-    else --distribute stats for non smoker (stress and sickness)
-        temp = smokable.originalStress * percent * gameSpeed
-        stats:setStress(adjustStat(stats:getStress(), temp * effectMultiplier))
-        smokable.stress = smokable.stress - temp
-
-        --Set these to 0 anyways for safety.
-        stats:setStressFromCigarettes(0)
-        character:setTimeSinceLastSmoke(0)
-
-        if smokable.stress > 0 then
-            smokable.stress = 0
-        end
-
-        if smokable.foodSick ~= 0 then
-            temp = smokable.originalFoodSick * percent * gameSpeed
-            body:setFoodSicknessLevel(math.min(body:getFoodSicknessLevel() + temp * effectMultiplier, 100))
-            smokable.foodSick = smokable.foodSick - temp
-            if smokable.foodSick < 0 then
-                smokable.foodSick = 0
-            end
-        end
-
-        if smokable.unhappyness ~= 0 then
-            temp = smokable.originalUnhappyness * percent * gameSpeed
-            body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp * effectMultiplier, 'unhappy'))
-            smokable.unhappyness = smokable.unhappyness - temp
-            -- print(string.format("Smokable unhappyness: %s | temp: %s", smokable.unhappyness, temp))
-            if smokable.unhappyness > 0 then
-                smokable.unhappyness = 0
-            end
-        end
-    end
-
-    --===Vanilla logic ends here===
-
-    --===Check for item stats and start applying===
 
     --If smokable has boredom or unhappyness distribute them (these are applied in vanilla outside of OnEat, but we 0'd them earlier.)
     if smokable.boredom ~= 0 then
@@ -198,6 +141,83 @@ function OnEat_OverTime(smokable)
         smokable.reduceFoodSick = smokable.reduceFoodSick - temp
         if smokable.reduceFoodSick < 0 then
             smokable.reduceFoodSick = 0
+        end
+    end
+end
+
+--Modified OnEat function to cover Smokables and distribute stats over time
+function OnEat_Tobacco(smokable)
+    local percent = smokable.puffPercent
+    local character = smokable.player
+    local body = character:getBodyDamage()
+    local stats = character:getStats()
+    local gameSpeed = getGameSpeed() == 1 and 1 or
+        getGameSpeed() == 2 and 5 or
+        getGameSpeed() == 3 and 20 or
+        getGameSpeed() == 4 and 40
+
+    --Multiplier for how much stats different smokables give (vanilla stats only)
+    local effectMultiplier = smokable.effectMultiplier
+
+    local function adjustStat(stat, value, name, add)
+        local name = name or 'nil'
+        local newStat = stat - math.abs(value)
+        -- print(string.format("Name: %s | Stat: %s | Value: %s | New Value: %s", name, stat, value, newStat))
+        if newStat < 0 then
+            newStat = 0
+        end
+
+        if add then newStat = stat + value end
+
+        return newStat
+    end
+
+    local temp  --Store temp values for calculations
+
+    --Mimic vanilla logic for smoker which essentially 0's these stats
+    if character:HasTrait("Smoker") then
+        temp = 100 * percent * gameSpeed * effectMultiplier
+        body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp, 'unhappy'))
+
+        temp = 1 * percent * gameSpeed * effectMultiplier
+        stats:setStress(adjustStat(stats:getStress()-stats:getStressFromCigarettes(), temp, 'stress'))
+
+        temp = 0.51 * percent * gameSpeed * effectMultiplier
+        stats:setStressFromCigarettes(adjustStat(stats:getStressFromCigarettes(), temp, 'cigs'))
+        -- stats:setStressFromCigarettes(0)
+
+        temp = 10 * percent * gameSpeed * effectMultiplier
+        character:setTimeSinceLastSmoke(character:getTimeSinceLastSmoke() - temp)
+    else --distribute stats for non smoker (stress and sickness)
+        temp = smokable.originalStress * percent * gameSpeed
+        stats:setStress(adjustStat(stats:getStress(), temp * effectMultiplier))
+        smokable.stress = smokable.stress - temp
+
+        --Set these to 0 anyways for safety.
+        stats:setStressFromCigarettes(0)
+        character:setTimeSinceLastSmoke(0)
+
+        if smokable.stress > 0 then
+            smokable.stress = 0
+        end
+
+        if smokable.foodSick ~= 0 then
+            temp = smokable.originalFoodSick * percent * gameSpeed
+            body:setFoodSicknessLevel(math.min(body:getFoodSicknessLevel() + temp * effectMultiplier, 100))
+            smokable.foodSick = smokable.foodSick - temp
+            if smokable.foodSick < 0 then
+                smokable.foodSick = 0
+            end
+        end
+
+        if smokable.unhappyness ~= 0 then
+            temp = smokable.originalUnhappyness * percent * gameSpeed
+            body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp * effectMultiplier, 'unhappy'))
+            smokable.unhappyness = smokable.unhappyness - temp
+            -- print(string.format("Smokable unhappyness: %s | temp: %s", smokable.unhappyness, temp))
+            if smokable.unhappyness > 0 then
+                smokable.unhappyness = 0
+            end
         end
     end
 end
