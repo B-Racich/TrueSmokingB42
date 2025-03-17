@@ -78,7 +78,7 @@ function Smokable:new(item, player)
     obj.originalReduceFoodSick = obj.reduceFoodSick
 
     obj.replaceOnUse = item:getModData().replaceOnUse or ''
-    print('Smokable Item ReplaceOnUse: '..obj.replaceOnUse)
+    print('Smokable Item ReplaceOnUse: ' .. obj.replaceOnUse)
 
     obj.smokePercent = obj.smokeLength / obj.originalSmokeLength
     obj.smokeLit = false
@@ -91,22 +91,22 @@ end
 
 function Smokable:getObject(item)
     local fullType = item:getFullType()
-    print('Looking for: '..fullType)
+    print('Looking for: ' .. fullType)
     local ob = TrueSmoking.SmokableObjects[fullType]
     local o = {}
+
+    -- If we have a object defined use it
     if ob then
         print('Retrieved Smokable Object')
         o = deepCopy(ob)
     end
 
-    -- If we have a object defined use it
     if not ob then
         print('Making Default Smokable Object')
         local onEat = item:getOnEat()
-        local defaultCallback = (onEat == 'OnEat_Cigarettes' or onEat == 'OnEat_Cigarillo' or onEat == 'OnEat_Cigar') and OnEat_Tobacco or false
-        local defaultSmokeLength = onEat == 'OnEat_Cigarettes' and TrueSmoking.Options.CigaretteLength or
-            onEat == 'OnEat_Cigarillo' and TrueSmoking.Options.CigarilloLength or
-            onEat == 'OnEat_Cigar' and TrueSmoking.Options.CigarLength or
+        local defaultSmokeLength = (onEat == 'OnEat_Cigarettes' and TrueSmoking.Options.CigaretteLength) or
+            (onEat == 'OnEat_Cigarillo' and TrueSmoking.Options.CigarilloLength) or
+            (onEat == 'OnEat_Cigar' and TrueSmoking.Options.CigarLength) or
             TrueSmoking.Options.SmokeLength
         o = {
             smokeLength = defaultSmokeLength,
@@ -147,18 +147,18 @@ function Smokable:getObject(item)
             onEat == 'OnEat_Cigarillo' or
             onEat == 'OnEat_Cigar'
         then
-            o.callback = OnEat_OverTime
+            o.callback = OnEat_Tobacco
         end
     end
 
     print("=== Smoke Object Details ===")
-    print('Smoke Length '..o.smokeLength)
-    print('Original Smoke Length '..o.originalSmokeLength)
-    print('Burn Min '..o.burnMin)
-    print('Burn Max '..o.burnMax)
-    print('Burn Speed '..o.burnSpeed)
-    print('Burn Speed Decay '..o.burnSpeedDecay)
-    print('Decay Rate '..o.decayRate)
+    print('Smoke Length ' .. o.smokeLength)
+    print('Original Smoke Length ' .. o.originalSmokeLength)
+    print('Burn Min ' .. o.burnMin)
+    print('Burn Max ' .. o.burnMax)
+    print('Burn Speed ' .. o.burnSpeed)
+    print('Burn Speed Decay ' .. o.burnSpeedDecay)
+    print('Decay Rate ' .. o.decayRate)
     print("======================")
 
     return o
@@ -297,7 +297,7 @@ function Smokable:stop()
     if self.item then
         local onUse = self.replaceOnUse
         if onUse and onUse ~= '' and self.smokeLength <= 0 then
-            print('adding item: '..self.replaceOnUse)
+            print('adding item: ' .. self.replaceOnUse)
             addOnUseItem(self.player)
         end
 
