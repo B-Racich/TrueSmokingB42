@@ -115,7 +115,7 @@ function Smokable:getObject(item)
             burnSpeed = 0.0025,
             burnSpeedDecay = 0.20,
             decayRate = 0.998,
-            callback = defaultCallback,
+            callback = false,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             idleFactor = TrueSmoking.Options.IdleFactor,
             walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -398,7 +398,7 @@ function Smokable:update()
         else
             -- Apply exponential decay when idling
             local decayFactor = self
-                .decayRate -- Tune this for desired decay speed (e.g., ~5 minutes to extinguish)
+                .decayRate -- Tune this for desired decay speed
             self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
         end
 
@@ -414,12 +414,12 @@ function Smokable:update()
         -- Apply stat changes from item
         OnEat_ItemStats(self)
 
-        -- Item callback
+        -- Item callback (OnEat_Tobacco or some mod OnEat)
         if self.callback then
             self.callback(self)
         end
 
-        -- Mod callback
+        -- General Mod callback that can be set
         for _, func in ipairs(TrueSmoking.Callbacks) do
             func(self)
         end
