@@ -2,5 +2,5 @@ UI_EN = {
     UI_TRUESMOKING_PUFF = "Take Puff",
     UI_TRUESMOKING_PUT_OUT = "Put Out Smoke",
     UI_TRUESMOKING_RELIGHT = "Relight Smoke",
-    UI_TRUESMOKING_GET_SMOKE = "Get/Light Smoke"
+    UI_TRUESMOKING_GET_SMOKE = "Get/Light Smoke",
 }

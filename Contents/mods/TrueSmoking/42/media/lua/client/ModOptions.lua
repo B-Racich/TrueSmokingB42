@@ -1,18 +1,17 @@
 local config = {}
 
---- "UNIQUEID" should be replaced with your own unique ID. Possibly best to just use your mod's ID
 local options = PZAPI.ModOptions:create("TrueSmoking", "True Smoking")
 
 -- define your options here .....
-options:addKeyBind("keySmoke", "Puff/Relight/Find Smoke", Keyboard.KEY_K, "Take a puff or relight a cigarette, find a cigarette if not smoking")
-options:addTickBox("FindSmoke", "Unpack/Light Smoke", true, "Enables/Disables the find/light smoke feature")
-options:addKeyBind("keyStopSmoke", "Stop Smoking", Keyboard.KEY_SEMICOLON, "Stop smoking")
-options:addTickBox("PassiveSmoking", "Passive Puffing", true, "Enable automatic passive puffing")
-options:addSlider("PassiveMinTime",  getText("Passive Puffing Min Time"), 0, 60, 1, 30, getText("UI_options_UNIQUEID_slider_tooltip"))
-options:addSlider("PassiveMaxTime",  getText("Passive Puffing Max Time"), 0, 120, 1, 80, getText("UI_options_UNIQUEID_slider_tooltip"))
-options:addTickBox("AutoPutOut", "Automatically Put Out Smoke", true, "Will automatically try to put out the smoke when its finished")
-options:addTickBox("HidePuffActionBar", "Hide the puffing action bar", false, "Hide the puffing action bar")
-options:addTickBox("HideAllActionBars", "Hides all actions bars for smoking", false, "Hides all actions bars for smoking")
+options:addKeyBind("keySmoke", getText("IGUI_TRUESMOKING_KEY_SMOKE"), Keyboard.KEY_K, getText("IGUI_TRUESMOKING_KEY_SMOKE_DESC"))
+options:addTickBox("FindSmoke", getText("IGUI_TRUESMOKING_FIND_SMOKE"), true, getText("IGUI_TRUESMOKING_FIND_SMOKE_DESC"))
+options:addKeyBind("keyStopSmoke", getText("IGUI_TRUESMOKING_KEY_STOP_SMOKE"), Keyboard.KEY_SEMICOLON, getText("IGUI_TRUESMOKING_KEY_STOP_SMOKE_DESC"))
+options:addTickBox("PassiveSmoking", getText("IGUI_TRUESMOKING_PASSIVE_SMOKING"), true, getText("IGUI_TRUESMOKING_PASSIVE_SMOKING_DESC"))
+options:addSlider("PassiveMinTime", getText("IGUI_TRUESMOKING_PASSIVE_MIN_TIME"), 0, 60, 1, 30, getText("IGUI_TRUESMOKING_PASSIVE_MIN_TIME_DESC"))
+options:addSlider("PassiveMaxTime", getText("IGUI_TRUESMOKING_PASSIVE_MAX_TIME"), 0, 120, 1, 80, getText("IGUI_TRUESMOKING_PASSIVE_MAX_TIME_DESC"))
+options:addTickBox("AutoPutOut", getText("IGUI_TRUESMOKING_AUTO_PUT_OUT"), true, getText("IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC"))
+options:addTickBox("HidePuffActionBar", getText("IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR"), false, getText("IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR_DESC"))
+options:addTickBox("HideAllActionBars", getText("IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS"), false, getText("IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS_DESC"))
 options:addSeparator()
 
 -- This is a helper function that will automatically populate the "config" table.

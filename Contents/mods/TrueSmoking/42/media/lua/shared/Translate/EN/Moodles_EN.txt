@@ -1,4 +1,4 @@
-Moodles_EN {
+Moodles_EN = {
     Moodles_smoking_new_Good_lvl4 = "A fresh smoke",
     Moodles_smoking_new_Good_lvl3 = "Just lit",
     Moodles_smoking_new_Good_lvl2 = "More than half",

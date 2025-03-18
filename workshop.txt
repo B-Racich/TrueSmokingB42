@@ -103,5 +103,5 @@ description=
 description=[h3]Credits[/h3]
 description=Credits to BongoRaccoon32 and CenturyOldRat for the wearable smokable assets
 description=Thanks to everyone in the discord for their contributions in sharing modding knowledge
-tags=Build 42;Balance;Food;Framework;Hardmode;Items;Misc;Multiplayer;Realistic;Silly/Fun;QoL
+tags=Build 42;Balance;Framework;Hardmode;Multiplayer;Realistic
 visibility=public

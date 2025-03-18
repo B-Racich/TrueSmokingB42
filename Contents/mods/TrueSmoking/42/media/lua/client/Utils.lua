@@ -40,6 +40,7 @@ function addOnUseItem(player)
     end
 end
 
+-- OnEat for applying item stats
 function OnEat_ItemStats(smokable)
     local percent = smokable.puffPercent
     local character = smokable.player
@@ -145,7 +146,7 @@ function OnEat_ItemStats(smokable)
     end
 end
 
---Modified OnEat function to cover Smokables and distribute stats over time
+--OnEat method for distributing Tobacco effects from Vanilla
 function OnEat_Tobacco(smokable)
     local percent = smokable.puffPercent
     local character = smokable.player
