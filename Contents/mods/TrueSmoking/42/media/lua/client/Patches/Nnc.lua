@@ -89,7 +89,7 @@ if getActivatedMods():contains('\\N&CsNarcotics') then
 
         local bluntSettings = {
             visualItem = 'Mask_Cigarillo',
-            smokeLength = 2.0,
+            smokeLength = 1.9,
             burnMin = 0.000165,
             burnMax = 0.000295,
             burnSpeed = 0.0030,
