@@ -6,7 +6,7 @@ IG_UI_EN = {
     IGUI_TRUESMOKING_FIND_SMOKE_DESC = "Enable or disable the feature to find and light a smoke automatically",
 
     IGUI_TRUESMOKING_KEY_STOP_SMOKE = "Stop Smoking",
-    IGUI_TRUESMOKING_KEY_STOP_SMOKE_DESC = "Stop smoking immediately",
+    IGUI_TRUESMOKING_KEY_STOP_SMOKE_DESC = "Put out the smoke",
 
     IGUI_TRUESMOKING_PASSIVE_SMOKING = "Passive Puffing",
     IGUI_TRUESMOKING_PASSIVE_SMOKING_DESC = "Enable automatic passive puffing while holding a cigarette",
