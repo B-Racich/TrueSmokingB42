@@ -1,0 +1,6 @@
+UI_PTBR = {
+    UI_TRUESMOKING_PUFF = "Dar Tragada",
+    UI_TRUESMOKING_PUT_OUT = "Apagar Cigarro",
+    UI_TRUESMOKING_RELIGHT = "Reacender Cigarro",
+    UI_TRUESMOKING_GET_SMOKE = "Pegar/Acender Cigarro"
+}

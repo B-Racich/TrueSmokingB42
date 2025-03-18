@@ -1,0 +1,21 @@
+Moodles_PTBR {
+    Moodles_smoking_new_Good_lvl4 = "Um cigarro novo",
+    Moodles_smoking_new_Good_lvl3 = "Recém aceso",
+    Moodles_smoking_new_Good_lvl2 = "Mais da metade",
+    Moodles_smoking_new_Good_lvl1 = "Pela metade",
+    Moodles_smoking_new_Bad_lvl1 = "Pela metade",
+    Moodles_smoking_new_Bad_lvl2 = "Menos da metade",
+    Moodles_smoking_new_Bad_lvl3 = "Quase no fim",
+    Moodles_smoking_new_Bad_lvl4 = "Última tragada",
+
+    Moodles_smoking_old_Good_lvl4 = "Um cigarro novo",
+    Moodles_smoking_old_Good_lvl3 = "Recém aceso",
+    Moodles_smoking_old_Good_lvl2 = "Mais da metade",
+    Moodles_smoking_old_Good_lvl1 = "Pela metade",
+    Moodles_smoking_old_Bad_lvl1 = "Pela metade",
+    Moodles_smoking_old_Bad_lvl2 = "Menos da metade",
+    Moodles_smoking_old_Bad_lvl3 = "Quase no fim",
+    Moodles_smoking_old_Bad_lvl4 = "Última tragada",
+
+    Moodles_smoking_Custom = "O cigarro está atualmente %1 com (%2 %) restante",
+}

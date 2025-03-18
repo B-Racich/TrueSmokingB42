@@ -1,0 +1,28 @@
+IG_UI_PTBR = {
+    IGUI_TRUESMOKING_KEY_SMOKE = "Tragar//Reacender//Encontrar Cigarro",
+    IGUI_TRUESMOKING_KEY_SMOKE_DESC = "Dar uma tragada ou reacender um cigarro, encontrar um cigarro se não estiver fumando",
+
+    IGUI_TRUESMOKING_FIND_SMOKE = "Desempacotar/Acender Cigarro",
+    IGUI_TRUESMOKING_FIND_SMOKE_DESC = "Ativar ou desativar o recurso para encontrar e acender um cigarro automaticamente",
+
+    IGUI_TRUESMOKING_KEY_STOP_SMOKE = "Parar de Fumar",
+    IGUI_TRUESMOKING_KEY_STOP_SMOKE_DESC = "Parar de fumar imediatamente",
+
+    IGUI_TRUESMOKING_PASSIVE_SMOKING = "Tragada Passiva",
+    IGUI_TRUESMOKING_PASSIVE_SMOKING_DESC = "Ativar tragada passiva automática enquanto segura um cigarro",
+
+    IGUI_TRUESMOKING_PASSIVE_MIN_TIME = "Tempo Mínimo de Tragada Passiva",
+    IGUI_TRUESMOKING_PASSIVE_MIN_TIME_DESC = "Definir o intervalo de tempo mínimo para tragada passiva",
+
+    IGUI_TRUESMOKING_PASSIVE_MAX_TIME = "Tempo Máximo de Tragada Passiva",
+    IGUI_TRUESMOKING_PASSIVE_MAX_TIME_DESC = "Definir o intervalo de tempo máximo para tragada passiva",
+
+    IGUI_TRUESMOKING_AUTO_PUT_OUT = "Apagar Cigarro Automaticamente",
+    IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC = "Apagar o cigarro automaticamente quando terminar",
+
+    IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR = "Ocultar a barra de ação de tragada",
+    IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR_DESC = "Ocultar a barra de ação que aparece durante a tragada",
+
+    IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS = "Ocultar todas as barras de ações para fumar",
+    IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS_DESC = "Ocultar todas as barras de ação relacionadas ao ato de fumar",
+}
