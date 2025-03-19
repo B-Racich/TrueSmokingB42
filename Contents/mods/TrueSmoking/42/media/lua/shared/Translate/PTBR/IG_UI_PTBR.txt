@@ -1,5 +1,5 @@
 IG_UI_PTBR = {
-    IGUI_TRUESMOKING_KEY_SMOKE = "Tragar//Reacender//Encontrar Cigarro",
+    IGUI_TRUESMOKING_KEY_SMOKE = "Tragar/Reacender/Encontrar Cigarro",
     IGUI_TRUESMOKING_KEY_SMOKE_DESC = "Dar uma tragada ou reacender um cigarro, encontrar um cigarro se não estiver fumando",
 
     IGUI_TRUESMOKING_FIND_SMOKE = "Desempacotar/Acender Cigarro",

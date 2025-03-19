@@ -1,6 +1,6 @@
 IG_UI_EN = {
-    IGUI_TRUESMOKING_KEY_SMOKE = "Puff//Relight//Find Smoke",
-    IGUI_TRUESMOKING_KEY_SMOKE_DESC = "Take a puff or relight a cigarette find a cigarette if not smoking",
+    IGUI_TRUESMOKING_KEY_SMOKE = "Puff/Relight/Find Smoke",
+    IGUI_TRUESMOKING_KEY_SMOKE_DESC = "Take a puff or relight a cigarette, find a cigarette if not smoking",
 
     IGUI_TRUESMOKING_FIND_SMOKE = "Unpack/Light Smoke",
     IGUI_TRUESMOKING_FIND_SMOKE_DESC = "Enable or disable the feature to find and light a smoke automatically",

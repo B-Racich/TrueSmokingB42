@@ -27,9 +27,12 @@ end
 
 function PutOut:waitToStart()
     --Wait for timed actions to finish
-    if not self.character:isStrafing() and not self.character:isRunning() and not self.character:isSprinting()
-            and not self.character:isAiming() and not self.character:isAsleep() and not self.character:isPerformingAnAction()
-    then return false else return true end
+    if self.character:isStrafing() or self.character:isRunning() or self.character:isSprinting() or self.character:isAiming()
+        or self.character:isAsleep() or self.character:isPerformingAnAction() then
+            return true
+    else
+        return false
+    end
 end
 
 function PutOut:start()
