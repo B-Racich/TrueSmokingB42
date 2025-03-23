@@ -20,6 +20,9 @@ IG_UI_PTBR = {
     IGUI_TRUESMOKING_AUTO_PUT_OUT = "Apagar Cigarro Automaticamente",
     IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC = "Apagar o cigarro automaticamente quando terminar",
 
+    IGUI_TRUESMOKING_KEEP_LIT = "Manter Cigarro Aceso",
+    IGUI_TRUESMOKING_KEEP_LIT_DESC = "Dar uma tragada automaticamente quando o cigarro estiver prestes a apagar",
+
     IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR = "Ocultar a barra de ação de tragada",
     IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR_DESC = "Ocultar a barra de ação que aparece durante a tragada",
 

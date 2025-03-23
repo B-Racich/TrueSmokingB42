@@ -16,14 +16,12 @@ option TrueSmoking.SmokeLength
     page = TrueSmoking, translation=TrueSmoking_SmokeLength,
 }
 
-
 option TrueSmoking.ManageHeadGear
 {
     type = boolean,
     default = true,
     page = TrueSmoking, translation=TrueSmoking_ManageHeadGear,
 }
-
 
 option TrueSmoking.UseNewMoodle
 {
@@ -32,14 +30,12 @@ option TrueSmoking.UseNewMoodle
     page = TrueSmoking, translation=TrueSmoking_UseNewMoodle,
 }
 
-
 option TrueSmoking.SmokeRelighting
 {
 	type = boolean,
 	default = true,
 	page = TrueSmoking, translation=TrueSmoking_SmokeRelighting,
 }
-
 
 option TrueSmoking.Coughing
 {
@@ -66,13 +62,13 @@ option TrueSmoking.CoughingChanceNonSmoker
     page = TrueSmoking, translation=TrueSmoking_CoughingChanceNonSmoker,
 }
 
-
 option TrueSmoking.Dropping
 {
     type = boolean,
 	default = true,
 	page = TrueSmoking, translation=TrueSmoking_Dropping,
 }
+
 option TrueSmoking.DroppingChanceSmoker
 {
     type = double,
@@ -81,6 +77,7 @@ option TrueSmoking.DroppingChanceSmoker
     default = 6.0,
     page = TrueSmoking, translation=TrueSmoking_DroppingChanceSmoker,
 }
+
 option TrueSmoking.DroppingChanceNonSmoker
 {
     type = double,
@@ -90,7 +87,7 @@ option TrueSmoking.DroppingChanceNonSmoker
     page = TrueSmoking, translation=TrueSmoking_DroppingChanceNonSmoker,
 }
 
-/* Vanilla Smokes */
+/* Vanilla Smokables Configuration */
 
 /* Cigarette */
 
@@ -172,6 +169,7 @@ option TrueSmoking.CigarettePuffFactor
     default = 1.35,
     page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
 }
+
 option TrueSmoking.CigaretteWalkingFactor
 {
     type = double,
@@ -180,6 +178,7 @@ option TrueSmoking.CigaretteWalkingFactor
     default = 1.0,
     page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
 }
+
 option TrueSmoking.CigaretteRunningFactor
 {
     type = double,
@@ -188,6 +187,7 @@ option TrueSmoking.CigaretteRunningFactor
     default = 1.15,
     page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
 }
+
 option TrueSmoking.CigaretteSprintingFactor
 {
     type = double,
@@ -277,6 +277,7 @@ option TrueSmoking.RolledCigarettePuffFactor
     default = 1.35,
     page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
 }
+
 option TrueSmoking.RolledCigaretteWalkingFactor
 {
     type = double,
@@ -285,6 +286,7 @@ option TrueSmoking.RolledCigaretteWalkingFactor
     default = 1.0,
     page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
 }
+
 option TrueSmoking.RolledCigaretteRunningFactor
 {
     type = double,
@@ -293,6 +295,7 @@ option TrueSmoking.RolledCigaretteRunningFactor
     default = 1.15,
     page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
 }
+
 option TrueSmoking.RolledCigaretteSprintingFactor
 {
     type = double,

@@ -7,9 +7,6 @@ Sandbox_TrueSmoking_OverrideSmokeLength = "Substituir TODOS os Tempos de Fumo",
 Sandbox_TrueSmoking_SmokeLength = "Valor Padrão/Substituição do Tempo de Fumo",
     Sandbox_TrueSmoking_SmokeLength_tooltip = "O valor padrão do tempo de fumo a ser usado quando o item não contém um (Maior = mais longo)",
 
-
-
-
 Sandbox_TrueSmoking_PuffFactor = "Aumento da taxa de queima ao tragar",
     Sandbox_TrueSmoking_PuffFactor_tooltip = "O quanto a taxa de queima aumenta ao tragar",
 
@@ -25,25 +22,14 @@ Sandbox_TrueSmoking_SprintingFactor = "Alteração da taxa de queima ao sprintar
 Sandbox_TrueSmoking_IdleFactor = "Diminuição da taxa de queima ao ficar parado",
     Sandbox_TrueSmoking_IdleFactor_tooltip = "O quanto a taxa de queima diminui ao ficar parado",
 
-
-
-
 Sandbox_TrueSmoking_ManageHeadGear = "Gerenciar Acessórios de Cabeça",
     Sandbox_TrueSmoking_ManageHeadGear_tooltip = "Quando ativado, acessórios de cabeça que restringem o fumo precisarão ser removidos para exibir o cigarro",
-
-
-
 
 Sandbox_TrueSmoking_UseNewMoodle = "Usar o Novo Moodle (Estilo B42)",
     Sandbox_TrueSmoking_UseNewMoodle_tooltip = "Desative para usar o ícone de moodle mais antigo do estilo B41",
 
-
-
 Sandbox_TrueSmoking_SmokeRelighting = "Reacender Cigarro",
     Sandbox_TrueSmoking_SmokeRelighting_tooltip = "Opção para permitir reacender o cigarro se ele cair abaixo do 'Limite mínimo de queima'",
-
-
-
 
 Sandbox_TrueSmoking_Coughing = "Tosse ao fumar",
     Sandbox_TrueSmoking_Coughing_tooltip = "Ativar/desativar a mecânica de chance de tossir ao dar uma tragada",
@@ -54,8 +40,6 @@ Sandbox_TrueSmoking_CoughingChanceSmoker = "Chance de Tosse % para Fumantes",
 Sandbox_TrueSmoking_CoughingChanceNonSmoker = "Chance de Tosse % para Não-Fumantes",
     Sandbox_TrueSmoking_CoughingChanceNonSmoker_tooltip = "A % de chance de tossir ao dar uma tragada para não-fumantes",
 
-
-
 Sandbox_TrueSmoking_Dropping = "Derrubar Cigarro",
     Sandbox_TrueSmoking_Dropping_tooltip = "Ativar/desativar a chance de derrubar seu cigarro ao cair",
 
@@ -64,7 +48,6 @@ Sandbox_TrueSmoking_DroppingChanceSmoker = "Chance de Derrubar % para Fumantes",
 
 Sandbox_TrueSmoking_DroppingChanceNonSmoker = "Chance de Derrubar % para Não-Fumantes",
     Sandbox_TrueSmoking_DroppingChanceNonSmoker_tooltip = "A % de chance de derrubar o cigarro ao cair",
-
 
 Sandbox_TrueSmoking_CigaretteLength = "Duração do Cigarro",
     Sandbox_TrueSmoking_CigaretteLength_tooltip ="Quanto tempo leva para fumar um cigarro",
@@ -80,3 +63,45 @@ Sandbox_TrueSmoking_PipeLength = "Duração do Cachimbo",
 
 Sandbox_TrueSmoking_CanLength = "Duração da Lata de Tabaco",
     Sandbox_TrueSmoking_CanLength_tooltip = "Quanto tempo leva para fumar tabaco de uma lata",
+
+Sandbox_TrueSmokingSmokables = "True Smoking - Fumáveis",
+
+Sandbox_TrueSmoking_CigaretteSettings = "Configurações de Cigarro",
+    Sandbox_TrueSmoking_CigaretteSettings_tooltip = "Configurações de Cigarro",
+
+Sandbox_TrueSmoking_RolledCigaretteSettings = "Configurações de Cigarro Enrolado",
+    Sandbox_TrueSmoking_RolledCigaretteSettings_tooltip = "Configurações de Cigarro Enrolado",
+
+Sandbox_TrueSmoking_CigarilloSettings = "Configurações de Cigarrilha",
+    Sandbox_TrueSmoking_CigarilloSettings_tooltip = "Configurações de Cigarrilha",
+
+Sandbox_TrueSmoking_CigarSettings = "Configurações de Charuto",
+    Sandbox_TrueSmoking_CigarSettings_tooltip = "Configurações de Charuto",
+
+Sandbox_TrueSmoking_PipeSettings = "Configurações de Cachimbo",
+    Sandbox_TrueSmoking_PipeSettings_tooltip = "Configurações de Cachimbo",
+
+Sandbox_TrueSmoking_CanSettings = "Configurações de Lata de Tabaco",
+    Sandbox_TrueSmoking_CanSettings_tooltip = "Configurações de Lata de Tabaco",
+
+Sandbox_TrueSmoking_Length = "Duração do Fumo",
+    Sandbox_TrueSmoking_Length_tooltip = "Define a 'quantidade' do fumável",
+
+Sandbox_TrueSmoking_BurnMin = "Taxa Mínima de Queima",
+    Sandbox_TrueSmoking_BurnMin_tooltip = "A taxa mínima de queima que o cigarro deve tentar manter enquanto caminha/corre/sprinta",
+
+Sandbox_TrueSmoking_BurnMax = "Taxa Máxima de Queima",
+    Sandbox_TrueSmoking_BurnMax_tooltip = "A taxa máxima de queima que o cigarro deve tentar manter enquanto traga",
+
+Sandbox_TrueSmoking_BurnSpeed = "Velocidade de Queima",
+    Sandbox_TrueSmoking_BurnSpeed_tooltip = "Quão rápido o cigarro deve aumentar a taxa de queima em direção ao máximo enquanto traga (aceleração)",
+
+Sandbox_TrueSmoking_BurnSpeedDecay = "Decaimento da Velocidade de Queima",
+    Sandbox_TrueSmoking_BurnSpeedDecay_tooltip = "Quanto a taxa de queima deve desacelerar após atingir o máximo (retornos decrescentes)",
+
+Sandbox_TrueSmoking_DecayRate = "Taxa de Decaimento",
+    Sandbox_TrueSmoking_DecayRate_tooltip = "Quão rápido o cigarro deve apagar quando parado e não se movendo",
+
+Sandbox_TrueSmoking_EffectMultiplier = "Multiplicador de Efeito",
+    Sandbox_TrueSmoking_EffectMultiplier_tooltip = "Multiplica a eficácia do cigarro para reduzir o estresse e outras estatísticas de fumantes",
+}

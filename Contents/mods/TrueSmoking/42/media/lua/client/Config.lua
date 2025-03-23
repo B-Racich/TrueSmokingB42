@@ -2,49 +2,39 @@ Events.OnCreatePlayer.Add(function()
     --[[
         The smokable object defines settings and properties for each smokable item that should be
             hooked into the TrueSmoking system.
-
         ===The following settings can be used to tweak how each item behaves when smoked:===
 
-        visualItem: The item to display on the mouth while smoking. Custom wearable items can be made and should
+        [visualItem]: The item to display on the mouth while smoking. Custom wearable items can be made and should
             work if the fullType of the item is passed here. They need to be made in the same format as the ones
             from this mod so reference that.
-
             ['Mask_Cigarette', 'Mask_Cigarillo', 'Mask_Cigar', 'Mask_Pipe', false]
 
-        burnMin: the minimum burn rate the smokable tries to reach when walking/running/sprinting
-
-        burnMax: the maximum burn rate the smokable tries to reach when puffing
-
-        burnSpeed: the acceleration towards burnMax when puffing
-
-        burnSpeedDecay: the acceleration decay rate after reaching burnMax
-
-        effectMultiplier: multiplier for smoking effects (stress, unhappyness, etc)
-
-        callback: the callback function that happens onTick while smoking
+        [burnMin]: the minimum burn rate the smokable tries to reach when walking/running/sprinting
+        [burnMax]: the maximum burn rate the smokable tries to reach when puffin
+        [burnSpeed]: the acceleration towards burnMax when puffing
+        [burnSpeedDecay]: the acceleration decay rate after reaching burnMax
+        [effectMultiplier]: multiplier for smoking effects (stress, unhappyness, etc)
+        [callback]: the callback function that happens onTick while smoking
             For modded onEat methods, this will pass in a reference of the Smokable object to use
-
             Functions that are designed for the vanilla system can be made to user the Smokable.puffPercent value to
             calculate how much of a change should happen
 
-        conditions: Flags to set certain logic/settings per item
+        [conditions]: Flags to set certain logic/settings per item
             idle = should go out when idle
             walking/running/sprinting/strafing = should increase burn while doing
             canDrop = if the smoke should be dropped when falling (trees,zombies,walls)
-
-        idleFactor: the multiplier to decrease the burn rate when idle // 0.85
-
-        walkingFactor: the multiplier to increase the burn rate to min when walking // 1.0
-
-        runningFactor: the multiplier to increase the burn rate to min when running // 1.15
-
-        sprintingFactor: the multiplier to increase the burn rate to min when sprinting // 1.35
-
-        puffFactor: the multiplier to increase the burn rate to max when puffing // 1.35
+            
+        [idleFactor]: the multiplier to decrease the burn rate when idle
+        [walkingFactor]: the multiplier to increase the burn rate to min when walking
+        [runningFactor]: the multiplier to increase the burn rate to min when running
+        [sprintingFactor]: the multiplier to increase the burn rate to min when sprinting
+        [puffFactor]: the multiplier to increase the burn rate to max when puffing
     ]]
     local smokableObjects = {
         ['Base.CigaretteSingle'] = {
             visualItem = 'Mask_Cigarette',
+            callback = OnEat_Tobacco,
+            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.CigaretteLength,
             burnMin = TrueSmoking.Options.CigaretteBurnMin,
             burnMax = TrueSmoking.Options.CigaretteBurnMax,
@@ -52,8 +42,6 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = TrueSmoking.Options.CigaretteBurnSpeedDecay,
             decayRate = TrueSmoking.Options.CigaretteDecayRate,
             effectMultiplier = TrueSmoking.Options.CigaretteEffectMultiplier,
-            callback = OnEat_Tobacco,
-            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             walkingFactor = TrueSmoking.Options.CigaretteWalkingFactor,
             runningFactor = TrueSmoking.Options.CigaretteRunningFactor,
             sprintingFactor = TrueSmoking.Options.CigaretteSprintingFactor,
@@ -61,6 +49,8 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.CigaretteRolled'] = {
             visualItem = 'Mask_Cigarette',
+            callback = OnEat_Tobacco,
+            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.RolledCigaretteLength,
             burnMin = TrueSmoking.Options.RolledCigaretteBurnMin,
             burnMax = TrueSmoking.Options.RolledCigaretteBurnMax,
@@ -68,8 +58,6 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = TrueSmoking.Options.RolledCigaretteBurnSpeedDecay,
             decayRate = TrueSmoking.Options.RolledCigaretteDecayRate,
             effectMultiplier = TrueSmoking.Options.RolledCigaretteEffectMultiplier,
-            callback = OnEat_Tobacco,
-            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             walkingFactor = TrueSmoking.Options.RolledCigaretteWalkingFactor,
             runningFactor = TrueSmoking.Options.RolledCigaretteRunningFactor,
             sprintingFactor = TrueSmoking.Options.RolledCigaretteSprintingFactor,
@@ -77,6 +65,8 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.Cigarillo'] = {
             visualItem = 'Mask_Cigarillo',
+            callback = OnEat_Tobacco,
+            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.CigarilloLength,
             burnMin = TrueSmoking.Options.CigarilloBurnMin,
             burnMax = TrueSmoking.Options.CigarilloBurnMax,
@@ -84,8 +74,6 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = TrueSmoking.Options.CigarilloBurnSpeedDecay,
             decayRate = TrueSmoking.Options.CigarilloDecayRate,
             effectMultiplier = TrueSmoking.Options.CigarilloEffectMultiplier,
-            callback = OnEat_Tobacco,
-            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             walkingFactor = TrueSmoking.Options.CigarilloWalkingFactor,
             runningFactor = TrueSmoking.Options.CigarilloRunningFactor,
             sprintingFactor = TrueSmoking.Options.CigarilloSprintingFactor,
@@ -93,6 +81,8 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.Cigar'] = {
             visualItem = 'Mask_Cigar',
+            callback = OnEat_Tobacco,
+            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.CigarLength,
             burnMin = TrueSmoking.Options.CigarBurnMin,
             burnMax = TrueSmoking.Options.CigarBurnMax,
@@ -100,8 +90,6 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = TrueSmoking.Options.CigarBurnSpeedDecay,
             decayRate = TrueSmoking.Options.CigarDecayRate,
             effectMultiplier = TrueSmoking.Options.CigarEffectMultiplier,
-            callback = OnEat_Tobacco,
-            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             walkingFactor = TrueSmoking.Options.CigarWalkingFactor,
             runningFactor = TrueSmoking.Options.CigarRunningFactor,
             sprintingFactor = TrueSmoking.Options.CigarSprintingFactor,
@@ -109,6 +97,8 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.SmokingPipe_Tobacco'] = {
             visualItem = 'Mask_Pipe',
+            callback = OnEat_Tobacco,
+            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.PipeLength,
             burnMin = TrueSmoking.Options.PipeBurnMin,
             burnMax = TrueSmoking.Options.PipeBurnMax,
@@ -116,8 +106,6 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = TrueSmoking.Options.PipeBurnSpeedDecay,
             decayRate = TrueSmoking.Options.PipeDecayRate,
             effectMultiplier = TrueSmoking.Options.PipeEffectMultiplier,
-            callback = OnEat_Tobacco,
-            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             walkingFactor = TrueSmoking.Options.PipeWalkingFactor,
             runningFactor = TrueSmoking.Options.PipeRunningFactor,
             sprintingFactor = TrueSmoking.Options.PipeSprintingFactor,
@@ -125,6 +113,8 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.CanPipe_Tobacco'] = {
             visualItem = false,
+            callback = OnEat_Tobacco,
+            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.CanLength,
             burnMin = TrueSmoking.Options.CanBurnMin,
             burnMax = TrueSmoking.Options.CanBurnMax,
@@ -132,8 +122,6 @@ Events.OnCreatePlayer.Add(function()
             burnSpeedDecay = TrueSmoking.Options.CanBurnSpeedDecay,
             decayRate = TrueSmoking.Options.CanDecayRate,
             effectMultiplier = TrueSmoking.Options.CanEffectMultiplier,
-            callback = OnEat_Tobacco,
-            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             walkingFactor = TrueSmoking.Options.CanWalkingFactor,
             runningFactor = TrueSmoking.Options.CanRunningFactor,
             sprintingFactor = TrueSmoking.Options.CanSprintingFactor,

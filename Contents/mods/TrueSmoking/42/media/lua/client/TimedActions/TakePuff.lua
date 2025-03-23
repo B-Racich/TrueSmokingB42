@@ -67,10 +67,7 @@ function TakePuff:start()
     self.timer = os.time()
     -- set the anim for vanilla or modded
     local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
-    -- print('anim is '..anim)
     self:setActionAnim(anim)
-    -- local eatType = self.item:getEatType()
-    -- print('eatType is '..eatType)
     self:setAnimVariable("FoodType", self.item:getEatType())
     self.trueSmoking.Smokable.puffTimeMark = os.time()
 

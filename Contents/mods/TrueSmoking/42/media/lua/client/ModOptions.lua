@@ -9,6 +9,7 @@ options:addKeyBind("keyStopSmoke", getText("IGUI_TRUESMOKING_KEY_STOP_SMOKE"), K
 options:addTickBox("PassiveSmoking", getText("IGUI_TRUESMOKING_PASSIVE_SMOKING"), true, getText("IGUI_TRUESMOKING_PASSIVE_SMOKING_DESC"))
 options:addSlider("PassiveMinTime", getText("IGUI_TRUESMOKING_PASSIVE_MIN_TIME"), 0, 60, 1, 30, getText("IGUI_TRUESMOKING_PASSIVE_MIN_TIME_DESC"))
 options:addSlider("PassiveMaxTime", getText("IGUI_TRUESMOKING_PASSIVE_MAX_TIME"), 0, 120, 1, 80, getText("IGUI_TRUESMOKING_PASSIVE_MAX_TIME_DESC"))
+options:addTickBox("KeepLit", getText("IGUI_TRUESMOKING_KEEP_LIT"), false, getText("IGUI_TRUESMOKING_KEEP_LIT_DESC"))
 options:addTickBox("AutoPutOut", getText("IGUI_TRUESMOKING_AUTO_PUT_OUT"), true, getText("IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC"))
 options:addTickBox("HidePuffActionBar", getText("IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR"), false, getText("IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR_DESC"))
 options:addTickBox("HideAllActionBars", getText("IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS"), false, getText("IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS_DESC"))

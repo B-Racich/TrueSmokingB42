@@ -383,9 +383,6 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.OverrideSmokeLength = SandboxVars.TrueSmoking.OverrideSmokeLength
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
 
-    -- SSO anims are 2x so just /2 the value so we arn't turbo smoking when puffing
-    local reducePuff = getActivatedMods():contains('\\SmokingSoundsOverhaul')
-
     TrueSmoking.Options.ManageHeadGear = SandboxVars.TrueSmoking.ManageHeadGear
 
     TrueSmoking.Options.UseNewMoodle = SandboxVars.TrueSmoking.UseNewMoodle
@@ -400,6 +397,8 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.DroppingChanceSmoker = SandboxVars.TrueSmoking.DroppingChanceSmoker
     TrueSmoking.Options.DroppingChanceNonSmoker = SandboxVars.TrueSmoking.DroppingChanceNonSmoker
 
+    -- Smokable config options
+
     TrueSmoking.Options.CigaretteLength = SandboxVars.TrueSmoking.CigaretteLength
     TrueSmoking.Options.CigaretteBurnMin = SandboxVars.TrueSmoking.CigaretteBurnMin
     TrueSmoking.Options.CigaretteBurnMax = SandboxVars.TrueSmoking.CigaretteBurnMax
@@ -407,7 +406,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.CigaretteBurnSpeedDecay = SandboxVars.TrueSmoking.CigaretteBurnSpeedDecay
     TrueSmoking.Options.CigaretteDecayRate = SandboxVars.TrueSmoking.CigaretteDecayRate
     TrueSmoking.Options.CigaretteEffectMultiplier = SandboxVars.TrueSmoking.CigaretteEffectMultiplier
-    TrueSmoking.Options.CigarettePuffFactor = reducePuff and SandboxVars.TrueSmoking.CigarettePuffFactor/2 or SandboxVars.TrueSmoking.CigarettePuffFactor
+    TrueSmoking.Options.CigarettePuffFactor = SandboxVars.TrueSmoking.CigarettePuffFactor
     TrueSmoking.Options.CigaretteWalkingFactor = SandboxVars.TrueSmoking.CigaretteWalkingFactor
     TrueSmoking.Options.CigaretteRunningFactor = SandboxVars.TrueSmoking.CigaretteRunningFactor
     TrueSmoking.Options.CigaretteSprintingFactor = SandboxVars.TrueSmoking.CigaretteSprintingFactor
@@ -419,7 +418,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.RolledCigaretteBurnSpeedDecay = SandboxVars.TrueSmoking.RolledCigaretteBurnSpeedDecay
     TrueSmoking.Options.RolledCigaretteDecayRate = SandboxVars.TrueSmoking.RolledCigaretteDecayRate
     TrueSmoking.Options.RolledCigaretteEffectMultiplier = SandboxVars.TrueSmoking.RolledCigaretteEffectMultiplier
-    TrueSmoking.Options.RolledCigarettePuffFactor = reducePuff and SandboxVars.TrueSmoking.RolledCigarettePuffFactor/2 or SandboxVars.TrueSmoking.RolledCigarettePuffFactor
+    TrueSmoking.Options.RolledCigarettePuffFactor = SandboxVars.TrueSmoking.RolledCigarettePuffFactor
     TrueSmoking.Options.RolledCigaretteWalkingFactor = SandboxVars.TrueSmoking.RolledCigaretteWalkingFactor
     TrueSmoking.Options.RolledCigaretteRunningFactor = SandboxVars.TrueSmoking.RolledCigaretteRunningFactor
     TrueSmoking.Options.RolledCigaretteSprintingFactor = SandboxVars.TrueSmoking.RolledCigaretteSprintingFactor
@@ -431,7 +430,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.CigarilloBurnSpeedDecay = SandboxVars.TrueSmoking.CigarilloBurnSpeedDecay
     TrueSmoking.Options.CigarilloDecayRate = SandboxVars.TrueSmoking.CigarilloDecayRate
     TrueSmoking.Options.CigarilloEffectMultiplier = SandboxVars.TrueSmoking.CigarilloEffectMultiplier
-    TrueSmoking.Options.CigarilloPuffFactor = reducePuff and SandboxVars.TrueSmoking.CigarilloPuffFactor/2 or SandboxVars.TrueSmoking.CigarilloPuffFactor
+    TrueSmoking.Options.CigarilloPuffFactor = SandboxVars.TrueSmoking.CigarilloPuffFactor
     TrueSmoking.Options.CigarilloWalkingFactor = SandboxVars.TrueSmoking.CigarilloWalkingFactor
     TrueSmoking.Options.CigarilloRunningFactor = SandboxVars.TrueSmoking.CigarilloRunningFactor
     TrueSmoking.Options.CigarilloSprintingFactor = SandboxVars.TrueSmoking.CigarilloSprintingFactor
@@ -443,7 +442,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.CigarBurnSpeedDecay = SandboxVars.TrueSmoking.CigarBurnSpeedDecay
     TrueSmoking.Options.CigarDecayRate = SandboxVars.TrueSmoking.CigarDecayRate
     TrueSmoking.Options.CigarEffectMultiplier = SandboxVars.TrueSmoking.CigarEffectMultiplier
-    TrueSmoking.Options.CigarPuffFactor = reducePuff and SandboxVars.TrueSmoking.CigarPuffFactor/2 or SandboxVars.TrueSmoking.CigarPuffFactor
+    TrueSmoking.Options.CigarPuffFactor = SandboxVars.TrueSmoking.CigarPuffFactor
     TrueSmoking.Options.CigarWalkingFactor = SandboxVars.TrueSmoking.CigarWalkingFactor
     TrueSmoking.Options.CigarRunningFactor = SandboxVars.TrueSmoking.CigarRunningFactor
     TrueSmoking.Options.CigarSprintingFactor = SandboxVars.TrueSmoking.CigarSprintingFactor
@@ -455,7 +454,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.PipeBurnSpeedDecay = SandboxVars.TrueSmoking.PipeBurnSpeedDecay
     TrueSmoking.Options.PipeDecayRate = SandboxVars.TrueSmoking.PipeDecayRate
     TrueSmoking.Options.PipeEffectMultiplier = SandboxVars.TrueSmoking.PipeEffectMultiplier
-    TrueSmoking.Options.PipePuffFactor = reducePuff and SandboxVars.TrueSmoking.PipePuffFactor/2 or SandboxVars.TrueSmoking.PipePuffFactor
+    TrueSmoking.Options.PipePuffFactor = SandboxVars.TrueSmoking.PipePuffFactor
     TrueSmoking.Options.PipeWalkingFactor = SandboxVars.TrueSmoking.PipeWalkingFactor
     TrueSmoking.Options.PipeRunningFactor = SandboxVars.TrueSmoking.PipeRunningFactor
     TrueSmoking.Options.PipeSprintingFactor = SandboxVars.TrueSmoking.PipeSprintingFactor
@@ -467,7 +466,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.CanBurnSpeedDecay = SandboxVars.TrueSmoking.CanBurnSpeedDecay
     TrueSmoking.Options.CanDecayRate = SandboxVars.TrueSmoking.CanDecayRate
     TrueSmoking.Options.CanEffectMultiplier = SandboxVars.TrueSmoking.CanEffectMultiplier
-    TrueSmoking.Options.CanPuffFactor = reducePuff and SandboxVars.TrueSmoking.CanPuffFactor/2 or SandboxVars.TrueSmoking.CanPuffFactor
+    TrueSmoking.Options.CanPuffFactor = SandboxVars.TrueSmoking.CanPuffFactor
     TrueSmoking.Options.CanWalkingFactor = SandboxVars.TrueSmoking.CanWalkingFactor
     TrueSmoking.Options.CanRunningFactor = SandboxVars.TrueSmoking.CanRunningFactor
     TrueSmoking.Options.CanSprintingFactor = SandboxVars.TrueSmoking.CanSprintingFactor

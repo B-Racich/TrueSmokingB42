@@ -17,6 +17,9 @@ IG_UI_EN = {
     IGUI_TRUESMOKING_PASSIVE_MAX_TIME = "Passive Puffing Max Time",
     IGUI_TRUESMOKING_PASSIVE_MAX_TIME_DESC = "Set the maximum time interval for passive puffing",
 
+    IGUI_TRUESMOKING_KEEP_LIT = "Keep Smoke Lit",
+    IGUI_TRUESMOKING_KEEP_LIT_DESC = "Automatically puff when the smoke is about to go out",
+
     IGUI_TRUESMOKING_AUTO_PUT_OUT = "Automatically Put Out Smoke",
     IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC = "Automatically put out the cigarette when finished",
 

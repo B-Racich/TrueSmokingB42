@@ -130,6 +130,12 @@ function Smokable:getObject(item)
     local savedSmoke = self:getSavedSmokeLength(item)
     o.smokeLength = savedSmoke and savedSmoke or o.smokeLength
 
+    local reducePuff = getActivatedMods():contains('\\SmokingSoundsOverhaul')
+
+    if reducePuff then
+        o.puffFactor = o.puffFactor / 2
+    end
+
     item:getModData().SmokeLength = o.smokeLength
     item:getModData().OriginalSmokeLength = o.originalSmokeLength
 
@@ -158,6 +164,11 @@ function Smokable:getObject(item)
     print('Burn Speed ' .. o.burnSpeed)
     print('Burn Speed Decay ' .. o.burnSpeedDecay)
     print('Decay Rate ' .. o.decayRate)
+    print('Effect Multiplier ' .. o.effectMultiplier)
+    print('Puff Factor ' .. o.puffFactor)
+    print('Walking Factor ' .. o.walkingFactor)
+    print('Running Factor ' .. o.runningFactor)
+    print('Sprinting Factor ' .. o.sprintingFactor)
     print("======================")
 
     return o
@@ -256,7 +267,6 @@ function Smokable:light()
         Events.OnTick.Add(updateWrapper)
         self.updateWrapper = updateWrapper
 
-        -- self.table.visualItem = self.visualItem
         self:equipVisualItem()
         self.player:getInventory():Remove(self.item)
     end
@@ -462,8 +472,8 @@ function Smokable:idlePuff()
     local timeDiff = os.difftime(os.time(), self.puffTimeMark)
 
     if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
-        local puff = TakePuff:new(self.player)
-        -- puff.maxTime = 220
-        ISTimedActionQueue.add(puff)
+        ISTimedActionQueue.add(TakePuff:new(self.player))
+    elseif TrueSmoking.Config.KeepLit and self.burnRate < 0.00001 then
+        ISTimedActionQueue.add(TakePuff:new(self.player))
     end
 end
