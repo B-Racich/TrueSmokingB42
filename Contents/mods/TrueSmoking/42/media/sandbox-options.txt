@@ -6,6 +6,7 @@ option TrueSmoking.OverrideSmokeLength
 	default = false,
 	page = TrueSmoking, translation=TrueSmoking_OverrideSmokeLength,
 }
+
 option TrueSmoking.SmokeLength
 {
     type = double,
@@ -13,48 +14,6 @@ option TrueSmoking.SmokeLength
     max = 10.0,
     default = 1.0,
     page = TrueSmoking, translation=TrueSmoking_SmokeLength,
-}
-
-
-option TrueSmoking.PuffFactor
-{
-    type = double,
-    min = 0.0,
-    max = 10.0,
-    default = 1.35,
-    page = TrueSmoking, translation=TrueSmoking_PuffFactor,
-}
-option TrueSmoking.WalkingFactor
-{
-    type = double,
-    min = -10.0,
-    max = 10.0,
-    default = 1.0,
-    page = TrueSmoking, translation=TrueSmoking_WalkingFactor,
-}
-option TrueSmoking.RunningFactor
-{
-    type = double,
-    min = -10.0,
-    max = 10.0,
-    default = 1.15,
-    page = TrueSmoking, translation=TrueSmoking_RunningFactor,
-}
-option TrueSmoking.SprintingFactor
-{
-    type = double,
-    min = -10.0,
-    max = 10.0,
-    default = 1.35,
-    page = TrueSmoking, translation=TrueSmoking_SprintingFactor,
-}
-option TrueSmoking.IdleFactor
-{
-    type = double,
-    min = 0.0,
-    max = 10.0,
-    default = 0.85,
-    page = TrueSmoking, translation=TrueSmoking_IdleFactor,
 }
 
 
@@ -88,6 +47,7 @@ option TrueSmoking.Coughing
 	default = true,
 	page = TrueSmoking, translation=TrueSmoking_Coughing,
 }
+
 option TrueSmoking.CoughingChanceSmoker
 {
     type = double,
@@ -96,6 +56,7 @@ option TrueSmoking.CoughingChanceSmoker
     default = 4.0,
     page = TrueSmoking, translation=TrueSmoking_CoughingChanceSmoker,
 }
+
 option TrueSmoking.CoughingChanceNonSmoker
 {
     type = double,
@@ -129,6 +90,16 @@ option TrueSmoking.DroppingChanceNonSmoker
     page = TrueSmoking, translation=TrueSmoking_DroppingChanceNonSmoker,
 }
 
+/* Vanilla Smokes */
+
+/* Cigarette */
+
+option TrueSmoking.CigaretteSettings
+{
+    type = boolean,
+    default = true,
+    page = TrueSmokingSmokables, translation=TrueSmoking_CigaretteSettings,
+}
 
 option TrueSmoking.CigaretteLength
 {
@@ -136,37 +107,629 @@ option TrueSmoking.CigaretteLength
     min = 0.0,
     max = 10.0,
     default = 1.3,
-    page = TrueSmoking, translation=TrueSmoking_CigaretteLength,
+    page = TrueSmokingSmokables, translation=TrueSmoking_Length,
 }
+
+option TrueSmoking.CigaretteBurnMin
+{
+    type = double,
+    min = 0.0001,
+    max = 0.01,
+    default = 0.000125,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
+}
+
+option TrueSmoking.CigaretteBurnMax
+{
+    type = double,
+    min = 0.0001,
+    max = 0.01,
+    default = 0.000275,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
+}
+
+option TrueSmoking.CigaretteBurnSpeed
+{
+    type = double,
+    min = 0.0001,
+    max = 0.1,
+    default = 0.0025,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeed,
+}
+
+option TrueSmoking.CigaretteBurnSpeedDecay
+{
+    type = double,
+    min = 0.01,
+    max = 1.0,
+    default = 0.25,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeedDecay,
+}
+
+option TrueSmoking.CigaretteDecayRate
+{
+    type = double,
+    min = 0.001,
+    max = 1.0,
+    default = 0.999,
+    page = TrueSmokingSmokables, translation=TrueSmoking_DecayRate,
+}
+
+option TrueSmoking.CigaretteEffectMultiplier
+{
+    type = double,
+    min = 0.1,
+    max = 100.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_EffectMultiplier,
+}
+
+option TrueSmoking.CigarettePuffFactor
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
+}
+option TrueSmoking.CigaretteWalkingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
+}
+option TrueSmoking.CigaretteRunningFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.15,
+    page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
+}
+option TrueSmoking.CigaretteSprintingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_SprintingFactor,
+}
+
+/* Cigarette Rolled */
+
+option TrueSmoking.RolledCigaretteSettings
+{
+    type = boolean,
+    default = true,
+    page = TrueSmokingSmokables, translation=TrueSmoking_RolledCigaretteSettings,
+}
+
+option TrueSmoking.RolledCigaretteLength
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.3,
+    page = TrueSmokingSmokables, translation=TrueSmoking_Length,
+}
+
+option TrueSmoking.RolledCigaretteBurnMin
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.0001,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
+}
+
+option TrueSmoking.RolledCigaretteBurnMax
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.0003,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
+}
+
+option TrueSmoking.RolledCigaretteBurnSpeed
+{
+    type = double,
+    min = 0.0001,
+    max = 0.1,
+    default = 0.0025,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeed,
+}
+
+option TrueSmoking.RolledCigaretteBurnSpeedDecay
+{
+    type = double,
+    min = 0.01,
+    max = 1.0,
+    default = 0.25,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeedDecay,
+}
+
+option TrueSmoking.RolledCigaretteDecayRate
+{
+    type = double,
+    min = 0.001,
+    max = 1.0,
+    default = 0.996,
+    page = TrueSmokingSmokables, translation=TrueSmoking_DecayRate,
+}
+
+option TrueSmoking.RolledCigaretteEffectMultiplier
+{
+    type = double,
+    min = 0.1,
+    max = 100.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_EffectMultiplier,
+}
+
+option TrueSmoking.RolledCigarettePuffFactor
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
+}
+option TrueSmoking.RolledCigaretteWalkingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
+}
+option TrueSmoking.RolledCigaretteRunningFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.15,
+    page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
+}
+option TrueSmoking.RolledCigaretteSprintingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_SprintingFactor,
+}
+
+/* Cigarillo */
+
+option TrueSmoking.CigarilloSettings
+{
+    type = boolean,
+    default = true,
+    page = TrueSmokingSmokables, translation=TrueSmoking_CigarilloSettings,
+}
+
 option TrueSmoking.CigarilloLength
 {
     type = double,
     min = 0.0,
     max = 10.0,
     default = 2.0,
-    page = TrueSmoking, translation=TrueSmoking_CigarilloLength,
+    page = TrueSmokingSmokables, translation=TrueSmoking_Length,
 }
+
+option TrueSmoking.CigarilloBurnMin
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.000125,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
+}
+
+option TrueSmoking.CigarilloBurnMax
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.0003,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
+}
+
+option TrueSmoking.CigarilloBurnSpeed
+{
+    type = double,
+    min = 0.0001,
+    max = 0.1,
+    default = 0.0025,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeed,
+}
+
+option TrueSmoking.CigarilloBurnSpeedDecay
+{
+    type = double,
+    min = 0.01,
+    max = 1.0,
+    default = 0.25,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeedDecay,
+}
+
+option TrueSmoking.CigarilloDecayRate
+{
+    type = double,
+    min = 0.001,
+    max = 1.0,
+    default = 0.998,
+    page = TrueSmokingSmokables, translation=TrueSmoking_DecayRate,
+}
+
+option TrueSmoking.CigarilloEffectMultiplier
+{
+    type = double,
+    min = 0.1,
+    max = 100.0,
+    default = 2.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_EffectMultiplier,
+}
+
+option TrueSmoking.CigarilloPuffFactor
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
+}
+
+option TrueSmoking.CigarilloWalkingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
+}
+
+option TrueSmoking.CigarilloRunningFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.15,
+    page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
+}
+
+option TrueSmoking.CigarilloSprintingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_SprintingFactor,
+}
+
+/* Cigar */
+
+option TrueSmoking.CigarSettings
+{
+    type = boolean,
+    default = true,
+    page = TrueSmokingSmokables, translation=TrueSmoking_CigarSettings,
+}
+
 option TrueSmoking.CigarLength
 {
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 3.5,
-    page = TrueSmoking, translation=TrueSmoking_CigarLength,
+    default = 3.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_Length,
 }
+
+option TrueSmoking.CigarBurnMin
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.000125,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
+}
+
+option TrueSmoking.CigarBurnMax
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.0003,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
+}
+
+option TrueSmoking.CigarBurnSpeed
+{
+    type = double,
+    min = 0.0001,
+    max = 0.1,
+    default = 0.0025,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeed,
+}
+
+option TrueSmoking.CigarBurnSpeedDecay
+{
+    type = double,
+    min = 0.01,
+    max = 1.0,
+    default = 0.25,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeedDecay,
+}
+
+option TrueSmoking.CigarDecayRate
+{
+    type = double,
+    min = 0.001,
+    max = 1.0,
+    default = 0.998,
+    page = TrueSmokingSmokables, translation=TrueSmoking_DecayRate,
+}
+
+option TrueSmoking.CigarEffectMultiplier
+{
+    type = double,
+    min = 0.1,
+    max = 100.0,
+    default = 3.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_EffectMultiplier,
+}
+
+option TrueSmoking.CigarPuffFactor
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
+}
+
+option TrueSmoking.CigarWalkingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
+}
+
+option TrueSmoking.CigarRunningFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.15,
+    page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
+}
+
+option TrueSmoking.CigarSprintingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_SprintingFactor,
+}
+
+/* Tobacco Pipe */
+
+option TrueSmoking.PipeSettings
+{
+    type = boolean,
+    default = true,
+    page = TrueSmokingSmokables, translation=TrueSmoking_PipeSettings,
+}
+
 option TrueSmoking.PipeLength
 {
     type = double,
     min = 0.0,
     max = 10.0,
     default = 2.5,
-    page = TrueSmoking, translation=TrueSmoking_PipeLength,
+    page = TrueSmokingSmokables, translation=TrueSmoking_Length,
 }
+
+option TrueSmoking.PipeBurnMin
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.000125,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
+}
+
+option TrueSmoking.PipeBurnMax
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.0003,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
+}
+
+option TrueSmoking.PipeBurnSpeed
+{
+    type = double,
+    min = 0.0001,
+    max = 0.1,
+    default = 0.0025,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeed,
+}
+
+option TrueSmoking.PipeBurnSpeedDecay
+{
+    type = double,
+    min = 0.01,
+    max = 1.0,
+    default = 0.25,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeedDecay,
+}
+
+option TrueSmoking.PipeDecayRate
+{
+    type = double,
+    min = 0.001,
+    max = 1.0,
+    default = 0.998,
+    page = TrueSmokingSmokables, translation=TrueSmoking_DecayRate,
+}
+
+option TrueSmoking.PipeEffectMultiplier
+{
+    type = double,
+    min = 0.1,
+    max = 100.0,
+    default = 2.5,
+    page = TrueSmokingSmokables, translation=TrueSmoking_EffectMultiplier,
+}
+
+option TrueSmoking.PipePuffFactor
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
+}
+
+option TrueSmoking.PipeWalkingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
+}
+
+option TrueSmoking.PipeRunningFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.15,
+    page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
+}
+
+option TrueSmoking.PipeSprintingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_SprintingFactor,
+}
+
+/* Can Pipe */
+
+option TrueSmoking.CanSettings
+{
+    type = boolean,
+    default = true,
+    page = TrueSmokingSmokables, translation=TrueSmoking_CanSettings,
+}
+
 option TrueSmoking.CanLength
 {
     type = double,
     min = 0.0,
     max = 10.0,
     default = 2.5,
-    page = TrueSmoking, translation=TrueSmoking_CanLength,
+    page = TrueSmokingSmokables, translation=TrueSmoking_Length,
+}
+
+option TrueSmoking.CanBurnMin
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.000125,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
+}
+
+option TrueSmoking.CanBurnMax
+{
+    type = double,
+    min = 0.0001,
+    max = 0.001,
+    default = 0.0003,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
+}
+
+option TrueSmoking.CanBurnSpeed
+{
+    type = double,
+    min = 0.0001,
+    max = 0.1,
+    default = 0.0025,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeed,
+}
+
+option TrueSmoking.CanBurnSpeedDecay
+{
+    type = double,
+    min = 0.01,
+    max = 1.0,
+    default = 0.25,
+    page = TrueSmokingSmokables, translation=TrueSmoking_BurnSpeedDecay,
+}
+
+option TrueSmoking.CanDecayRate 
+{
+    type = double,
+    min = 0.001,
+    max = 1.0,
+    default = 0.992,
+    page = TrueSmokingSmokables, translation=TrueSmoking_DecayRate,
+}
+
+option TrueSmoking.CanEffectMultiplier
+{
+    type = double,
+    min = 0.1,
+    max = 100.0,
+    default = 1.5,
+    page = TrueSmokingSmokables, translation=TrueSmoking_EffectMultiplier,
+}
+
+option TrueSmoking.CanPuffFactor
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_PuffFactor,
+}
+
+option TrueSmoking.CanWalkingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingSmokables, translation=TrueSmoking_WalkingFactor,
+}
+
+option TrueSmoking.CanRunningFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.15,
+    page = TrueSmokingSmokables, translation=TrueSmoking_RunningFactor,
+}
+
+option TrueSmoking.CanSprintingFactor
+{
+    type = double,
+    min = -10.0,
+    max = 10.0,
+    default = 1.35,
+    page = TrueSmokingSmokables, translation=TrueSmoking_SprintingFactor,
 }

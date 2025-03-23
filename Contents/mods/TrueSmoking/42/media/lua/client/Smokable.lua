@@ -117,11 +117,10 @@ function Smokable:getObject(item)
             decayRate = 0.998,
             callback = false,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-            idleFactor = TrueSmoking.Options.IdleFactor,
-            walkingFactor = TrueSmoking.Options.WalkingFactor,
-            runningFactor = TrueSmoking.Options.RunningFactor,
-            sprintingFactor = TrueSmoking.Options.SprintingFactor,
-            puffFactor = TrueSmoking.Options.PuffFactor
+            walkingFactor = 1.0,
+            runningFactor = 1.15,
+            sprintingFactor = 1.35,
+            puffFactor = 1.35
         }
     end
 

@@ -9,29 +9,8 @@ Sandbox_EN = {
 
 
 
-
-    Sandbox_TrueSmoking_PuffFactor = "Burn rate increase while puffing",
-        Sandbox_TrueSmoking_PuffFactor_tooltip = "How much the burn rate increases when puffing",
-
-    Sandbox_TrueSmoking_WalkingFactor = "Burn rate change while walking",
-        Sandbox_TrueSmoking_WalkingFactor_tooltip = "Tthe burn rate change when walking",
-
-    Sandbox_TrueSmoking_RunningFactor = "Burn rate change while running",
-        Sandbox_TrueSmoking_RunningFactor_tooltip = "Tthe burn rate change when running",
-
-    Sandbox_TrueSmoking_SprintingFactor = "Burn rate change while sprinting",
-        Sandbox_TrueSmoking_SprintingFactor_tooltip = "Tthe burn rate change when sprinting",
-
-    Sandbox_TrueSmoking_IdleFactor = "Burn rate decrease while idle",
-        Sandbox_TrueSmoking_IdleFactor_tooltip = "How much the burn rate decreases when idle",
-
-
-
-
     Sandbox_TrueSmoking_ManageHeadGear = "Manage Headgear",
         Sandbox_TrueSmoking_ManageHeadGear_tooltip = "When enabled headgear that restricts smoking will need to be removed to display the smoke",
-
-
 
 
     Sandbox_TrueSmoking_UseNewMoodle = "Use The New Moodle (B42 Style)",
@@ -41,8 +20,6 @@ Sandbox_EN = {
 
     Sandbox_TrueSmoking_SmokeRelighting = "Smoke Relighting",
         Sandbox_TrueSmoking_SmokeRelighting_tooltip = "Option to enable relighting of the smoke if it drops below 'Minimum burn limit'",
-
-
 
 
     Sandbox_TrueSmoking_Coughing = "Coughing from smoking",
@@ -65,19 +42,58 @@ Sandbox_EN = {
     Sandbox_TrueSmoking_DroppingChanceNonSmoker = "Dropping Chance % for Non-Smokers",
         Sandbox_TrueSmoking_DroppingChanceNonSmoker_tooltip = "The % chance of dropping the smoke when falling",
 
+    /* Smokable translations */
 
-    Sandbox_TrueSmoking_CigaretteLength = "Cigarette Length",
-        Sandbox_TrueSmoking_CigaretteLength_tooltip ="How long it takes to smoke a cigarette",
+    Sandbox_TrueSmokingSmokables = "True Smoking - Smokables",
 
-    Sandbox_TrueSmoking_CigarilloLength = "Cigarillo Length",
-        Sandbox_TrueSmoking_CigarilloLength_tooltip = "How long it takes to smoke a cigarillo",
+    Sandbox_TrueSmoking_CigaretteSettings = "Cigarette Settings",
+        Sandbox_TrueSmoking_CigaretteSettings_tooltip = "Cigarette Settings",
 
-    Sandbox_TrueSmoking_CigarLength = "Cigar Length",
-        Sandbox_TrueSmoking_CigarLength_tooltip = "How long it takes to smoke a cigar",
+    Sandbox_TrueSmoking_RolledCigaretteSettings = "Rolled Cigarette Settings",
+        Sandbox_TrueSmoking_RolledCigaretteSettings_tooltip = "Rolled Cigarette Settings",
 
-    Sandbox_TrueSmoking_PipeLength = "Tobacco Pipe Length",
-        Sandbox_TrueSmoking_PipeLength_tooltip = "How long it takes to smoke a tobacco pipe",
+    Sandbox_TrueSmoking_CigarilloSettings = "Cigarillo Settings",
+        Sandbox_TrueSmoking_CigarilloSettings_tooltip = "Cigarillo Settings",
 
-    Sandbox_TrueSmoking_CanLength = "Tobacco Can Length",
-        Sandbox_TrueSmoking_CanLength_tooltip = "How long it takes to smoke tobacco from a can",
+    Sandbox_TrueSmoking_CigarSettings = "Cigar Settings",
+        Sandbox_TrueSmoking_CigarSettings_tooltip = "Cigar Settings",
+
+    Sandbox_TrueSmoking_PipeSettings = "Pipe Settings",
+        Sandbox_TrueSmoking_PipeSettings_tooltip = "Pipe Settings",
+
+    Sandbox_TrueSmoking_CanSettings = "Can Settings",
+        Sandbox_TrueSmoking_CanSettings_tooltip = "Can Settings",
+
+    Sandbox_TrueSmoking_Length = "Smoke Length",
+        Sandbox_TrueSmoking_Length_tooltip = "Defines the 'amount' of the smokable",
+
+    Sandbox_TrueSmoking_BurnMin = "Minimum Burn Rate",
+        Sandbox_TrueSmoking_BurnMin_tooltip = "The minimum burn rate the smoke should try to stay at while walking/running/sprinting",
+    
+    Sandbox_TrueSmoking_BurnMax = "Maximum Burn Rate",
+        Sandbox_TrueSmoking_BurnMax_tooltip = "The maximum burn rate the smoke should try to stay at while puffing",
+
+    Sandbox_TrueSmoking_BurnSpeed = "Burn Speed",
+        Sandbox_TrueSmoking_BurnSpeed_tooltip = "How fast the the smoke should increase the burn rate towards maximum while puffing (acceleration)",
+
+    Sandbox_TrueSmoking_BurnSpeedDecay = "Burn Speed Decay",
+        Sandbox_TrueSmoking_BurnSpeedDecay_tooltip = "How much the burn rate should slow down after reaching the maximum (diminishing returns)",
+
+    Sandbox_TrueSmoking_DecayRate = "Decay Rate",
+        Sandbox_TrueSmoking_DecayRate_tooltip = "How fast the smoke should go out when idle and not moving",
+
+    Sandbox_TrueSmoking_EffectMultiplier = "Effect Multiplier",
+        Sandbox_TrueSmoking_EffectMultiplier_tooltip = "Multiplies the effectiveness of the smoke for reducing stress and other smoker stats",
+
+    Sandbox_TrueSmoking_PuffFactor = "Burn rate increase while puffing",
+        Sandbox_TrueSmoking_PuffFactor_tooltip = "How much the burn rate increases when puffing",
+
+    Sandbox_TrueSmoking_WalkingFactor = "Burn rate increase while walking",
+        Sandbox_TrueSmoking_WalkingFactor_tooltip = "How much the burn rate increases when walking",
+
+    Sandbox_TrueSmoking_RunningFactor = "Burn rate increase while running",
+        Sandbox_TrueSmoking_RunningFactor_tooltip = "How much the burn rate increases when running",
+
+    Sandbox_TrueSmoking_SprintingFactor = "Burn rate increase while sprinting",
+        Sandbox_TrueSmoking_SprintingFactor_tooltip = "How much the burn rate increases when sprinting",
 }
