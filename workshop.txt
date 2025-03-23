@@ -1,111 +1,111 @@
 version=1
 id=3423984426
 title=True Smoking [B42]
-description=[h1] True Smoking [B42] [/h1]
-description=[code][h3]This mod provides a more realistic and immersive smoking experience. Smoking is no longer a short action but now a tracked and passively handled mechanic where the stats and effects are distributed over time while smoking.[/h3][/code]
-description=
-description=[code]
-description=[h1]Smoking[/h1]
-description=[img]https://i.imgur.com/XuqrLAH.gif[/img]
-description=Light a smoke as normal, any restrictive headgear will be taken off. After lighting, a moodle will appear tracking the progress of your smoke. You can take puffs manually or enable passive smoking and your character will take puffs when idle.
-description=[/code]
-description=
-description=[code]
-description=[h1]Dynamic Burn Rate[/h1]
-description=[img]https://i.ibb.co/qY7qsNyF/Relighting.gif[/img]
-description=The smoke will burn faster as you puff or move around, when idle it will slowly go out. If it goes out you can relight it to keep smoking. Smokes can be put out and saved for later, the amount left will be visible on the item tooltip.
-description=[/code]
-description=
-description=[code]
-description=[h1]Freedom[/h1]
-description=[img]https://i.imgur.com/vQdNBdG.gif[/img]
-description=Lighting, puffing, and putting out the smoke are actions but while smoking you can do anything else now!
-description=[img]https://i.imgur.com/bkegWkz.gif[/img]
-description=[/code]
-description=
-description=[h3] Features [/h3]
-description=[list]
-description=[*][b]Save Game Compatible![/b]
-description=[*]Controller support
-description=[*]Split-screen support
-description=[*]Compatible with Smoker Trait and [i]most[/i] mods
-description=[*]Options and Settings configurable via Sandbox Options and Mod Options
-description=[/list]
-description=
-description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
-description=
-description=[h3]Controls[/h3]
-description=[code]
-description=[h3]Default Keyboard[/h3]
-description=[b]K[/b] - Tap to take a short puff, hold to keep puffing. Will light a cigarette or unpack one. Relights the smoke when if it goes out.
-description=[b]; (semi colon)[/b] - Puts the smoke out. Re-equips headgear that was taken off.
-description=
-description=[h3]Controller[/h3]
-description=Button prompts will appear when the corresponding action can be done. LB is a modifier key that when held changes the B action as follows below:
-description=LB + B = Get/Light Cigarette
-description=LB + B = Put Out Smoke / Re-equip headgear
-description=B = (Hold) Take Puff / Relight
-description=[/code]
-description=
-description=[h3] Configurable[/h3]
-description=[code]
-description=[h3]Smoke Length[/h3]
-description=Smoke Length adjusts how long it takes to smoke something. Items have different lengths, you can also set a default and toggle an override to make all items the same smoke length.
-description=
-description=[h3]Puff/Running/Idle Factors[/h3]
-description=Adjust these values in the sandbox to change how much the burnRate changes during these actions
-description=
-description=[h3]Smoke Relighting[/h3]
-description=Smoke relighting can be toggled to never have the smoke go out
-description=
-description=[h3]Headgear Management / Display Smoke On Mouth[/h3]
-description=Headgear management will toggle the need for removing headgear and also showing a visual smoke in the players mouth.
-description=
-description=[h3]Automatic Passive Puffing[/h3]
-description=The automatic passive puffing feature lets your character automatically puff when idle, the frequency of this can be adjusted or turned off.
-description=
-description=[h3]Unpack Cigarette / Light[/h3]
-description=The unpacking and lighting feature can be toggled off if desired if using another mod that does something similar.
-description=
-description=[h3]More Settings[/h3]
-description=I add new settings as requested and there are more than listed here and shown in the screenshots. I am open to making most things configurable where I can and adding in new features/settings where it makes sense.
-description=[/code]
-description=
-description=[h3] Mod Support [/h3]
-description=[list]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404563567]Hemp & Tobacco[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404956403]N&C's Narcotics[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3424309174]HGO Expansion (B42)[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2951287846]Clove Cigarettes[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3416588496][B42] Tobacco Hotkey Mod[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3421508458]<B42>Reefer Madness[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2857762294]Smoking Sounds Overhaul[/url] (Animations are longer and slower to match the new sounds)
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2883633728][B41/B42]I Might Need A Lighter[/url] (IDNAL also supported)
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2769706949]Tidy Up Meister[/url] ([b]Turn off the option for eating food as that is covered in the base game of b42 now and conflicts with this mod[/b])
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3173649443]Medical Meister[/url] (Turn on the option for smoke cigarettes on stress)
-description=[/list]
-description=
-description=[code][h3]Most mods should be compatible, if not let me know and I'll look at making a patch[/h3][/code]
-description=
-description=[h3]Future Updates[/h3]
-description=[list]
-description=[*]Custom Animations For Lighting
-description=[*]Dynamic Smoker Trait / Addiction / Withdrawal
-description=[*]Additional traits
-description=[*]Mod support as requested and needed
-description=[*]Further tweaks, options, etc
-description=[/list]
-description=
-description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
-description=
-description=[code]Do not modify or redistribute my mod/code without consent, ask for permission. Treat this mod as on 'lockdown'[/code]
-description=
-description=[h3]Credits[/h3]
-description=Credits to BongoRaccoon32 and CenturyOldRat for the wearable smokable assets
-description=Thanks to everyone in the discord for their contributions in sharing modding knowledge
-description=
-description=[h3]Translations[/h3]
-description=Credits to those who provide translation files! :)
+description=[h1] True Smoking [B42] [/h1]
+description=[code][h3]This mod provides a more realistic and immersive smoking experience. Smoking is no longer a short action but now a tracked and passively handled mechanic where the stats and effects are distributed over time while smoking.[/h3][/code]
+description=
+description=[code]
+description=[h1]Smoking[/h1]
+description=[img]https://i.imgur.com/XuqrLAH.gif[/img]
+description=Light a smoke as normal, any restrictive headgear will be taken off. After lighting, a moodle will appear tracking the progress of your smoke. You can take puffs manually or enable passive smoking and your character will take puffs when idle.
+description=[/code]
+description=
+description=[code]
+description=[h1]Dynamic Burn Rate[/h1]
+description=[img]https://i.ibb.co/qY7qsNyF/Relighting.gif[/img]
+description=The smoke will burn faster as you puff or move around, when idle it will slowly go out. If it goes out you can relight it to keep smoking. Smokes can be put out and saved for later, the amount left will be visible on the item tooltip.
+description=[/code]
+description=
+description=[code]
+description=[h1]Freedom[/h1]
+description=[img]https://i.imgur.com/vQdNBdG.gif[/img]
+description=Lighting, puffing, and putting out the smoke are actions but while smoking you can do anything else now!
+description=[img]https://i.imgur.com/bkegWkz.gif[/img]
+description=[/code]
+description=
+description=[h3] Features [/h3]
+description=[list]
+description=[*][b]Save Game Compatible![/b]
+description=[*]Controller support
+description=[*]Split-screen support
+description=[*]Compatible with Smoker Trait and [i]most[/i] mods
+description=[*]Options and Settings configurable via Sandbox Options and Mod Options
+description=[/list]
+description=
+description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
+description=
+description=[h3]Controls[/h3]
+description=[code]
+description=[h3]Default Keyboard[/h3]
+description=[b]K[/b] - Tap to take a short puff, hold to keep puffing. Will light a cigarette or unpack one. Relights the smoke when if it goes out.
+description=[b]; (semi colon)[/b] - Puts the smoke out. Re-equips headgear that was taken off.
+description=
+description=[h3]Controller[/h3]
+description=Button prompts will appear when the corresponding action can be done. LB is a modifier key that when held changes the B action as follows below:
+description=LB + B = Get/Light Cigarette
+description=LB + B = Put Out Smoke / Re-equip headgear
+description=B = (Hold) Take Puff / Relight
+description=[/code]
+description=
+description=[h3] Configurable[/h3]
+description=[code]
+description=[h3]Smoke Length[/h3]
+description=Smoke Length adjusts how long it takes to smoke something. Items have different lengths, you can also set a default and toggle an override to make all items the same smoke length.
+description=
+description=[h3]Puff/Running/Idle Factors[/h3]
+description=Adjust these values in the sandbox to change how much the burnRate changes during these actions
+description=
+description=[h3]Smoke Relighting[/h3]
+description=Smoke relighting can be toggled to never have the smoke go out
+description=
+description=[h3]Headgear Management / Display Smoke On Mouth[/h3]
+description=Headgear management will toggle the need for removing headgear and also showing a visual smoke in the players mouth.
+description=
+description=[h3]Automatic Passive Puffing[/h3]
+description=The automatic passive puffing feature lets your character automatically puff when idle, the frequency of this can be adjusted or turned off.
+description=
+description=[h3]Unpack Cigarette / Light[/h3]
+description=The unpacking and lighting feature can be toggled off if desired if using another mod that does something similar.
+description=
+description=[h3]More Settings[/h3]
+description=I add new settings as requested and there are more than listed here and shown in the screenshots. I am open to making most things configurable where I can and adding in new features/settings where it makes sense.
+description=[/code]
+description=
+description=[h3] Mod Support [/h3]
+description=[list]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404563567]Hemp & Tobacco[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404956403]N&C's Narcotics[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3424309174]HGO Expansion (B42)[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2951287846]Clove Cigarettes[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3416588496][B42] Tobacco Hotkey Mod[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3421508458]<B42>Reefer Madness[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2857762294]Smoking Sounds Overhaul[/url] (Animations are longer and slower to match the new sounds)
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2883633728][B41/B42]I Might Need A Lighter[/url] (IDNAL also supported)
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2769706949]Tidy Up Meister[/url] ([b]Turn off the option for eating food as that is covered in the base game of b42 now and conflicts with this mod[/b])
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3173649443]Medical Meister[/url] (Turn on the option for smoke cigarettes on stress)
+description=[/list]
+description=
+description=[code][h3]Most mods should be compatible, if not let me know and I'll look at making a patch[/h3][/code]
+description=
+description=[h3]Future Updates[/h3]
+description=[list]
+description=[*]Custom Animations For Lighting
+description=[*]Dynamic Smoker Trait / Addiction / Withdrawal
+description=[*]Additional traits
+description=[*]Mod support as requested and needed
+description=[*]Further tweaks, options, etc
+description=[/list]
+description=
+description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
+description=
+description=[code]Do not modify or redistribute my mod/code without consent, ask for permission. Treat this mod as on 'lockdown'[/code]
+description=
+description=[h3]Credits[/h3]
+description=Credits to BongoRaccoon32 and CenturyOldRat for the wearable smokable assets
+description=Thanks to everyone in the discord for their contributions in sharing modding knowledge
+description=
+description=[h3]Translations[/h3]
+description=Credits to those who provide translation files! :)
 description=PTBR - Simba
 tags=Build 42;Balance;Framework;Hardmode;Multiplayer;Realistic
 visibility=public
