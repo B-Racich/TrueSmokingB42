@@ -72,7 +72,7 @@ Sandbox_EN = {
         Sandbox_TrueSmoking_BurnSpeedDecay_tooltip = "How much the burn rate should slow down after reaching the maximum (diminishing returns)",
 
     Sandbox_TrueSmoking_DecayRate = "Decay Rate",
-        Sandbox_TrueSmoking_DecayRate_tooltip = "How fast the smoke should go out when idle and not moving",
+        Sandbox_TrueSmoking_DecayRate_tooltip = "How fast the smoke should go out when idle and not moving (Multiplies the burn rate every tick)",
 
     Sandbox_TrueSmoking_EffectMultiplier = "Effect Multiplier",
         Sandbox_TrueSmoking_EffectMultiplier_tooltip = "Multiplies the effectiveness of the smoke for reducing stress and other smoker stats",

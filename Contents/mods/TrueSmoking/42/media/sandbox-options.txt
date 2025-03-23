@@ -218,8 +218,8 @@ option TrueSmoking.RolledCigaretteLength
 option TrueSmoking.RolledCigaretteBurnMin
 {
     type = double,
-    min = 0.0,
-    max = 1.0,
+    min = 0.0001,
+    max = 0.01,
     default = 0.0001,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
 }
@@ -228,7 +228,7 @@ option TrueSmoking.RolledCigaretteBurnMax
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.0003,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
 }
@@ -327,7 +327,7 @@ option TrueSmoking.CigarilloBurnMin
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.000125,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
 }
@@ -336,7 +336,7 @@ option TrueSmoking.CigarilloBurnMax
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.0003,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
 }
@@ -435,7 +435,7 @@ option TrueSmoking.CigarBurnMin
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.000125,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
 }
@@ -444,7 +444,7 @@ option TrueSmoking.CigarBurnMax
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.0003,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
 }
@@ -543,7 +543,7 @@ option TrueSmoking.PipeBurnMin
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.000125,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
 }
@@ -552,7 +552,7 @@ option TrueSmoking.PipeBurnMax
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.0003,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
 }
@@ -643,7 +643,7 @@ option TrueSmoking.CanLength
     type = double,
     min = 0.0,
     max = 10.0,
-    default = 2.5,
+    default = 1.0,
     page = TrueSmokingSmokables, translation=TrueSmoking_Length,
 }
 
@@ -651,7 +651,7 @@ option TrueSmoking.CanBurnMin
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.000125,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMin,
 }
@@ -660,7 +660,7 @@ option TrueSmoking.CanBurnMax
 {
     type = double,
     min = 0.0001,
-    max = 0.001,
+    max = 0.01,
     default = 0.0003,
     page = TrueSmokingSmokables, translation=TrueSmoking_BurnMax,
 }
@@ -688,7 +688,7 @@ option TrueSmoking.CanDecayRate
     type = double,
     min = 0.001,
     max = 1.0,
-    default = 0.992,
+    default = 0.9955,
     page = TrueSmokingSmokables, translation=TrueSmoking_DecayRate,
 }
 
