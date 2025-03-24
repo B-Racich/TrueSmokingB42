@@ -4,7 +4,7 @@ TakePuff = ISBaseTimedAction:derive("TakePuff")
 
 function TakePuff:isValid()
     --Check if we have a smoke lit
-    return self.trueSmoking.isSmoking
+    return self.trueSmoking.isSmoking or not self.endAction
         -- and ((isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) or self.maxTime ~= -1)
 end
 
@@ -42,9 +42,13 @@ function TakePuff:update()
         local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % self.visualItemAnimLength))
         -- print(string.format('timer: %s - roundedDiffTime: %s - roundedDiffTimeMod: %s',self.timer, roundedDiffTime, roundedDiffTimeMod))
         if roundedDiffTime > self.visualItemTimer and roundedDiffTimeMod == self.visualItemTimer then
-            self.maxTime = 1
+            -- self.maxTime = 1
             self.endAction = true
-            self:forceComplete()
+            if self.character:isSitOnGround() then
+                self:stop()
+            else
+                self:forceComplete()
+            end
         end
     end
 end

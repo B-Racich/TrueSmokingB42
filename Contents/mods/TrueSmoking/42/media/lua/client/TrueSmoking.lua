@@ -70,23 +70,52 @@ function TrueSmoking:setSmokableObjects(table)
     end
 end
 
-function TrueSmoking:hasRequiredItem(smokable)
+function TrueSmoking:hasRequiredItem(smokable, player)
+    if not smokable:getRequireInHandOrInventory() then
+		return true
+	end
+
+    local types = smokable:getRequireInHandOrInventory()
+    local typesTable = {}
+    for i=1,types:size() do
+        typesTable[moduleDotType(smokable:getModule(), types:get(i-1))] = true
+    end
+
+    local lightSource = false
+
+    if player:getVehicle() and player:getVehicle():canLightSmoke(player) then lightSource = true end
+    if not lightSource then
+        lightSource = ISInventoryPaneContextMenu.hasOpenFlame(player)
+    end
+
     local function predicateNotEmpty(smokable)
         return smokable:getCurrentUsesFloat() > 0
     end
 
-	if not smokable:getRequireInHandOrInventory() then
-		return true
-	end
-	local types = smokable:getRequireInHandOrInventory()
-	for i=1,types:size() do
-		local fullType = moduleDotType(smokable:getModule(), types:get(i-1))
-		local item2 = getPlayer():getInventory():getFirstTypeEvalRecurse(fullType, predicateNotEmpty)
-		if item2 then
-			return true
-		end
-	end
-	return false
+	if not lightSource then
+        if not lightSource then
+            local items = player:getInventory():getItems()
+            for j=1, items:size() do
+                if typesTable[items:get(j-1):getFullType()] and predicateNotEmpty(items:get(j-1))then
+                    lightSource = items:get(j-1)
+                    ISInventoryPaneContextMenu.transferIfNeeded(player, lightSource)
+                    break
+                end
+            end
+        end
+        -- Then check recurse in other containers
+        if not lightSource then
+            for v, _ in pairs(typesTable) do
+                lightSource = player:getInventory():getFirstTypeRecurse(v)
+                if lightSource then
+                    ISInventoryPaneContextMenu.transferIfNeeded(player, lightSource)
+                    break
+                end
+            end
+        end
+    end
+
+    return lightSource
 end
 
 function TrueSmoking:getShemagh(player, reCover)
@@ -216,7 +245,7 @@ function TrueSmoking:findSmokable(player)
         end
     end
 
-    if cigarette and self:hasRequiredItem(cigarette) then
+    if cigarette and self:hasRequiredItem(cigarette, player) then
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
         ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
     end
@@ -288,9 +317,9 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         --Context Menu Hook
         hasSmoke = context:getOptionFromName(getText('ContextMenu_Smoke'))
         if hasSmoke then
-            if o.isSmoking or not self:hasRequiredItem(item) then
+            if o.isSmoking or not self:hasRequiredItem(item, getSpecificPlayer(player)) then
                 hasSmoke.notAvailable = true
-            elseif not o.isSmoking and self:hasRequiredItem(item) then
+            elseif not o.isSmoking and self:hasRequiredItem(item, getSpecificPlayer(player)) then
                 hasSmoke.notAvailable = false
             end
         end
