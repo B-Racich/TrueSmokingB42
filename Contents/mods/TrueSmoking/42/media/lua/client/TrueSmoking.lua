@@ -246,6 +246,7 @@ function TrueSmoking:findSmokable(player)
     end
 
     if cigarette and self:hasRequiredItem(cigarette, player) then
+        print('TRUESMOKING::FOUND CIG/PACK')
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
         ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
     end
@@ -286,7 +287,7 @@ end
 
 --Key Event Listener
 function TrueSmoking:onKeyStartPressed(key)
-    -- print(string.format('KEY PRESSED - %s',key))
+    -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
     local o = self.Player_1
     local player = getSpecificPlayer(0) -- Player_0 is always keyboard
     if player then
@@ -295,6 +296,7 @@ function TrueSmoking:onKeyStartPressed(key)
         elseif o.isSmoking and not o.Smokable.smokeLit and key == self.Config.keySmoke then
             o.Smokable:light()
         elseif self.Config.FindSmoke and not o.isSmoking and key == self.Config.keySmoke then
+            print('TRUESMOKING::Find smokable')
             self:findSmokable(player)
         elseif o.isSmoking and key == self.Config.keyStopSmoke then
             o.Smokable:putOut()
