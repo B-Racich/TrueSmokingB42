@@ -258,7 +258,10 @@ end
 function Smokable:light()
     if not self.table.isSmoking then
         self.table.isSmoking = true
-        self.table.Moodle:start()
+
+        if TrueSmoking.Options.UseMoodle then
+            self.table.Moodle:start()
+        end
 
         --Start the update event
         local function updateWrapper()
@@ -292,7 +295,10 @@ function Smokable:stop()
     self.smokeLit = false
     self.hasDropped = false
     self.dropState = false
-    self.table.Moodle:stop()
+
+    if TrueSmoking.Options.UseMoodle then
+        self.table.Moodle:stop()
+    end
 
     self:removeVisualItem()
 

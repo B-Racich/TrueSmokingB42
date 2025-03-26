@@ -2,7 +2,6 @@ require 'ISUI/ISInventoryPaneContextMenu'
 
 require 'Utils'
 require 'Smokable'
-require 'SmokingMoodle'
 
 local InventoryUI = require("Starlit/client/ui/InventoryUI")
 
@@ -331,7 +330,9 @@ end
 --Start our event listerns on player load
 function TrueSmoking:start(playerNum, player)
     local o = self:getPlayerReference(player)
-    o.Moodle = SmokingMoodle:new(o, playerNum)
+    if TrueSmoking.Options.UseMoodle then
+        o.Moodle = SmokingMoodle:new(o, playerNum)
+    end
     o.eatSound = ''
     o.lightingEatSound = ''
 
@@ -367,7 +368,10 @@ end
 function TrueSmoking:stop(player)
     local o = self:getPlayerReference(player)
 
-    o.Moodle:stop()
+    if TrueSmoking.Options.UseMoodle then
+        o.Moodle:stop()
+    end
+
     if o.Smokable then
         o.Smokable:putOut()
     end
@@ -415,6 +419,12 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
 
     TrueSmoking.Options.ManageHeadGear = SandboxVars.TrueSmoking.ManageHeadGear
+
+    if getActivatedMods():contains('\\MoodleFramework') then
+        TrueSmoking.Options.UseMoodle = SandboxVars.TrueSmoking.UseMoodle
+    else
+        TrueSmoking.Options.UseMoodle = false
+    end
 
     TrueSmoking.Options.UseNewMoodle = SandboxVars.TrueSmoking.UseNewMoodle
 
