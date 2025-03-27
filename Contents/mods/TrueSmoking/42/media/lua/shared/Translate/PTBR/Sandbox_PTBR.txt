@@ -25,6 +25,9 @@ Sandbox_TrueSmoking_IdleFactor = "Diminuição da taxa de queima ao ficar parado
 Sandbox_TrueSmoking_ManageHeadGear = "Gerenciar Acessórios de Cabeça",
     Sandbox_TrueSmoking_ManageHeadGear_tooltip = "Quando ativado, acessórios de cabeça que restringem o fumo precisarão ser removidos para exibir o cigarro",
 
+Sandbox_TrueSmoking_UseMoodle = "Use o Moodle",
+    Sandbox_TrueSmoking_UseMoodle_tooltip = "Ativa/desativa o moodle",
+
 Sandbox_TrueSmoking_UseNewMoodle = "Usar o Novo Moodle (Estilo B42)",
     Sandbox_TrueSmoking_UseNewMoodle_tooltip = "Desative para usar o ícone de moodle mais antigo do estilo B41",
 

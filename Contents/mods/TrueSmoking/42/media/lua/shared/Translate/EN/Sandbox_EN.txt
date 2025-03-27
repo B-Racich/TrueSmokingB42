@@ -10,6 +10,9 @@ Sandbox_EN = {
     Sandbox_TrueSmoking_ManageHeadGear = "Manage Headgear",
         Sandbox_TrueSmoking_ManageHeadGear_tooltip = "When enabled headgear that restricts smoking will need to be removed to display the smoke",
 
+    Sandbox_TrueSmoking_UseMoodle = "Toggles the Moodle",
+        Sandbox_TrueSmoking_UseMoodle_tooltip = "Toggles the moodle on/off",
+
     Sandbox_TrueSmoking_UseNewMoodle = "Use The New Moodle (B42 Style)",
         Sandbox_TrueSmoking_UseNewMoodle_tooltip = "Disable to use the older B41 style moodle icon",
 
