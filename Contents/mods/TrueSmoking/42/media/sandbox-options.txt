@@ -23,6 +23,13 @@ option TrueSmoking.ManageHeadGear
     page = TrueSmoking, translation=TrueSmoking_ManageHeadGear,
 }
 
+option TrueSmoking.UseMoodle
+{
+    type = boolean,
+    default = true,
+    page = TrueSmoking, translation=TrueSmoking_UseMoodle,
+}
+
 option TrueSmoking.UseNewMoodle
 {
     type = boolean,
