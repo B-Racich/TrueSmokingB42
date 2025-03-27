@@ -428,6 +428,13 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.DroppingChanceSmoker = SandboxVars.TrueSmoking.DroppingChanceSmoker
     TrueSmoking.Options.DroppingChanceNonSmoker = SandboxVars.TrueSmoking.DroppingChanceNonSmoker
 
+    -- Old Defaults for redundancy
+
+    TrueSmoking.Options.PuffFactor = 1.35
+    TrueSmoking.Options.RunningFactor = 1.15
+    TrueSmoking.Options.SprintingFactor = 1.35
+    TrueSmoking.Options.WalkingFactor = 1.0
+
     -- Smokable config options
 
     TrueSmoking.Options.CigaretteLength = SandboxVars.TrueSmoking.CigaretteLength
