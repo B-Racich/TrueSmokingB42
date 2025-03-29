@@ -1,4 +1,44 @@
 if getActivatedMods():contains('\\ReeferMadness') then
+
+    function OnEat_WeedPipe_OverTime(smokable)
+        if smokable.item:getOnEat() == 'OnEat_WeedPipe' then
+            local player = smokable.player -- The stored player here should also be the correct splitscreen player if present
+            local moodle = MF.getMoodle("ReeferMadness_High", player:getPlayerNum())
+            local currentMoodleValue = moodle:getValue()
+            --[[
+                Here we want to scale the value we are adding by the puffPercent which is calculated every tick we smoke
+                this will accumulate over the duration of the smoke to that complete value
+
+                You can add another multipler to this to help scale it faster if you desire as it might not increase fast enough to negate
+                the decrease over time (largely depends on the smoke setttings)
+            ]]
+            local additionMoodleValue = (ReeferMadness_THC.WeedPipe) * smokable.puffPercent
+            local myNewMoodleValue = math.max(currentMoodleValue + additionMoodleValue)
+            if myNewMoodleValue > 0.9 then
+                myNewMoodleValue = 0.9
+            end
+            MF.getMoodle("ReeferMadness_High",playerNum):setValue(myNewMoodleValue)
+        end
+    end
+
+    function OnEat_WeedJoint_OverTime(smokable)
+        if smokable.item:getOnEat() == 'OnEat_WeedJoint' then
+            local player = smokable.player
+            local moodle = MF.getMoodle("ReeferMadness_High", player:getPlayerNum())
+            local currentMoodleValue = moodle:getValue()
+            local additionMoodleValue = (ReeferMadness_THC.WeedJoint) * smokable.puffPercent
+            local myNewMoodleValue = math.max(currentMoodleValue + additionMoodleValue)
+            if myNewMoodleValue > 0.9 then
+                myNewMoodleValue = 0.9
+            end
+            MF.getMoodle("ReeferMadness_High",playerNum):setValue(myNewMoodleValue)
+        end
+    end
+
+
+    --[[
+        I only set the first callback here but this will be how you can adjust and tweak items as you desire
+    ]]
     Events.OnCreatePlayer.Add(function()
         local smokableObjects = {
             ['ReeferMadness.SmokingPipe_marijuana'] = {
@@ -9,9 +49,8 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                           -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                        -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                            -- Decay rate when idle
-                callback = false,                             -- Callback function when smoked (mod support)
+                callback = OnEat_WeedPipe_OverTime,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -27,7 +66,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                           -- Decay rate when idle
                 callback = false,                            -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -43,7 +81,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -59,7 +96,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -75,7 +111,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -91,7 +126,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -107,7 +141,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                            -- Decay rate when idle
                 callback = false,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -123,7 +156,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                           -- Decay rate when idle
                 callback = false,                            -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -139,7 +171,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -155,7 +186,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -171,7 +201,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -187,7 +216,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                            -- Decay rate when idle
                 callback = false,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -203,7 +231,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                           -- Decay rate when idle
                 callback = false,                            -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
@@ -219,7 +246,6 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 decayRate = 0.998,                                 -- Decay rate when idle
                 callback = false,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-                idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
                 sprintingFactor = TrueSmoking.Options.SprintingFactor,
