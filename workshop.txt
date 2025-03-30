@@ -30,9 +30,8 @@ description=[*]Controller support
 description=[*]Split-screen support
 description=[*]Compatible with Smoker Trait and [i]most[/i] mods
 description=[*]Options and Settings configurable via Sandbox Options and Mod Options
+description=[*]All vanilla smokes compatible with visual item displayed on face!
 description=[/list]
-description=
-description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
 description=
 description=[h3]Controls[/h3]
 description=[code]
@@ -78,7 +77,7 @@ description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=34165
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3421508458]<B42>Reefer Madness[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2857762294]Smoking Sounds Overhaul[/url] (Animations are longer and slower to match the new sounds)
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2883633728][B41/B42]I Might Need A Lighter[/url] (IDNAL also supported)
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2769706949]Tidy Up Meister[/url] ([b]Turn off the option for eating food as that is covered in the base game of b42 now and conflicts with this mod[/b])
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2769706949]Tidy Up Meister[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3173649443]Medical Meister[/url] (Turn on the option for smoke cigarettes on stress)
 description=[/list]
 description=
@@ -93,6 +92,8 @@ description=[*]Mod support as requested and needed
 description=[*]Further tweaks, options, etc
 description=[/list]
 description=
+description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
+description=
 description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
 description=
 description=[code]Do not modify or redistribute my mod/code without consent, ask for permission. Treat this mod as on 'lockdown'[/code]
@@ -103,9 +104,6 @@ description=Thanks to everyone in the discord for their contributions in sharing
 description=
 description=[h3]Translations[/h3]
 description=Credits to those who provide translation files! :)
-description=PTBR - Simba
-description=
-description=Workshop ID: 3423984426
-description=Mod ID: TrueSmoking
+description=PTBR - Simba
 tags=Build 42;Balance;Framework;Hardmode;Multiplayer;Realistic
 visibility=public
