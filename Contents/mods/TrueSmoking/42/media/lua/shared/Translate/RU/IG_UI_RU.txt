@@ -1,0 +1,31 @@
+IG_UI_RU = {
+    IGUI_TRUESMOKING_KEY_SMOKE = "Затяжка/Поджечь/Найти сигарету",
+    IGUI_TRUESMOKING_KEY_SMOKE_DESC = "Сделать затяжку или поджечь сигарету, автоматически найти сигарету если не курите",
+
+    IGUI_TRUESMOKING_FIND_SMOKE = "Достать/Зажечь",
+    IGUI_TRUESMOKING_FIND_SMOKE_DESC = "Включить/отключить автоматический поиск и зажигание сигареты",
+
+    IGUI_TRUESMOKING_KEY_STOP_SMOKE = "Потушить",
+    IGUI_TRUESMOKING_KEY_STOP_SMOKE_DESC = "Потушить сигарету",
+
+    IGUI_TRUESMOKING_PASSIVE_SMOKING = "Пассивное курение",
+    IGUI_TRUESMOKING_PASSIVE_SMOKING_DESC = "Автоматически делать затяжки при удерживании сигареты",
+
+    IGUI_TRUESMOKING_PASSIVE_MIN_TIME = "Мин. интервал затяжек",
+    IGUI_TRUESMOKING_PASSIVE_MIN_TIME_DESC = "Минимальный промежуток времени между автоматическими затяжками",
+
+    IGUI_TRUESMOKING_PASSIVE_MAX_TIME = "Макс. интервал затяжек",
+    IGUI_TRUESMOKING_PASSIVE_MAX_TIME_DESC = "Максимальный промежуток времени между автоматическими затяжками",
+
+    IGUI_TRUESMOKING_KEEP_LIT = "Поддерживать горение",
+    IGUI_TRUESMOKING_KEEP_LIT_DESC = "Автоматически делать затяжки, когда сигарета вот-вот погаснет",
+
+    IGUI_TRUESMOKING_AUTO_PUT_OUT = "Автоматически тушить",
+    IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC = "Автоматически тушить сигарету по окончании",
+
+    IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR = "Скрыть панель затяжек",
+    IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR_DESC = "Скрыть панель действий при затяжке",
+
+    IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS = "Скрыть все панели курения",
+    IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS_DESC = "Скрыть все панели действий, связанные с курением",
+}

@@ -1,0 +1,6 @@
+UI_RU = {
+    UI_TRUESMOKING_PUFF = "Сделать затяжку",
+    UI_TRUESMOKING_PUT_OUT = "Потушить",
+    UI_TRUESMOKING_RELIGHT = "Поджечь снова",
+    UI_TRUESMOKING_GET_SMOKE = "Достать/Зажечь",
+}
