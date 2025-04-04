@@ -423,12 +423,6 @@ Events.OnInitGlobalModData.Add(function()
 
     TrueSmoking.Options.ManageHeadGear = SandboxVars.TrueSmoking.ManageHeadGear
 
-    if getActivatedMods():contains('\\MoodleFramework') then
-        TrueSmoking.Options.UseMoodle = SandboxVars.TrueSmoking.UseMoodle
-    else
-        TrueSmoking.Options.UseMoodle = false
-    end
-
     TrueSmoking.Options.UseNewMoodle = SandboxVars.TrueSmoking.UseNewMoodle
 
     TrueSmoking.Options.SmokeRelighting = SandboxVars.TrueSmoking.SmokeRelighting
@@ -446,6 +440,7 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.RunningFactor = 1.15
     TrueSmoking.Options.SprintingFactor = 1.35
     TrueSmoking.Options.WalkingFactor = 1.0
+    TrueSmoking.Options.IdleFactor = 1.0
 
     -- Smokable config options [Keep the length for redundancy]
     TrueSmoking.Options.CigaretteLength = SandboxVars.TrueSmoking.CigaretteLength

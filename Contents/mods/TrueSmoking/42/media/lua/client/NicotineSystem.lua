@@ -29,10 +29,13 @@ NicotineSystem.Constants = {
     BASE_RELIEF = 8,
 
     STRESS_BASE = 0.0005,
-    UNHAPPINESS_BASE = 0.0000015,
-    BOREDOME_BASE = 0.0000055,
+    UNHAPPINESS_BASE = 1,
+    BOREDOM_BASE = 1,
     FATIGUE_BASE = 0.0001,
     HUNGER_BASE = 0.0001,
+
+    UNHAPPINESS_MAX = 35,
+    BOREDOM_MAX = 35,
 
     HIGH_ADDICTION_THRESHOLD = 80,
     HIGH_ADDICTION_BOOST = 0.5,
@@ -130,9 +133,12 @@ function NicotineSystem:initialize(player)
 
         stressChange = 0,
         unhappinessChange = 0,
+        boredomChange = 0,
         fatigueChange = 0,
         hungerChange = 0,
-        boredomChange = 0,
+
+        unhappinessAccumulation = 0,
+        boredomAccumulation = 0,
     }
 
     local modData = player:getModData()
@@ -422,7 +428,19 @@ function NicotineSystem:updateAddictionLevel(player, data, hoursPassed)
             linearComponent = linearComponent + (self.Constants.MIN_DECAY * hoursPassed)
         end
 
-        data.addictionLevel = math.max(0, exponentialDecay - linearComponent)
+        local endurance = player:getStats():getEndurance() -- 0.0 to 1.0
+        local enduranceModifier
+        if endurance >= 1.0 then
+            enduranceModifier = 1.0
+        elseif endurance < 0.15 then
+            enduranceModifier = 1.5
+        else
+            enduranceModifier = 1.0 + (0.5 / 0.85) * (1.0 - endurance)
+        end
+
+        local baseDecay = data.addictionLevel - (exponentialDecay - linearComponent)
+        local adjustedDecay = baseDecay * enduranceModifier
+        data.addictionLevel = math.max(0, data.addictionLevel - adjustedDecay)
     end
 
     if hoursPassed > 0 then
@@ -517,18 +535,25 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
 
     local stressChange = intensity * self.Constants.STRESS_BASE * hoursPassed
     local unhappinessChange = intensity * self.Constants.UNHAPPINESS_BASE * hoursPassed
-    local boredomChange = intensity * self.Constants.BOREDOME_BASE * hoursPassed
+    local boredomChange = intensity * self.Constants.BOREDOM_BASE * hoursPassed
     data.stressChange = stressChange
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
 
-    self:trackValueChange(data, "stress", stressChange, hoursPassed)
-    self:trackValueChange(data, "unhappiness", unhappinessChange, hoursPassed)
-    self:trackValueChange(data, "boredom", boredomChange, hoursPassed)
+    if data.boredomAccumulation < self.Constants.BOREDOM_MAX then
+        data.boredomAccumulation = data.boredomAccumulation + boredomChange
+        self:trackValueChange(data, "boredom", boredomChange, hoursPassed)
+        bodyDamage:setBoredomLevel(math.min(100, bodyDamage:getBoredomLevel() + boredomChange))
+    end
 
+    if data.unhappinessAccumulation < self.Constants.UNHAPPINESS_MAX then
+        data.unhappinessAccumulation = data.unhappinessAccumulation + unhappinessChange
+        self:trackValueChange(data, "unhappiness", unhappinessChange, hoursPassed)
+        bodyDamage:setUnhappynessLevel(math.min(100, bodyDamage:getUnhappynessLevel() + unhappinessChange))
+    end
+
+    self:trackValueChange(data, "stress", stressChange, hoursPassed)
     stats:setStressFromCigarettes(math.min(0.51, stats:getStressFromCigarettes() + stressChange))
-    bodyDamage:setUnhappynessLevel(math.min(100, bodyDamage:getUnhappynessLevel() + unhappinessChange))
-    bodyDamage:setBoredomLevel(math.min(100, bodyDamage:getBoredomLevel() + boredomChange))
 
     local currentTime = getGameTime():getWorldAgeHours()
     if not data.lastWithdrawalMessage then data.lastWithdrawalMessage = 0 end
@@ -558,21 +583,27 @@ function NicotineSystem:relieveWithdrawalEffects(player, hoursPassed)
 
     local stressChange = reliefFactor * self.Constants.STRESS_BASE
     local unhappinessChange = reliefFactor * self.Constants.UNHAPPINESS_BASE
-    local boredomChange = reliefFactor * self.Constants.BOREDOME_BASE
+    local boredomChange = reliefFactor * self.Constants.BOREDOM_BASE
     data.stressChange = stressChange
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
 
+    if data.boredomAccumulation > 0 then
+        data.boredomAccumulation = math.max(0,data.boredomAccumulation - boredomChange)
+        self:trackValueChange(data, "boredom", boredomChange, hoursPassed)
+        bodyDamage:setBoredomLevel(math.max(0, bodyDamage:getBoredomLevel() - boredomChange))
+    end
+
+    if data.unhappinessAccumulation > 0 then
+        data.unhappinessAccumulation = math.max(0, data.unhappinessAccumulation - unhappinessChange)
+        self:trackValueChange(data, "unhappiness", unhappinessChange, hoursPassed)
+        bodyDamage:setUnhappynessLevel(math.max(0, bodyDamage:getUnhappynessLevel() - unhappinessChange))
+    end
+
     self:trackValueChange(data, "stress", stressChange, hoursPassed)
-    self:trackValueChange(data, "unhappiness", unhappinessChange, hoursPassed)
-    self:trackValueChange(data, "boredom", boredomChange, hoursPassed)
 
     stats:setStressFromCigarettes(math.max(0,
         stats:getStressFromCigarettes() - stressChange))
-    bodyDamage:setUnhappynessLevel(math.max(0,
-        bodyDamage:getUnhappynessLevel() - unhappinessChange))
-    bodyDamage:setBoredomLevel(math.max(0,
-        bodyDamage:getBoredomLevel() - boredomChange))
 
     data.lastWithdrawalMessage = getGameTime():getWorldAgeHours()
     data.timeToNextWithdrawal = self:calculateMessageCooldown(data.withdrawalLevel)

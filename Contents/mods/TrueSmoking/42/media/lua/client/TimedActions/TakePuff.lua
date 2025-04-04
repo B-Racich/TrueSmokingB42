@@ -3,9 +3,7 @@ require "TimedActions/ISBaseTimedAction"
 TakePuff = ISBaseTimedAction:derive("TakePuff")
 
 function TakePuff:isValid()
-    --Check if we have a smoke lit
-    return self.trueSmoking.isSmoking or not self.endAction
-        -- and ((isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) or self.maxTime ~= -1)
+    return self.trueSmoking.isSmoking
 end
 
 function TakePuff:update()
@@ -21,34 +19,16 @@ function TakePuff:update()
             else
                 self:setOverrideHandModels(nil, self.item)
             end
-            -- self:setOverrideHandModels(self.character:getPrimaryHandItem():getStaticModel(), self.item)
         end
     end
 
-    -- Trigger every game update when the action is performs
     self.trueSmoking.Smokable.puffTimeMark = os.time()
-    -- This should cover if the audio got stopped and needs to loop
-    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
-        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
-    end
-    -- starts audio if starting with audio already playing
-    if self.eatSound ~= '' and self.eatAudio == 0 and not self.character:getEmitter():isPlaying(self.trueSmoking.eatSound) then
-        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
-    end
 
-    if self.trueSmoking.Smokable.smokeLength <= 0 or (not (isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) and not self.endAction) then
-        local diffTime = os.difftime(curTime, self.timer)
-        local roundedDiffTime = tonumber(string.format("%.1f", diffTime))
-        local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % self.visualItemAnimLength))
-        -- print(string.format('timer: %s - roundedDiffTime: %s - roundedDiffTimeMod: %s',self.timer, roundedDiffTime, roundedDiffTimeMod))
-        if roundedDiffTime > self.visualItemTimer and roundedDiffTimeMod == self.visualItemTimer then
-            -- self.maxTime = 1
-            self.endAction = true
-            if self.character:isSitOnGround() then
-                self:stop()
-            else
-                self:forceComplete()
-            end
+    -- Reset job if keybind is held
+    if self:getJobDelta() >= .98 then
+        if self.trueSmoking.Smokable.smokeLength > 0 and ((isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) and not self.endAction) then -- We reset job delta for continous smoking
+            self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
+            self:resetJobDelta()
         end
     end
 end
@@ -60,8 +40,12 @@ function TakePuff:waitToStart()
     end
     --Wait for timed actions to finish
     if self.character:isStrafing() or self.character:isRunning() or self.character:isSprinting()
-            or self.character:isAiming() or self.character:isAsleep() or self.character:isPerformingAnAction()
-    then return true else return false end
+        or self.character:isAiming() or self.character:isAsleep() or self.character:isPerformingAnAction()
+    then
+        return true
+    else
+        return false
+    end
 end
 
 function TakePuff:start()
@@ -81,8 +65,8 @@ function TakePuff:start()
 
     --2x for 1/2 speed anim
     if anim == 'Smoke_Quiet' then
-        self.visualItemTimer = self.visualItemTimer*2
-        self.visualItemAnimLength = self.visualItemAnimLength*2
+        self.visualItemTimer = self.visualItemTimer * 2
+        self.visualItemAnimLength = self.visualItemAnimLength * 2
     end
 
     if not self.trueSmoking.visualItem then
@@ -94,7 +78,6 @@ function TakePuff:start()
         end
     end
 
-    -- TODO base this off of anim instead for future expansion
     -- Play custom sound when no sound is playing
     if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
         local gender = self.character:isFemale()
@@ -108,7 +91,7 @@ function TakePuff:start()
             end
         end
     end
-    self.character:reportEvent("EventEating");
+    -- self.character:reportEvent("EventEating");
 end
 
 function TakePuff:stop()
@@ -140,32 +123,6 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
-    -- if self.character:getEmitter():isPlaying(self.eatSound) then
-    --     self.character:getEmitter():stopSound(self.eatAudio)
-    -- end
-
-    -- self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
-    -- self.trueSmoking.takingPuff = false
-    -- self.trueSmoking.Smokable.puffTimeMark = os.time()
-    -- self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
-
-    -- if TrueSmoking.Options.Coughing then
-    --     local coughChance = 100
-    --     if self.character:HasTrait("Smoker") then
-    --         if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
-    --             self.character:triggerCough()
-    --         end
-    --     else
-    --         if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceNonSmoker then
-    --             self.character:triggerCough()
-    --         end
-    --     end
-    -- end
-
-    ISBaseTimedAction.perform(self)
-end
-
-function TakePuff:complete()
     if self.character:getEmitter():isPlaying(self.eatSound) then
         self.character:getEmitter():stopSound(self.eatAudio)
     end
@@ -175,6 +132,10 @@ function TakePuff:complete()
     self.trueSmoking.Smokable.puffTimeMark = os.time()
     self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
 
+    ISBaseTimedAction.perform(self)
+end
+
+function TakePuff:complete()
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
         if self.character:HasTrait("Smoker") then
@@ -190,11 +151,6 @@ function TakePuff:complete()
     return true
 end
 
-function TakePuff:getDuration()
-    -- print('called getDuration')
-    return ISBaseTimedAction.getDuration(self)
-end
-
 function TakePuff:new(character)
     local o = {
         stopOnWalk = false,
@@ -208,12 +164,12 @@ function TakePuff:new(character)
     o.item = o.trueSmoking.Smokable.item
     o.eatSound = ''
     o.eatAudio = 0
-    o.maxTime = -1 -- -1 means it will never finish
-    o.endAction = false
-    -- These are not accurate i just manually timed it a few times and it worked with this.
+    o.maxTime = 220
     o.visualItemAnimLength = 3.7
     o.visualItemTimer = 0.7
     o.visualItemFlag = false
+    o.LongJobDelta = 0
+    o.JobFactor = o.visualItemTimer / o.maxTime
 
     setmetatable(o, self)
     self.__index = self

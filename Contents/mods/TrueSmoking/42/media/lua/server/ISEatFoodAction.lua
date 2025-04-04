@@ -13,15 +13,14 @@ function ISEatFoodAction:new(character, item, percentage)
     local funcsToHook = { 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
         'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', hook }
 
-    --Store the original action to return it if we don't need to hook it
     o = originalActionNew(self, character, item, percentage)
 
-    local trueSmoking = TrueSmoking:getPlayerReference(character)
-    o.trueSmoking = trueSmoking
+    local table = TrueSmoking:getPlayerReference(character)
+    o.table = table
 
     if isInList(onEat, funcsToHook) or hasSmokableTag then
         print('TRUESMOKING::Hooking: ' .. onEat .. ' -> ' .. hook)
-        if not trueSmoking.isSmoking then
+        if not table.isSmoking then
             print('TRUESMOKING::Setting up smokable')
             local replace = item:getReplaceOnUseFullType()
 
@@ -31,7 +30,7 @@ function ISEatFoodAction:new(character, item, percentage)
                 item:setReplaceOnUse(nil)
             end
 
-            trueSmoking.Smokable = Smokable:new(item, character)
+            table.Smokable = Smokable:new(item, character)
             item:getModData().modOnEat = hook
 
             o.item = item
@@ -43,36 +42,22 @@ function ISEatFoodAction:new(character, item, percentage)
 end
 
 function ISEatFoodAction:complete()
-    -- print('inside complete')
     if self.item:getModData().modOnEat == 'OnEat_Hook' then
-        -- print('complete hook')
-        self.trueSmoking.Smokable.smokeLit = true
-        self.trueSmoking.Smokable.puffTimeMark = os.time()
-        self.trueSmoking.lightingEatSound = ''
-
-        if self.trueSmoking.Smokable.burnRate == 0 then
-            self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin,
-                self.trueSmoking.Smokable.burnMax)
-        end
-
-        -- print('call light')
-        self.trueSmoking.Smokable:light()
+        self.table.Smokable:light()
         return true
     else
-        -- print('complete non hook')
         originalActionComplete(self)
     end
     return true;
 end
 
 function ISEatFoodAction:start()
-    -- print('starting original')
     originalActionStart(self)
+
     if self.item:getModData().modOnEat == 'OnEat_Hook' then
         if TrueSmoking.Config.HideAllActionBars then
             self.action:setUseProgressBar(false)
         end
-        -- print('starting hook')
         local hasPrimary = self.character:getPrimaryHandItem()
         if hasPrimary then
             self:setOverrideHandModels(hasPrimary, self.item)
@@ -81,11 +66,9 @@ function ISEatFoodAction:start()
         end
 
         if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
-            -- print('eatAudio '..self.eatAudio)
-            -- print('eatSound '..self.eatSound)
             if (self.eatAudio == 0 and (self.eatSound == '' or self.eatSound == 'm' or self.eatSound == 'f')) then
                 self.eatSound = SmokingSoundsOverhaul:getLightingSound(self.character)
-                self.trueSmoking.lightingEatSound = self.eatSound
+                self.table.lightingEatSound = self.eatSound
                 self.eatAudio = self.eatSound
             end
         end

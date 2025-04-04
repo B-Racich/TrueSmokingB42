@@ -79,9 +79,32 @@ function Smokable:getObject(item)
 
     local onEat = item:getOnEat()
     local defaults = {
-        ['OnEat_Cigarettes'] = { smokeLength = TrueSmoking.Options.CigaretteLength, foodSick = 14, nicotineContent = 25, effectMultiplier = 1.0, callback = OnEat_Tobacco, visualItem = 'Mask_Cigarette' },
-        ['OnEat_Cigarillo'] = { smokeLength = TrueSmoking.Options.CigarilloLength, foodSick = 21, nicotineContent = 45, effectMultiplier = 2.0, callback = OnEat_Tobacco, visualItem = 'Mask_Cigarillo' },
-        ['OnEat_Cigar'] = { smokeLength = TrueSmoking.Options.CigarLength, foodSick = 28, nicotineContent = 75, effectMultiplier = 3.0, callback = OnEat_Tobacco, visualItem = 'Mask_Cigar' },
+        ['OnEat_Cigarettes'] = {
+            smokeLength = TrueSmoking.Options.CigaretteLength,
+            foodSick = 14,
+            nicotineContent = 25,
+            effectMultiplier = 1.0,
+            callback = OnEat_Tobacco,
+            visualItem = 'Mask_Cigarette'
+        },
+
+        ['OnEat_Cigarillo'] = {
+            smokeLength = TrueSmoking.Options.CigarilloLength,
+            foodSick = 21,
+            nicotineContent = 40,
+            effectMultiplier = 2.0,
+            callback = OnEat_Tobacco,
+            visualItem = 'Mask_Cigarillo'
+        },
+
+        ['OnEat_Cigar'] = {
+            smokeLength = TrueSmoking.Options.CigarLength,
+            foodSick = 28,
+            nicotineContent = 65,
+            effectMultiplier = 3.0,
+            callback = OnEat_Tobacco,
+            visualItem = 'Mask_Cigar'
+        },
     }
     local default = {
         smokeLength = defaults[onEat] and defaults[onEat].smokeLength or TrueSmoking.Options.SmokeLength,
@@ -195,6 +218,15 @@ function Smokable:light()
         self.updateWrapper = updateWrapper
         self:equipVisualItem()
         self.player:getInventory():Remove(self.item)
+
+        self.smokeLit = true
+        self.puffTimeMark = os.time()
+        self.table.lightingEatSound = ''
+
+        if self.burnRate == 0 then
+            self.burnRate = ZombRandFloat(self.burnMin,
+                self.burnMax)
+        end
     end
     if not self.smokeLit then
         ISTimedActionQueue.add(LightSmoke:new(self.player))
@@ -250,7 +282,7 @@ end
 function Smokable:dropSmoke()
     self.hasRolledForDrop = false
     local dropX, dropY, dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self
-    .item)
+        .item)
     self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
     self.item = false
     self.player:getModData().Smokable = false
@@ -276,7 +308,7 @@ function Smokable:update()
             self.hasRolledForDrop = true
             local roll = ZombRandFloat(0.0, 100.0)
             local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or
-            TrueSmoking.Options.DroppingChanceNonSmoker
+                TrueSmoking.Options.DroppingChanceNonSmoker
             if dropChance >= roll then
                 self.hasDropped = true
             end
@@ -359,14 +391,14 @@ function Smokable:update()
 end
 
 function Smokable:puff()
-    ISTimedActionQueue.add(TakePuff:new(self.player))
+    if not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
+        ISTimedActionQueue.add(TakePuff:new(self.player))
+    end
 end
 
 function Smokable:idlePuff()
     local timeDiff = os.difftime(os.time(), self.puffTimeMark)
-    if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
-        ISTimedActionQueue.add(TakePuff:new(self.player))
-    elseif TrueSmoking.Config.KeepLit and self.burnRate < 0.00001 then
-        ISTimedActionQueue.add(TakePuff:new(self.player))
+    if (TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck) or (TrueSmoking.Config.KeepLit and self.burnRate < 0.00001) then
+        self:puff()
     end
 end

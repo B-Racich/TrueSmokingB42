@@ -1,3 +1,6 @@
+--[[
+    Add instant equip time for the visual smoke
+]]
 local originalNew = ISUnequipAction.new
 function ISUnequipAction:new(character, item, maxTime)
     local o = originalNew(self, character, item, maxTime)
@@ -11,6 +14,9 @@ function ISUnequipAction:new(character, item, maxTime)
     return o
 end
 
+--[[
+    If the player somehow unequips the visual smoke we need to put the smoke out
+]]
 local originalComplete = ISUnequipAction.complete
 function ISUnequipAction:complete()
     originalComplete(self)

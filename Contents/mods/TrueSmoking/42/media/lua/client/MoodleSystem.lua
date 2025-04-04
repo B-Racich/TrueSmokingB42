@@ -62,7 +62,7 @@ function SmokingMoodle:update()
     local item = self.table.Smokable
     local smokeLit = item.smokeLit
     local percent = item.smokeLength / item.originalSmokeLength
-    local percentVal = percent >= 0 and percent or 0
+    local percentVal = tonumber(percent) or 0
     local displayedPercentage = string.format('%.1f%%', percentVal * 100)
 
     local estimateLeft = {
@@ -82,11 +82,13 @@ function SmokingMoodle:update()
     if TrueSmoking.Config.ShowSmokePercent then
         estimate = displayedPercentage
     else
+        local highestEstimate = "~"
         for k, v in pairs(estimateLeft) do
-            if tonumber(displayedPercentage) > tonumber(k) then
-                estimate = v
+            if percentVal * 100 >= k then
+                highestEstimate = v
             end
         end
+        estimate = highestEstimate
     end
 
     local smokeLitText = smokeLit and 'lit' or 'out'
@@ -226,7 +228,7 @@ function NicotineMoodle:generateDebugInfo(data)
     if data.nicotineLevel < NicotineSystem.Options.GROWTH_THRESHOLD then
         local symptomTime = data.messageCooldown - data.timeSinceLastMessage
         debugText = debugText .. string.format("\nNext Symptom: %d hours, %d minutes", symptomTime, (symptomTime * 60) %
-        60)
+            60)
     else
         debugText = debugText .. string.format("\nNext Symptom: ~~")
     end
@@ -236,8 +238,11 @@ function NicotineMoodle:generateDebugInfo(data)
     debugText = debugText .. string.format("\nTolerance Factor: %.2fx", data.toleranceFactor)
     debugText = debugText .. string.format("\nMetabolic Factor: %.2fx", data.metabolicFactor)
     debugText = debugText .. string.format("\nStress Change: %.8f/hr", data.longTermStressChangeRate * 60)
-    debugText = debugText .. string.format("\nUnhappiness Change: %.8f/hr", data.longTermUnhappinessChangeRate * 60)
-    debugText = debugText .. string.format("\nBoredome Change: %.8f/hr", data.longTermBoredomChangeRate * 60)
+    debugText = debugText ..
+    string.format("\nUnhappiness Total: %.6f, Change: %.8f/hr", data.unhappinessAccumulation,
+        data.longTermUnhappinessChangeRate * 60)
+    debugText = debugText ..
+    string.format("\nBoredom Total: %.6f, Change: %.8f/hr", data.boredomAccumulation, data.longTermBoredomChangeRate * 60)
     debugText = debugText .. string.format("\nFatigue Change: %.8f/hr", data.longTermFatigueChangeRate * 60)
     debugText = debugText .. string.format("\nHunger Change: %.8f/hr", data.longTermHungerChangeRate * 60)
 
@@ -258,7 +263,8 @@ function NicotineMoodle:getAddictionRecoveryText()
         end
 
         if data.addictionDuration then
-            return getText("Moodles_nicotine_addiction", string.format("%d days", data.addictionDurationDays, data.addictionDuration))
+            return getText("Moodles_nicotine_addiction",
+                string.format("%d days", data.addictionDurationDays, data.addictionDuration))
         end
     else
         local level = data.withdrawalLevel

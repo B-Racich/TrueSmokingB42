@@ -3,16 +3,13 @@ require "TimedActions/ISBaseTimedAction"
 LightSmoke = ISBaseTimedAction:derive("LightSmoke")
 
 function LightSmoke:isValid()
-    --Check if we have a smoke lit
     return self.trueSmoking.isSmoking and self.hasLighter
 end
 
 function LightSmoke:update()
-    -- Trigger every game update when the action is performed
 end
 
 function LightSmoke:waitToStart()
-    --Wait for timed actions to finish
     if not self.character:isStrafing() and not self.character:isRunning() and not self.character:isSprinting()
         and not self.character:isAiming() and not self.character:isAsleep() and not self.character:isPerformingAnAction()
     then
@@ -64,11 +61,8 @@ function LightSmoke:start()
             -- Play custom sound when no sound is playing
             if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
                 local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
-                -- print(self.eatSound)
                 if self.eatSound == '' or self.eatSound == nil then -- No sound running for first time
                     self.eatSound = sound
-                    -- Check if we previously started a puff and its audio is still playing
-                    -- print(self.trueSmoking.lightingEatSound)
                     if not self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound) then
                         self.trueSmoking.lightingEatSound = self.eatSound
                         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
@@ -82,7 +76,6 @@ end
 
 function LightSmoke:stop()
     ISBaseTimedAction.stop(self)
-    -- self:forceComplete()
 end
 
 function LightSmoke:perform()
@@ -97,15 +90,7 @@ function LightSmoke:perform()
 end
 
 function LightSmoke:complete()
-    self.trueSmoking.Smokable.smokeLit = true
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
-
     self.trueSmoking.lightingEatSound = ''
-
-    if self.trueSmoking.Smokable.burnRate == 0 then
-        self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMin,
-            self.trueSmoking.Smokable.burnMax)
-    end
     return true
 end
 
