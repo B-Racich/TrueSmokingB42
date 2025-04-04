@@ -37,6 +37,48 @@ Sandbox_EN = {
     Sandbox_TrueSmoking_DroppingChanceNonSmoker = "Dropping Chance % for Non-Smokers",
         Sandbox_TrueSmoking_DroppingChanceNonSmoker_tooltip = "The % chance of dropping the smoke when falling",
 
+    /* Nicotine System */
+
+    Sandbox_TrueSmokingNicotine = "True Smoking - Nicotine System",
+
+    Sandbox_TrueSmoking_UseNicotineSystem = "Use Nicotine System",
+        Sandbox_TrueSmoking_UseNicotineSystem_tooltip = "Enable the nicotine addiction and withdrawal system",
+    
+   /* Nicotine System - Metabolism Settings */
+    Sandbox_TrueSmoking_MetabolismBaseDecayRate = "Nicotine Base Decay Rate",
+        Sandbox_TrueSmoking_MetabolismBaseDecayRate_tooltip = "How fast nicotine leaves the system (higher = slower decay)",
+
+    /* Nicotine System - Addiction Settings */
+    Sandbox_TrueSmoking_AddictionGainRate = "Addiction Gain Rate",
+        Sandbox_TrueSmoking_AddictionGainRate_tooltip = "How quickly addiction increases with high nicotine levels",
+
+    Sandbox_TrueSmoking_AddictionDecayRate = "Addiction Decay Rate",
+        Sandbox_TrueSmoking_AddictionDecayRate_tooltip = "How slowly addiction decreases with low nicotine levels (higher = slower decay)",
+
+    Sandbox_TrueSmoking_AddictionMinDecay = "Minimum Addiction Decay",
+        Sandbox_TrueSmoking_AddictionMinDecay_tooltip = "Minimum addiction decay per hour",
+
+    Sandbox_TrueSmoking_AddictionGrowthThreshold = "Addiction Growth Threshold",
+        Sandbox_TrueSmoking_AddictionGrowthThreshold_tooltip = "Minimum nicotine level required to increase addiction",
+
+    Sandbox_TrueSmoking_AddictionTraitThreshold = "Smoker Trait Threshold",
+        Sandbox_TrueSmoking_AddictionTraitThreshold_tooltip = "Addiction level at which player becomes a 'Smoker'",
+
+    Sandbox_TrueSmoking_AddictionCureThreshold = "Addiction Cure Threshold",
+        Sandbox_TrueSmoking_AddictionCureThreshold_tooltip = "Addiction level below which 'Smoker' trait is removed",
+
+    Sandbox_TrueSmoking_AddictionCurveExponent = "Addiction Curve Exponent",
+        Sandbox_TrueSmoking_AddictionCurveExponent_tooltip = "Controls the shape of the addiction growth curve",
+
+    Sandbox_TrueSmoking_AddictionCurveMultiplier = "Addiction Curve Multiplier",
+        Sandbox_TrueSmoking_AddictionCurveMultiplier_tooltip = "Multiplier for the addiction growth curve",
+
+    Sandbox_TrueSmoking_AddictionIntakeConversion = "Nicotine to Addiction Conversion",
+        Sandbox_TrueSmoking_AddictionIntakeConversion_tooltip = "% of nicotine directly converted to addiction",
+
+    Sandbox_TrueSmoking_AddictionActiveSmoking = "Active Smoking Addiction Bonus",
+        Sandbox_TrueSmoking_AddictionActiveSmoking_tooltip = "Bonus addiction when actively smoking",
+    
     /* Smokable translations */
 
     Sandbox_TrueSmokingSmokables = "True Smoking - Smokables",

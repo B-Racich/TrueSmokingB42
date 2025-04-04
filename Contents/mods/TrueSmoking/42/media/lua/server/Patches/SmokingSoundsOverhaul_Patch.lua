@@ -57,7 +57,7 @@ if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
             gender = "f";
         end
 
-        print('lighting sound selected: ' .. current_sound .. gender)
+        -- print('lighting sound selected: ' .. current_sound .. gender)
 
         return current_sound .. gender
     end

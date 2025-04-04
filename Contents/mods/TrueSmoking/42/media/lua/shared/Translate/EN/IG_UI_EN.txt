@@ -21,11 +21,23 @@ IG_UI_EN = {
     IGUI_TRUESMOKING_KEEP_LIT_DESC = "Automatically puff when the smoke is about to go out",
 
     IGUI_TRUESMOKING_AUTO_PUT_OUT = "Automatically Put Out Smoke",
-    IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC = "Automatically put out the cigarette when finished",
+    IGUI_TRUESMOKING_AUTO_PUT_OUT_DESC = "Automatically put out the smoke when finished",
 
-    IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR = "Hide the puffing action bar",
+    IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR = "Hide puffing action bar",
     IGUI_TRUESMOKING_HIDE_PUFF_ACTION_BAR_DESC = "Hide the action bar that appears during puffing",
 
-    IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS = "Hides all actions bars for smoking",
+    IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS = "Hides all actions bars",
     IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS_DESC = "Hide all action bars related to smoking",
+
+    IGUI_TRUESMOKING_HIDE_MOODLES = "Hide Moodles",
+    IGUI_TRUESMOKING_HIDE_MOODLES_DESC = "Hides the moodles",
+
+    IGUI_TRUESMOKING_SHOW_DAYS_REMAINING = "Show Days Remaining",
+    IGUI_TRUESMOKING_SHOW_DAYS_REMAINING_DESC = "Show the number of days remaining until recovery from addiction",
+
+    IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT = "Show Smoke Percent Remaining",
+    IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT_DESC = "Show the remianing percentage of the smoke",
+
+    IGUI_TRUESMOKING_DEBUG_MOODLES = "Debug Info",
+    IGUI_TRUESMOKING_DEBUG_MOODLES_DESC = "Shows Debug information on the moodle tooltips",
 }

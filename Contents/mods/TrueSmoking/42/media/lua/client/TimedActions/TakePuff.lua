@@ -36,7 +36,7 @@ function TakePuff:update()
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
 
-    if not (isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) and not self.endAction then
+    if self.trueSmoking.Smokable.smokeLength <= 0 or (not (isKeyDown(TrueSmoking.Config.keySmoke) or self.trueSmoking.B_HELD) and not self.endAction) then
         local diffTime = os.difftime(curTime, self.timer)
         local roundedDiffTime = tonumber(string.format("%.1f", diffTime))
         local roundedDiffTimeMod = tonumber(string.format('%.1f',roundedDiffTime % self.visualItemAnimLength))
@@ -140,27 +140,27 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
-    if self.character:getEmitter():isPlaying(self.eatSound) then
-        self.character:getEmitter():stopSound(self.eatAudio)
-    end
+    -- if self.character:getEmitter():isPlaying(self.eatSound) then
+    --     self.character:getEmitter():stopSound(self.eatAudio)
+    -- end
 
-    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
-    self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
+    -- self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
+    -- self.trueSmoking.takingPuff = false
+    -- self.trueSmoking.Smokable.puffTimeMark = os.time()
+    -- self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
 
-    if TrueSmoking.Options.Coughing then
-        local coughChance = 100
-        if self.character:HasTrait("Smoker") then
-            if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
-                self.character:triggerCough()
-            end
-        else
-            if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceNonSmoker then
-                self.character:triggerCough()
-            end
-        end
-    end
+    -- if TrueSmoking.Options.Coughing then
+    --     local coughChance = 100
+    --     if self.character:HasTrait("Smoker") then
+    --         if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
+    --             self.character:triggerCough()
+    --         end
+    --     else
+    --         if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceNonSmoker then
+    --             self.character:triggerCough()
+    --         end
+    --     end
+    -- end
 
     ISBaseTimedAction.perform(self)
 end
@@ -191,7 +191,7 @@ function TakePuff:complete()
 end
 
 function TakePuff:getDuration()
-    print('called getDuration')
+    -- print('called getDuration')
     return ISBaseTimedAction.getDuration(self)
 end
 

@@ -4,124 +4,107 @@ require 'Utils'
 Smokable = Smokable or {}
 Smokable.__index = Smokable
 
---[[
-    Smokable class that creates our object from smokable items.
-
-    The majority of the smoking logic is handled here, the update method runs onTick to calculate the burn rate and call the OnEat_OverTime
-    method.
-
-    The moodle is started/stopped here but stored in the TrueSmoking table reference
-
-    visualItem is hardcoded to sync with the default smoking anim based on a timer
-]]
-
---Create a new Smokable object from consumed item (ISEatFoodAction)
 function Smokable:new(item, player)
     local obj = {}
     setmetatable(obj, self)
+    obj:init(item, player)
+    return obj
+end
 
-    local puffMin, puffMax = TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime
+function Smokable:init(item, player)
+    self.player = player
+    self.table = TrueSmoking:getPlayerReference(player)
 
     local data = self:getObject(item)
-
     for k, v in pairs(data) do
-        obj[k] = v
+        self[k] = v
     end
 
-    obj.canDrop = obj.conditions and obj.conditions.canDrop or false
+    self.canDrop = self.conditions and self.conditions.canDrop or false
 
-    obj.player = player
-
-    obj.table = TrueSmoking:getPlayerReference(player)
-
-    -- Get our instanceItem
-    if obj.visualItem then
-        obj.table.visualItem = instanceItem(obj.visualItem)
+    if self.visualItem then
+        self.table.visualItem = instanceItem(self.visualItem)
     else
         local hasVisualItem = self:getVisualItem(item)
         if hasVisualItem then
-            obj.table.visualItem = hasVisualItem
+            self.table.visualItem = hasVisualItem
         end
     end
 
-    obj.item = item
-    obj.onEat = item:getOnEat() or ''
+    self.item = item
+    self.onEat = item:getOnEat() or false
 
-    obj.stress = item:getStressChange() or -5
-    obj.originalStress = obj.stress
+    local stats = self:getItemStats(item)
+    stats.foodSick = data.foodSick or 0
+    for k, v in pairs(stats) do
+        self[k] = v
+        local originalKey = 'original' .. k:sub(1, 1):upper() .. k:sub(2)
+        self[originalKey] = v
+    end
 
-    obj.boredom = item:getBoredomChange() or 0
-    obj.originalBoredom = obj.boredom
+    self.replaceOnUse = item:getModData().replaceOnUse or false
 
-    obj.unhappyness = item:getUnhappyChange() or 0
-    obj.originalUnhappyness = obj.unhappyness
+    self.smokePercent = self.smokeLength / self.originalSmokeLength
+    self.smokeLit = false
+    self.puffPercent = 0.0
+    self.burnRate = ZombRandFloat(self.burnMax * 0.75, self.burnMax * 1.15)
+    self.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
+    self.hasRolledForDrop = false
+end
 
-    obj.fatigue = item:getFatigueChange() or 0
-    obj.originalFatigue = obj.fatigue
-
-    obj.thirst = item:getThirstChange() or 0
-    obj.originalThirst = obj.thirst
-
-    obj.hunger = item:getHungChange() or 0
-    obj.originalHunger = obj.hunger
-
-    obj.pain = item:getPainReduction() or 0
-    obj.originalPain = obj.pain
-
-    obj.endurance = item:getEnduranceChange() or 0
-    obj.originalEndurance = obj.endurance
-
-    obj.foodSick = self:getFoodSick(item)
-    obj.originalFoodSick = obj.foodSick
-
-    obj.reduceFoodSick = item:getReduceFoodSickness() or 0
-    obj.originalReduceFoodSick = obj.reduceFoodSick
-
-    obj.replaceOnUse = item:getModData().replaceOnUse or ''
-    print('Smokable Item ReplaceOnUse: ' .. obj.replaceOnUse)
-
-    obj.smokePercent = obj.smokeLength / obj.originalSmokeLength
-    obj.smokeLit = false
-    obj.burnRate = ZombRandFloat(obj.burnMax * .75, obj.burnMax * 1.15)
-    obj.timeCheck = ZombRand(puffMin, puffMax)
-    obj.hasRolledForDrop = false
-
-    return obj
+function Smokable:getItemStats(item)
+    return {
+        stress = item:getStressChange() or -5,
+        boredom = item:getBoredomChange() or 0,
+        unhappyness = item:getUnhappyChange() or 0,
+        fatigue = item:getFatigueChange() or 0,
+        thirst = item:getThirstChange() or 0,
+        hunger = item:getHungChange() or 0,
+        pain = item:getPainReduction() or 0,
+        endurance = item:getEnduranceChange() or 0,
+        reduceFoodSick = item:getReduceFoodSickness() or 0,
+    }
 end
 
 function Smokable:getObject(item)
     local fullType = item:getFullType()
-    print('Looking for: ' .. fullType)
+    print('TRUESMOKING::Looking for: ' .. fullType)
     local ob = TrueSmoking.SmokableObjects[fullType]
     local o = {}
 
-    -- If we have a object defined use it
     if ob then
-        print('Retrieved Smokable Object')
+        print('TRUESMOKING::Retrieved Smokable Object')
         o = deepCopy(ob)
     end
 
-    if not ob then
-        print('Making Default Smokable Object')
-        local onEat = item:getOnEat()
-        local defaultSmokeLength = (onEat == 'OnEat_Cigarettes' and TrueSmoking.Options.CigaretteLength) or
-            (onEat == 'OnEat_Cigarillo' and TrueSmoking.Options.CigarilloLength) or
-            (onEat == 'OnEat_Cigar' and TrueSmoking.Options.CigarLength) or
-            TrueSmoking.Options.SmokeLength
-        o = {
-            smokeLength = defaultSmokeLength,
-            burnMin = 0.000125,
-            burnMax = 0.000300,
-            burnSpeed = 0.0025,
-            burnSpeedDecay = 0.20,
-            decayRate = 0.998,
-            callback = false,
-            conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-            walkingFactor = 1.0,
-            runningFactor = 1.15,
-            sprintingFactor = 1.35,
-            puffFactor = 1.35
-        }
+    local onEat = item:getOnEat()
+    local defaults = {
+        ['OnEat_Cigarettes'] = { smokeLength = TrueSmoking.Options.CigaretteLength, foodSick = 14, nicotineContent = 25, effectMultiplier = 1.0, callback = OnEat_Tobacco, visualItem = 'Mask_Cigarette' },
+        ['OnEat_Cigarillo'] = { smokeLength = TrueSmoking.Options.CigarilloLength, foodSick = 21, nicotineContent = 45, effectMultiplier = 2.0, callback = OnEat_Tobacco, visualItem = 'Mask_Cigarillo' },
+        ['OnEat_Cigar'] = { smokeLength = TrueSmoking.Options.CigarLength, foodSick = 28, nicotineContent = 75, effectMultiplier = 3.0, callback = OnEat_Tobacco, visualItem = 'Mask_Cigar' },
+    }
+    local default = {
+        smokeLength = defaults[onEat] and defaults[onEat].smokeLength or TrueSmoking.Options.SmokeLength,
+        burnMin = 0.000125,
+        burnMax = 0.000300,
+        burnSpeed = 0.0025,
+        burnSpeedDecay = 0.20,
+        decayRate = 0.998,
+        callback = defaults[onEat] and defaults[onEat].callback or false,
+        conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
+        walkingFactor = 1.0,
+        runningFactor = 1.15,
+        sprintingFactor = 1.35,
+        puffFactor = 1.35,
+        effectMultiplier = defaults[onEat] and defaults[onEat].effectMultiplier or 0.0,
+        nicotineContent = defaults[onEat] and defaults[onEat].nicotineContent or 0.0,
+        visualItem = defaults[onEat] and defaults[onEat].visualItem or false,
+    }
+
+    for key, value in pairs(default) do
+        if o[key] == nil then
+            o[key] = value
+        end
     end
 
     o.fullType = fullType
@@ -130,66 +113,14 @@ function Smokable:getObject(item)
     local savedSmoke = self:getSavedSmokeLength(item)
     o.smokeLength = savedSmoke and savedSmoke or o.smokeLength
 
-    local reducePuff = getActivatedMods():contains('\\SmokingSoundsOverhaul')
-
-    if reducePuff then
+    if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
         o.puffFactor = o.puffFactor / 2
     end
 
     item:getModData().SmokeLength = o.smokeLength
     item:getModData().OriginalSmokeLength = o.originalSmokeLength
 
-    local onEat = item:getOnEat()
-    if not o.effectMultiplier then
-        o.effectMultiplier = onEat == 'OnEat_Cigarettes' and 1.0 or
-            onEat == 'OnEat_Cigarillo' and 2.0 or
-            onEat == 'OnEat_Cigar' and 3.0 or
-            0.0 --not a standard tobacco item
-    end
-
-    if not o.callback then
-        if onEat == 'OnEat_Cigarettes' or
-            onEat == 'OnEat_Cigarillo' or
-            onEat == 'OnEat_Cigar'
-        then
-            o.callback = OnEat_Tobacco
-        end
-    end
-
-    print("=== Smoke Object Details ===")
-    print('Smoke Length ' .. o.smokeLength)
-    print('Original Smoke Length ' .. o.originalSmokeLength)
-    print('Burn Min ' .. o.burnMin)
-    print('Burn Max ' .. o.burnMax)
-    print('Burn Speed ' .. o.burnSpeed)
-    print('Burn Speed Decay ' .. o.burnSpeedDecay)
-    print('Decay Rate ' .. o.decayRate)
-    print('Effect Multiplier ' .. o.effectMultiplier)
-    print('Puff Factor ' .. o.puffFactor)
-    print('Walking Factor ' .. o.walkingFactor)
-    print('Running Factor ' .. o.runningFactor)
-    print('Sprinting Factor ' .. o.sprintingFactor)
-    print("======================")
-
     return o
-end
-
-function Smokable:getFoodSick(item)
-    local list = {
-        ["OnEat_Cigarettes"] = 14,
-        ["OnEat_Cigarillo"] = 21,
-        ["OnEat_Cigar"] = 28,
-        ['OnEat_WeedPipe'] = 8,
-        ['OnEat_WeedJoint'] = 32
-    }
-
-    for name, val in pairs(list) do
-        if item:getOnEat() == name then
-            return val
-        end
-    end
-
-    return 0
 end
 
 function Smokable:getSavedSmokeLength(item)
@@ -204,7 +135,7 @@ end
 function Smokable:equipVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
     if not self.player:getWornItem('Mask_Smoke') and self.table.visualItem then
-        self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem);
+        self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem)
     elseif self.player:getWornItem('Mask_Smoke') then
         self.player:removeWornItem(self.player:getWornItem('Mask_Smoke'))
         self:equipVisualItem()
@@ -238,38 +169,30 @@ function Smokable:getVisualItem(item)
 
     local itemType = item:getFullType():lower()
 
-    -- Then try partial match
     for pattern, itemName in pairs(typeMatches) do
         if itemType:find(pattern) then
             return itemName and instanceItem(itemName) or false
         end
     end
 
-    --If we can find a default use that
     for key, value in pairs(OnEat_Defaults) do
         if item:getOnEat() == key then return instanceItem(value) end
     end
 
-    -- If we found nothing do not display anything
     return false
 end
 
---Start smoking and light the smokable
 function Smokable:light()
     if not self.table.isSmoking then
         self.table.isSmoking = true
-
-        if TrueSmoking.Options.UseMoodle then
-            self.table.Moodle:start()
+        if not TrueSmoking.Config.HideMoodles then
+            self.table.SmokingMoodle:start()
         end
-
-        --Start the update event
         local function updateWrapper()
             self:update()
         end
-        Events.OnTick.Add(updateWrapper)
+        Events.OnPlayerUpdate.Add(updateWrapper)
         self.updateWrapper = updateWrapper
-
         self:equipVisualItem()
         self.player:getInventory():Remove(self.item)
     end
@@ -278,7 +201,6 @@ function Smokable:light()
     end
 end
 
---Stop smoking and remove the update event
 function Smokable:putOut()
     if self.table.isSmoking then
         ISTimedActionQueue.add(PutOut:new(self.player))
@@ -286,24 +208,21 @@ function Smokable:putOut()
 end
 
 function Smokable:stop()
-    -- if not self.table.isSmoking then return end
     self.table.isSmoking = false
     self.table.visualItem = false
-
-    -- self.table.isSmoking = false
     self.table.takingPuff = false
     self.smokeLit = false
     self.hasDropped = false
     self.dropState = false
 
-    if TrueSmoking.Options.UseMoodle then
-        self.table.Moodle:stop()
+    if not TrueSmoking.Config.HideMoodles then
+        self.table.SmokingMoodle:stop()
     end
 
     self:removeVisualItem()
 
     if self.updateWrapper then
-        Events.OnTick.Remove(self.updateWrapper)
+        Events.OnPlayerUpdate.Remove(self.updateWrapper)
         self.updateWrapper = nil
     end
 
@@ -312,7 +231,7 @@ function Smokable:stop()
     if self.item then
         local onUse = self.replaceOnUse
         if onUse and onUse ~= '' and self.smokeLength <= 0 then
-            print('adding item: ' .. self.replaceOnUse)
+            print('TRUESMOKING::adding item: ' .. self.replaceOnUse)
             addOnUseItem(self.player)
         end
 
@@ -331,7 +250,7 @@ end
 function Smokable:dropSmoke()
     self.hasRolledForDrop = false
     local dropX, dropY, dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self
-        .item)
+    .item)
     self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
     self.item = false
     self.player:getModData().Smokable = false
@@ -351,16 +270,13 @@ function Smokable:checkDropConditions()
     return result
 end
 
--- Updates the burnRate and smokeLength on game tick, tracks when the smoke is out or finished
 function Smokable:update()
-    -- Checks if we are falling and dropped the smoke
     if TrueSmoking.Options.Dropping and self.canDrop then
         if not self.hasRolledForDrop and self:checkDropConditions() then
             self.hasRolledForDrop = true
             local roll = ZombRandFloat(0.0, 100.0)
             local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or
-                TrueSmoking.Options.DroppingChanceNonSmoker
-            -- print(string.format('rolled drop: %s -- %s', roll, dropChance))
+            TrueSmoking.Options.DroppingChanceNonSmoker
             if dropChance >= roll then
                 self.hasDropped = true
             end
@@ -373,24 +289,14 @@ function Smokable:update()
             end
         end
     end
-    -- If smoke is lit, update burnRate
     if self.smokeLit then
-        -- Calculate game speed (unchanged from original)
-        local gameSpeed = getGameSpeed() == 1 and 1 or
-            getGameSpeed() == 2 and 5 or
-            getGameSpeed() == 3 and 20 or
-            getGameSpeed() == 4 and 40
-
-        -- Try to take idle puff before calculating burn changes (unchanged)
+        local gameSpeed = getGameSpeedMultiplier()
         self:idlePuff()
-
         local isWalking = self.player:isWalking() and self.conditions['walking']
         local isRunning = self.player:isRunning() and self.conditions['running']
         local isSprinting = self.player:isSprinting() and self.conditions['sprinting']
         local isStrafing = self.player:isStrafing() and self.conditions['strafing']
-        -- local inVehicle = self.player:isSeatedInVehicle()
 
-        -- Define target burn rate for active states only
         local targetBurnRate
         if self.table.takingPuff then
             targetBurnRate = self.burnMax * self.puffFactor
@@ -403,55 +309,40 @@ function Smokable:update()
         end
 
         if targetBurnRate then
-            -- Smoothly adjust burnRate toward targetBurnRate for active states
             local adjustmentSpeed = self.burnSpeed
             local adjustmentSpeedDecay = self.burnSpeedDecay
             if self.burnRate > self.burnMax then
-                adjustmentSpeed = adjustmentSpeed * adjustmentSpeedDecay -- Slower adjustment beyond burnMax
+                adjustmentSpeed = adjustmentSpeed * adjustmentSpeedDecay
             end
             self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * adjustmentSpeed * gameSpeed
         else
-            -- Apply exponential decay when idling
-            local decayFactor = self
-                .decayRate -- Tune this for desired decay speed
+            local decayFactor = self.decayRate
             self.burnRate = self.burnRate * (decayFactor ^ gameSpeed)
         end
 
-        -- Calculate how much % was smoked this tick (unchanged)
-        self.puffPercent = self.burnRate / self.originalSmokeLength
-
-        -- Update smoke length (unchanged)
-        self.smokeLength = self.smokeLength - self.burnRate
-
-        -- Update smoke % left (unchanged)
+        self.puffPercent = self.burnRate * gameSpeed / self.originalSmokeLength
+        self.smokeLength = self.smokeLength - self.burnRate * gameSpeed
         self.smokePercent = self.smokeLength / self.originalSmokeLength
 
-        -- Apply stat changes from item
         OnEat_ItemStats(self)
 
-        -- Item callback (OnEat_Tobacco or some mod OnEat)
+        if TrueSmoking.Options.UseNicotineSystem and self.puffPercent > 0 and self.nicotineContent then
+            local nicotineAmount = self.nicotineContent * self.puffPercent
+            NicotineSystem:addNicotine(self.player, nicotineAmount)
+        end
+
         if self.callback then
             self.callback(self)
         end
 
-        -- General Mod callback that can be set
         for _, func in ipairs(TrueSmoking.Callbacks) do
             func(self)
         end
 
-        -- print(string.format('Smoke Length: %f', self.smokeLength))
-        -- print(string.format('Smoke Length Org: %f', self.originalSmokeLength))
-        -- print(string.format('burnMin: %f', self.burnMin))
-        -- print(string.format('burnMax: %f', self.burnMax))
-
-        -- Update item mod data (unchanged)
         self.item:getModData().SmokeLength = self.smokeLength
         self.player:getModData().Smokable = { self.item:getFullType(), self.smokeLength }
     end
 
-    -- print(string.format('Burn Rate: %.8f', self.burnRate))
-
-    -- Smoke went out (burn rate is very low)
     if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000025 then
         self.burnRate = 0
         self.smokeLit = false
@@ -459,7 +350,6 @@ function Smokable:update()
         self.burnRate = self.burnMin
     end
 
-    -- Smoke is finished (smokeLength is 0)
     if self.smokeLength <= 0 then
         self.smokeLength = 0
         if TrueSmoking.Config.AutoPutOut then
@@ -468,15 +358,12 @@ function Smokable:update()
     end
 end
 
---Manual puff action while smokeKey is held
 function Smokable:puff()
     ISTimedActionQueue.add(TakePuff:new(self.player))
 end
 
---Passive puff action triggered by PassiveSmoking
 function Smokable:idlePuff()
     local timeDiff = os.difftime(os.time(), self.puffTimeMark)
-
     if TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck then
         ISTimedActionQueue.add(TakePuff:new(self.player))
     elseif TrueSmoking.Config.KeepLit and self.burnRate < 0.00001 then

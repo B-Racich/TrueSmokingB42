@@ -1,0 +1,279 @@
+require 'MF_ISMoodle'
+
+MoodleSystem = MoodleSystem or {}
+
+Moodle = Moodle or {}
+Moodle.__index = Moodle
+
+function Moodle:new(table, playerNum, moodleId)
+    local obj = {}
+    setmetatable(obj, self)
+
+    obj.table = table
+    obj.playerNum = playerNum
+    obj.moodleId = moodleId
+
+    if getActivatedMods():contains('\\MoodleFramework') then
+        MF.createMoodle(obj.moodleId)
+    end
+
+    return obj
+end
+
+function Moodle:start()
+    local function updateWrapper()
+        self:update()
+    end
+    Events.OnTick.Add(updateWrapper)
+    self.updateWrapper = updateWrapper
+end
+
+function Moodle:stop()
+    local moodle = MF.getMoodle(self.moodleId, self.playerNum)
+    if moodle ~= nil then
+        moodle:setValue(0.5)
+    end
+    if self.updateWrapper then
+        Events.OnTick.Remove(self.updateWrapper)
+        self.updateWrapper = nil
+    end
+end
+
+function Moodle:update()
+    -- Base update method - to be overridden by child classes
+end
+
+-- Smoking Moodle Implementation
+SmokingMoodle = SmokingMoodle or {}
+setmetatable(SmokingMoodle, { __index = Moodle })
+SmokingMoodle.__index = SmokingMoodle
+
+function SmokingMoodle:new(table, playerNum)
+    local moodleImage = TrueSmoking.Options.UseNewMoodle and 'smoking_new' or 'smoking_old'
+    local obj = Moodle.new(self, table, playerNum, moodleImage)
+    return obj
+end
+
+function SmokingMoodle:update()
+    local moodle = MF.getMoodle(self.moodleId, self.playerNum)
+    if not self.table.isSmoking then return end
+    if moodle == nil then return end
+
+    local item = self.table.Smokable
+    local smokeLit = item.smokeLit
+    local percent = item.smokeLength / item.originalSmokeLength
+    local percentVal = percent >= 0 and percent or 0
+    local displayedPercentage = string.format('%.1f%%', percentVal * 100)
+
+    local estimateLeft = {
+        [0] = "< 1/8",
+        [10] = "~ 1/8",
+        [20] = "~ 1/4",
+        [30] = "~ 3/8",
+        [40] = "~ 1/2",
+        [50] = "~ 5/8",
+        [60] = "~ 3/4",
+        [80] = "~ 7/8",
+        [90] = "~ 8/8"
+    }
+
+    local estimate = "~"
+
+    if TrueSmoking.Config.ShowSmokePercent then
+        estimate = displayedPercentage
+    else
+        for k, v in pairs(estimateLeft) do
+            if tonumber(displayedPercentage) > tonumber(k) then
+                estimate = v
+            end
+        end
+    end
+
+    local smokeLitText = smokeLit and 'lit' or 'out'
+
+    moodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
+
+    if not smokeLit then
+        moodle:doWiggle()
+    end
+
+    moodle:setValue(percentVal)
+
+    local debugInfo = ""
+    if TrueSmoking.Config.DebugMoodles then
+        debugInfo = self:generateDebugInfo(item)
+    end
+
+    moodle:setDescription(
+        moodle:getGoodBadNeutral(),
+        moodle:getLevel(),
+        getText('Moodles_smoking_Custom', smokeLitText, estimate) .. debugInfo
+    )
+end
+
+function SmokingMoodle:generateDebugInfo(item)
+    local debugText = "\n\n[DEBUG INFO]"
+
+    debugText = debugText .. string.format("\nCurrent Length: %.2f", item.smokeLength)
+    debugText = debugText .. string.format("\nOriginal Length: %.2f", item.originalSmokeLength)
+    debugText = debugText .. string.format("\nRemaining: %.1f%%", (item.smokeLength / item.originalSmokeLength) * 100)
+    debugText = debugText .. string.format("\nLit Status: %s", item.smokeLit and "Lit" or "Out")
+    debugText = debugText .. string.format("\nPuff Percent: %.6f", item.puffPercent)
+
+    debugText = debugText .. string.format("\n\n[Burn Parameters]")
+    debugText = debugText .. string.format("\nCurrent Rate: %.8f", item.burnRate)
+    debugText = debugText .. string.format("\nTarget Min: %.8f", item.burnMin)
+    debugText = debugText .. string.format("\nTarget Max: %.8f", item.burnMax)
+    debugText = debugText .. string.format("\nDecay Rate: %.8f", item.decayRate)
+    debugText = debugText .. string.format("\nBurn Speed: %.8f", item.burnSpeed)
+    debugText = debugText .. string.format("\nBurn Speed Decay: %.8f", item.burnSpeedDecay)
+
+    debugText = debugText .. string.format("\n\n[Effect Parameters]")
+    debugText = debugText .. string.format("\nEffect Multiplier: %.2f", item.effectMultiplier)
+    debugText = debugText .. string.format("\nNicotine Content: %.2f", item.nicotineContent)
+
+    debugText = debugText .. string.format("\n\n[Activity Factors]")
+    debugText = debugText .. string.format("\nPuff: %.2f", item.puffFactor)
+    debugText = debugText .. string.format("\nWalking: %.2f", item.walkingFactor)
+    debugText = debugText .. string.format("\nRunning: %.2f", item.runningFactor)
+    debugText = debugText .. string.format("\nSprinting: %.2f", item.sprintingFactor)
+
+    debugText = debugText .. string.format("\n\n[Conditions:]")
+    for condition, allowed in pairs(item.conditions) do
+        debugText = debugText .. string.format("\n%s: %s", condition, allowed and "Yes" or "No")
+    end
+
+    if item.smokeLit and item.smokeLength > 0 and item.burnRate > 0 then
+        local timeToFinish = item.smokeLength / item.burnRate
+        local minutes = math.floor(timeToFinish / 60)
+        local seconds = math.floor(timeToFinish % 60)
+        debugText = debugText .. string.format("\n\n[Time Estimates]")
+        debugText = debugText .. string.format("\nEstimated time left: ~%dm %ds", minutes, seconds)
+
+        local gameMinutes = timeToFinish / (60 * getGameTime():getMinutesPerDay() * getGameSpeed())
+        if gameMinutes > 0 then
+            debugText = debugText .. string.format("\nReal time: ~%.1f minutes", gameMinutes)
+        end
+    end
+
+    debugText = debugText .. string.format("\n\n[Item Info]")
+    debugText = debugText .. string.format("\nItem Type: %s", item.fullType or "Unknown")
+    debugText = debugText .. string.format("\nOnEat Method: %s", item.onEat)
+    debugText = debugText .. string.format("\nReplaceOnUse: %s", tostring(item.replaceOnUse))
+
+    return debugText
+end
+
+-- Nicotine Moodle Implementation
+NicotineMoodle = NicotineMoodle or {}
+setmetatable(NicotineMoodle, { __index = Moodle })
+NicotineMoodle.__index = NicotineMoodle
+
+function NicotineMoodle:new(table, playerNum)
+    local obj = Moodle.new(self, table, playerNum, "nicotine")
+    obj.player = getSpecificPlayer(playerNum)
+    return obj
+end
+
+function NicotineMoodle:update()
+    local player = self.player
+    if not player or not player:getModData().nicotineSystem then return end
+
+    local data = player:getModData().nicotineSystem
+    local addictionMoodle = MF.getMoodle(self.moodleId, self.playerNum)
+
+    if addictionMoodle then
+        addictionMoodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
+
+        local value = 1 - (data.addictionLevel / 100)
+        if not player:HasTrait('Smoker') and not TrueSmoking.Config.DebugMoodles then
+            value = 0.5
+        end
+        addictionMoodle:setValue(value)
+
+        local levelDesc = self:getAddictionRecoveryText()
+
+        local debugInfo = ""
+        if TrueSmoking.Config.DebugMoodles then
+            debugInfo = self:generateDebugInfo(data)
+        end
+
+        addictionMoodle:setDescription(
+            addictionMoodle:getGoodBadNeutral(),
+            addictionMoodle:getLevel(),
+            levelDesc .. debugInfo
+        )
+    end
+end
+
+function NicotineMoodle:generateDebugInfo(data)
+    local debugText = "\n\n[DEBUG INFO]"
+
+    debugText = debugText .. "\n[Nicotine]"
+    debugText = debugText .. string.format("\nLevel: %.2f%%", data.nicotineLevel)
+    debugText = debugText .. string.format("\nRate: %.4f%%/hr", math.abs(data.longTermNicotineChangeRate * 60))
+
+    debugText = debugText .. "\n\n[Addiction]"
+    debugText = debugText .. string.format("\nLevel: %.2f%%", data.addictionLevel)
+    debugText = debugText .. string.format("\nRate: %.4f%%/hr", math.abs(data.longTermAddictionChangeRate * 60))
+
+    local addictionTime = data.addictionDuration
+    local days = math.floor(addictionTime / 24)
+    local hours = math.floor(addictionTime % 24)
+    debugText = debugText .. string.format("\nTime to 0: %d days, %d hours", days, hours)
+
+    debugText = debugText .. "\n\n[Withdrawal]"
+    if data.nicotineLevel < NicotineSystem.Options.GROWTH_THRESHOLD then
+        local symptomTime = data.messageCooldown - data.timeSinceLastMessage
+        debugText = debugText .. string.format("\nNext Symptom: %d hours, %d minutes", symptomTime, (symptomTime * 60) %
+        60)
+    else
+        debugText = debugText .. string.format("\nNext Symptom: ~~")
+    end
+    debugText = debugText .. string.format("\nWithdrawal Level: %.1f%%", data.withdrawalLevel)
+
+    debugText = debugText .. "\n\n[Stats]"
+    debugText = debugText .. string.format("\nTolerance Factor: %.2fx", data.toleranceFactor)
+    debugText = debugText .. string.format("\nMetabolic Factor: %.2fx", data.metabolicFactor)
+    debugText = debugText .. string.format("\nStress Change: %.8f/hr", data.longTermStressChangeRate * 60)
+    debugText = debugText .. string.format("\nUnhappiness Change: %.8f/hr", data.longTermUnhappinessChangeRate * 60)
+    debugText = debugText .. string.format("\nBoredome Change: %.8f/hr", data.longTermBoredomChangeRate * 60)
+    debugText = debugText .. string.format("\nFatigue Change: %.8f/hr", data.longTermFatigueChangeRate * 60)
+    debugText = debugText .. string.format("\nHunger Change: %.8f/hr", data.longTermHungerChangeRate * 60)
+
+    return debugText
+end
+
+function NicotineMoodle:getAddictionRecoveryText()
+    local player = self.player
+    if not player or not player:getModData().nicotineSystem then return "" end
+
+    local data = player:getModData().nicotineSystem
+
+    local useDays = TrueSmoking.Config.ShowDaysRemaining
+
+    if useDays then
+        if data.addictionLevel <= 0.1 then
+            return getText("Moodles_nicotine_no_addiction")
+        end
+
+        if data.addictionDuration then
+            return getText("Moodles_nicotine_addiction", string.format("%d days", data.addictionDurationDays, data.addictionDuration))
+        end
+    else
+        local level = data.withdrawalLevel
+        if level >= 80 then
+            return getText("Moodles_nicotine_withdrawal_4")
+        elseif level >= 60 then
+            return getText("Moodles_nicotine_withdrawal_3")
+        elseif level >= 40 then
+            return getText("Moodles_nicotine_withdrawal_2")
+        elseif level >= 20 then
+            return getText("Moodles_nicotine_withdrawal_1")
+        elseif level >= 0 then
+            return getText("Moodles_nicotine_withdrawal_0")
+        end
+    end
+
+    return ""
+end

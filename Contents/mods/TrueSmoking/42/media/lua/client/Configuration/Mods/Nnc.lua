@@ -153,7 +153,7 @@ if getActivatedMods():contains('\\N&CsNarcotics') then
         }
 
         for _, item in ipairs(NnC_Items) do
-            print('Building Item for: '..item)
+            -- print('Building Item for: '..item)
             if string.match(item:lower(), 'joint') then
                 smokableObjects[item] = jointSettings
             elseif string.match(item:lower(), 'blunt') then

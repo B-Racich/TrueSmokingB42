@@ -18,7 +18,7 @@ TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
 TrueSmoking.SmokableObjects = TrueSmoking.SmokableObjects or {}
 TrueSmoking.Callbacks = TrueSmoking.Callbacks or {}
-TrueSmoking.Config = require 'ModOptions'
+TrueSmoking.Config = require 'Configuration/ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
 TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
@@ -63,21 +63,19 @@ end
 ]]
 function TrueSmoking:setSmokableObjects(table)
     for key, value in pairs(table) do
-        print('set: '..key)
-        print('smokeLength: '..value.smokeLength)
         self.SmokableObjects[key] = value
     end
 end
 
 function TrueSmoking:hasRequiredItem(smokable, player)
     if not smokable:getRequireInHandOrInventory() then
-		return true
-	end
+        return true
+    end
 
     local types = smokable:getRequireInHandOrInventory()
     local typesTable = {}
-    for i=1,types:size() do
-        typesTable[moduleDotType(smokable:getModule(), types:get(i-1))] = true
+    for i = 1, types:size() do
+        typesTable[moduleDotType(smokable:getModule(), types:get(i - 1))] = true
     end
 
     local lightSource = false
@@ -87,16 +85,16 @@ function TrueSmoking:hasRequiredItem(smokable, player)
         lightSource = ISInventoryPaneContextMenu.hasOpenFlame(player)
     end
 
-    local function predicateNotEmpty(smokable)
-        return smokable:getCurrentUsesFloat() > 0
+    local function predicateNotEmpty(item)
+        return item:getCurrentUsesFloat() > 0
     end
 
-	if not lightSource then
+    if not lightSource then
         if not lightSource then
             local items = player:getInventory():getItems()
-            for j=1, items:size() do
-                if typesTable[items:get(j-1):getFullType()] and predicateNotEmpty(items:get(j-1))then
-                    lightSource = items:get(j-1)
+            for j = 1, items:size() do
+                if typesTable[items:get(j - 1):getFullType()] and predicateNotEmpty(items:get(j - 1)) then
+                    lightSource = items:get(j - 1)
                     ISInventoryPaneContextMenu.transferIfNeeded(player, lightSource)
                     break
                 end
@@ -106,7 +104,7 @@ function TrueSmoking:hasRequiredItem(smokable, player)
         if not lightSource then
             for v, _ in pairs(typesTable) do
                 lightSource = player:getInventory():getFirstTypeRecurse(v)
-                if lightSource then
+                if lightSource and predicateNotEmpty(lightSource) then
                     ISInventoryPaneContextMenu.transferIfNeeded(player, lightSource)
                     break
                 end
@@ -158,7 +156,8 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
         for covered, open in pairs(covers) do
             local setTo = putDown and open or covered
             if (fullType == covered and putDown) or (fullType == open and not putDown) then
-                print(string.format('Adjusted Shegmah: %s - putDown: %s - setTo: %s',fullType, putDown and 'true' or 'false', setTo))
+                print(string.format('TRUESMOKING::Adjusted Shegmah: %s - putDown: %s - setTo: %s', fullType,
+                    putDown and 'true' or 'false', setTo))
                 ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo, 30))
                 return true
             end
@@ -183,7 +182,6 @@ function TrueSmoking:checkForMaskAndEquip(player)
     end
 end
 
---Wrappers for mask actions
 function TrueSmoking:removeItem(player, item, time)
     ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
 end
@@ -209,7 +207,6 @@ function TrueSmoking:getPlayerReference(player)
     end
 end
 
---Calls the crafting recipe from the item
 function TrueSmoking:useRecipe(item, player, recipeString)
     local containers = ISInventoryPaneContextMenu.getContainers(player)
     local recipes = CraftRecipeManager.getUniqueRecipeItems(item, player, containers)
@@ -221,7 +218,6 @@ function TrueSmoking:useRecipe(item, player, recipeString)
     end
 end
 
---Finds a smokable object from the inventory or a pack of cigarettes
 function TrueSmoking:findSmokable(player)
     local cigarette = false
     for _, value in ipairs(self.HotkeySmokes) do
@@ -247,11 +243,10 @@ function TrueSmoking:findSmokable(player)
     if cigarette and self:hasRequiredItem(cigarette, player) then
         print('TRUESMOKING::FOUND CIG/PACK')
         ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
-        ISInventoryPaneContextMenu.eatItem(cigarette,1,player:getPlayerNum())
+        ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
     end
 end
 
---Check if we are eating a smokable and set our mask flag
 ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
     if item:getTags():contains('Smokable') then
         TrueSmoking:getPlayerReference(player).CheckMaskSmoking = true
@@ -261,7 +256,6 @@ ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
     originalEatItem(item, percentage, player)
 end
 
---Cleaner implementation for detecting masks and shemaghs and doing our own logic to re-equip and adjust
 ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
     local o = TrueSmoking:getPlayerReference(playerObj)
 
@@ -284,7 +278,6 @@ ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
     return mask
 end
 
---Key Event Listener
 function TrueSmoking:onKeyStartPressed(key)
     -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
     local o = self.Player_1
@@ -305,7 +298,6 @@ function TrueSmoking:onKeyStartPressed(key)
     end
 end
 
---Hook into context menu for Smokable objects and toggle the Smoke option when Smoking
 function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     for i, v in ipairs(items) do
         local item = v
@@ -315,7 +307,6 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
 
         if not instanceof(v, 'InventoryItem') then item = v.items[1] end
 
-        --Context Menu Hook
         hasSmoke = context:getOptionFromName(getText('ContextMenu_Smoke'))
         if hasSmoke then
             if o.isSmoking or not self:hasRequiredItem(item, getSpecificPlayer(player)) then
@@ -327,20 +318,29 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
 end
 
---Start our event listerns on player load
 function TrueSmoking:start(playerNum, player)
     local o = self:getPlayerReference(player)
-    if TrueSmoking.Options.UseMoodle then
-        o.Moodle = SmokingMoodle:new(o, playerNum)
-    end
+
     o.eatSound = ''
     o.lightingEatSound = ''
+
+    o.Smokable = {}
+    o.Smokable.smokeLit = false
+
+    if TrueSmoking.Options.UseNicotineSystem then
+        NicotineSystem:initialize(player)
+    end
+
+    if not TrueSmoking.Config.HideMoodles then
+        o.SmokingMoodle = SmokingMoodle:new(o, playerNum)
+        o.NicotineMoodle = NicotineMoodle:new(o, playerNum)
+        o.NicotineMoodle:start()
+    end
 
     -- 460 is vanilla
     self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 400 or 220
     self.relightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 400 or 120
 
-    --Start the update event
     local function keyWrapper(key)
         self:onKeyStartPressed(key)
     end
@@ -351,38 +351,35 @@ function TrueSmoking:start(playerNum, player)
     end
     o.contextWrapper = contextWrapper
 
-    --If player closed game while smoking, give back the smoke
     if player:getModData().Smokable then
         local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
         smokable:getModData().SmokeLength = player:getModData().Smokable[2]
         player:getModData().Smokable = false
     end
 
-    --Keybinds
     Events.OnKeyStartPressed.Add(o.keyWrapper)
-    --Toggles the Smoke option in the context menu
     Events.OnFillInventoryObjectContextMenu.Add(o.contextWrapper)
 end
 
---Stop our event listeners on player death
 function TrueSmoking:stop(player)
     local o = self:getPlayerReference(player)
 
-    if TrueSmoking.Options.UseMoodle then
-        o.Moodle:stop()
+    if not TrueSmoking.Config.HideMoodles then
+        o.SmokingMoodle:stop()
+        o.NicotineMoodle:stop()
     end
 
     if o.Smokable then
         o.Smokable:putOut()
     end
-    o.Moodle = nil
+    o.SmokingMoodle = nil
     o.Smokable = nil
-    --Keybinds
+
     if o.keyWrapper then
         Events.OnKeyStartPressed.Remove(o.keyWrapper)
         o.keyWrapper = nil
     end
-    --Context Menu Hook
+
     if o.contextWrapper then
         Events.OnFillInventoryObjectContextMenu.Remove(o.contextWrapper)
         o.contextWrapper = nil
@@ -400,20 +397,26 @@ local remainingSmokeTooltip = function(tooltip, layout, item)
     end
 end
 
+local function onPlayerUpdate(player)
+    if player and TrueSmoking.Options.UseNicotineSystem and player:getModData().nicotineSystem then
+        NicotineSystem:update(player)
+    end
+end
+
 InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
 BodyLocations.getGroup("Human"):getOrCreateLocation("Mask_Smoke")
 
---Events.OnGameBoot.Add(init)
 Events.OnCreatePlayer.Add(function(playerNum, player)
     TrueSmoking:start(playerNum, player)
+    Events.OnPlayerUpdate.Add(onPlayerUpdate)
 end)
 
 Events.OnPlayerDeath.Add(function(player)
     TrueSmoking:stop(player)
+    Events.OnPlayerUpdate.Remove(onPlayerUpdate)
 end)
 
---Load SandboxVars
 Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.OverrideSmokeLength = SandboxVars.TrueSmoking.OverrideSmokeLength
     TrueSmoking.Options.SmokeLength = SandboxVars.TrueSmoking.SmokeLength
@@ -439,84 +442,114 @@ Events.OnInitGlobalModData.Add(function()
     TrueSmoking.Options.DroppingChanceNonSmoker = SandboxVars.TrueSmoking.DroppingChanceNonSmoker
 
     -- Old Defaults for redundancy
-
     TrueSmoking.Options.PuffFactor = 1.35
     TrueSmoking.Options.RunningFactor = 1.15
     TrueSmoking.Options.SprintingFactor = 1.35
     TrueSmoking.Options.WalkingFactor = 1.0
 
-    -- Smokable config options
-
+    -- Smokable config options [Keep the length for redundancy]
     TrueSmoking.Options.CigaretteLength = SandboxVars.TrueSmoking.CigaretteLength
-    TrueSmoking.Options.CigaretteBurnMin = SandboxVars.TrueSmoking.CigaretteBurnMin
-    TrueSmoking.Options.CigaretteBurnMax = SandboxVars.TrueSmoking.CigaretteBurnMax
-    TrueSmoking.Options.CigaretteBurnSpeed = SandboxVars.TrueSmoking.CigaretteBurnSpeed
-    TrueSmoking.Options.CigaretteBurnSpeedDecay = SandboxVars.TrueSmoking.CigaretteBurnSpeedDecay
-    TrueSmoking.Options.CigaretteDecayRate = SandboxVars.TrueSmoking.CigaretteDecayRate
-    TrueSmoking.Options.CigaretteEffectMultiplier = SandboxVars.TrueSmoking.CigaretteEffectMultiplier
-    TrueSmoking.Options.CigarettePuffFactor = SandboxVars.TrueSmoking.CigarettePuffFactor
-    TrueSmoking.Options.CigaretteWalkingFactor = SandboxVars.TrueSmoking.CigaretteWalkingFactor
-    TrueSmoking.Options.CigaretteRunningFactor = SandboxVars.TrueSmoking.CigaretteRunningFactor
-    TrueSmoking.Options.CigaretteSprintingFactor = SandboxVars.TrueSmoking.CigaretteSprintingFactor
+    TrueSmoking.Options.Cigarette = {
+        length = SandboxVars.TrueSmoking.CigaretteLength,
+        burnMin = SandboxVars.TrueSmoking.CigaretteBurnMin,
+        burnMax = SandboxVars.TrueSmoking.CigaretteBurnMax,
+        burnSpeed = SandboxVars.TrueSmoking.CigaretteBurnSpeed,
+        burnSpeedDecay = SandboxVars.TrueSmoking.CigaretteBurnSpeedDecay,
+        decayRate = SandboxVars.TrueSmoking.CigaretteDecayRate,
+        effectMultiplier = SandboxVars.TrueSmoking.CigaretteEffectMultiplier,
+        puffFactor = SandboxVars.TrueSmoking.CigarettePuffFactor,
+        walkingFactor = SandboxVars.TrueSmoking.CigaretteWalkingFactor,
+        runningFactor = SandboxVars.TrueSmoking.CigaretteRunningFactor,
+        sprintingFactor = SandboxVars.TrueSmoking.CigaretteSprintingFactor
+    }
 
     TrueSmoking.Options.RolledCigaretteLength = SandboxVars.TrueSmoking.RolledCigaretteLength
-    TrueSmoking.Options.RolledCigaretteBurnMin = SandboxVars.TrueSmoking.RolledCigaretteBurnMin
-    TrueSmoking.Options.RolledCigaretteBurnMax = SandboxVars.TrueSmoking.RolledCigaretteBurnMax
-    TrueSmoking.Options.RolledCigaretteBurnSpeed = SandboxVars.TrueSmoking.RolledCigaretteBurnSpeed
-    TrueSmoking.Options.RolledCigaretteBurnSpeedDecay = SandboxVars.TrueSmoking.RolledCigaretteBurnSpeedDecay
-    TrueSmoking.Options.RolledCigaretteDecayRate = SandboxVars.TrueSmoking.RolledCigaretteDecayRate
-    TrueSmoking.Options.RolledCigaretteEffectMultiplier = SandboxVars.TrueSmoking.RolledCigaretteEffectMultiplier
-    TrueSmoking.Options.RolledCigarettePuffFactor = SandboxVars.TrueSmoking.RolledCigarettePuffFactor
-    TrueSmoking.Options.RolledCigaretteWalkingFactor = SandboxVars.TrueSmoking.RolledCigaretteWalkingFactor
-    TrueSmoking.Options.RolledCigaretteRunningFactor = SandboxVars.TrueSmoking.RolledCigaretteRunningFactor
-    TrueSmoking.Options.RolledCigaretteSprintingFactor = SandboxVars.TrueSmoking.RolledCigaretteSprintingFactor
+    TrueSmoking.Options.RolledCigarette = {
+        length = SandboxVars.TrueSmoking.RolledCigaretteLength,
+        burnMin = SandboxVars.TrueSmoking.RolledCigaretteBurnMin,
+        burnMax = SandboxVars.TrueSmoking.RolledCigaretteBurnMax,
+        burnSpeed = SandboxVars.TrueSmoking.RolledCigaretteBurnSpeed,
+        burnSpeedDecay = SandboxVars.TrueSmoking.RolledCigaretteBurnSpeedDecay,
+        decayRate = SandboxVars.TrueSmoking.RolledCigaretteDecayRate,
+        effectMultiplier = SandboxVars.TrueSmoking.RolledCigaretteEffectMultiplier,
+        puffFactor = SandboxVars.TrueSmoking.RolledCigarettePuffFactor,
+        walkingFactor = SandboxVars.TrueSmoking.RolledCigaretteWalkingFactor,
+        runningFactor = SandboxVars.TrueSmoking.RolledCigaretteRunningFactor,
+        sprintingFactor = SandboxVars.TrueSmoking.RolledCigaretteSprintingFactor
+    }
 
     TrueSmoking.Options.CigarilloLength = SandboxVars.TrueSmoking.CigarilloLength
-    TrueSmoking.Options.CigarilloBurnMin = SandboxVars.TrueSmoking.CigarilloBurnMin
-    TrueSmoking.Options.CigarilloBurnMax = SandboxVars.TrueSmoking.CigarilloBurnMax
-    TrueSmoking.Options.CigarilloBurnSpeed = SandboxVars.TrueSmoking.CigarilloBurnSpeed
-    TrueSmoking.Options.CigarilloBurnSpeedDecay = SandboxVars.TrueSmoking.CigarilloBurnSpeedDecay
-    TrueSmoking.Options.CigarilloDecayRate = SandboxVars.TrueSmoking.CigarilloDecayRate
-    TrueSmoking.Options.CigarilloEffectMultiplier = SandboxVars.TrueSmoking.CigarilloEffectMultiplier
-    TrueSmoking.Options.CigarilloPuffFactor = SandboxVars.TrueSmoking.CigarilloPuffFactor
-    TrueSmoking.Options.CigarilloWalkingFactor = SandboxVars.TrueSmoking.CigarilloWalkingFactor
-    TrueSmoking.Options.CigarilloRunningFactor = SandboxVars.TrueSmoking.CigarilloRunningFactor
-    TrueSmoking.Options.CigarilloSprintingFactor = SandboxVars.TrueSmoking.CigarilloSprintingFactor
+    TrueSmoking.Options.Cigarillo = {
+        length = SandboxVars.TrueSmoking.CigarilloLength,
+        burnMin = SandboxVars.TrueSmoking.CigarilloBurnMin,
+        burnMax = SandboxVars.TrueSmoking.CigarilloBurnMax,
+        burnSpeed = SandboxVars.TrueSmoking.CigarilloBurnSpeed,
+        burnSpeedDecay = SandboxVars.TrueSmoking.CigarilloBurnSpeedDecay,
+        decayRate = SandboxVars.TrueSmoking.CigarilloDecayRate,
+        effectMultiplier = SandboxVars.TrueSmoking.CigarilloEffectMultiplier,
+        puffFactor = SandboxVars.TrueSmoking.CigarilloPuffFactor,
+        walkingFactor = SandboxVars.TrueSmoking.CigarilloWalkingFactor,
+        runningFactor = SandboxVars.TrueSmoking.CigarilloRunningFactor,
+        sprintingFactor = SandboxVars.TrueSmoking.CigarilloSprintingFactor
+    }
 
     TrueSmoking.Options.CigarLength = SandboxVars.TrueSmoking.CigarLength
-    TrueSmoking.Options.CigarBurnMin = SandboxVars.TrueSmoking.CigarBurnMin
-    TrueSmoking.Options.CigarBurnMax = SandboxVars.TrueSmoking.CigarBurnMax
-    TrueSmoking.Options.CigarBurnSpeed = SandboxVars.TrueSmoking.CigarBurnSpeed
-    TrueSmoking.Options.CigarBurnSpeedDecay = SandboxVars.TrueSmoking.CigarBurnSpeedDecay
-    TrueSmoking.Options.CigarDecayRate = SandboxVars.TrueSmoking.CigarDecayRate
-    TrueSmoking.Options.CigarEffectMultiplier = SandboxVars.TrueSmoking.CigarEffectMultiplier
-    TrueSmoking.Options.CigarPuffFactor = SandboxVars.TrueSmoking.CigarPuffFactor
-    TrueSmoking.Options.CigarWalkingFactor = SandboxVars.TrueSmoking.CigarWalkingFactor
-    TrueSmoking.Options.CigarRunningFactor = SandboxVars.TrueSmoking.CigarRunningFactor
-    TrueSmoking.Options.CigarSprintingFactor = SandboxVars.TrueSmoking.CigarSprintingFactor
+    TrueSmoking.Options.Cigar = {
+        length = SandboxVars.TrueSmoking.CigarLength,
+        burnMin = SandboxVars.TrueSmoking.CigarBurnMin,
+        burnMax = SandboxVars.TrueSmoking.CigarBurnMax,
+        burnSpeed = SandboxVars.TrueSmoking.CigarBurnSpeed,
+        burnSpeedDecay = SandboxVars.TrueSmoking.CigarBurnSpeedDecay,
+        decayRate = SandboxVars.TrueSmoking.CigarDecayRate,
+        effectMultiplier = SandboxVars.TrueSmoking.CigarEffectMultiplier,
+        puffFactor = SandboxVars.TrueSmoking.CigarPuffFactor,
+        walkingFactor = SandboxVars.TrueSmoking.CigarWalkingFactor,
+        runningFactor = SandboxVars.TrueSmoking.CigarRunningFactor,
+        sprintingFactor = SandboxVars.TrueSmoking.CigarSprintingFactor
+    }
 
     TrueSmoking.Options.PipeLength = SandboxVars.TrueSmoking.PipeLength
-    TrueSmoking.Options.PipeBurnMin = SandboxVars.TrueSmoking.PipeBurnMin
-    TrueSmoking.Options.PipeBurnMax = SandboxVars.TrueSmoking.PipeBurnMax
-    TrueSmoking.Options.PipeBurnSpeed = SandboxVars.TrueSmoking.PipeBurnSpeed
-    TrueSmoking.Options.PipeBurnSpeedDecay = SandboxVars.TrueSmoking.PipeBurnSpeedDecay
-    TrueSmoking.Options.PipeDecayRate = SandboxVars.TrueSmoking.PipeDecayRate
-    TrueSmoking.Options.PipeEffectMultiplier = SandboxVars.TrueSmoking.PipeEffectMultiplier
-    TrueSmoking.Options.PipePuffFactor = SandboxVars.TrueSmoking.PipePuffFactor
-    TrueSmoking.Options.PipeWalkingFactor = SandboxVars.TrueSmoking.PipeWalkingFactor
-    TrueSmoking.Options.PipeRunningFactor = SandboxVars.TrueSmoking.PipeRunningFactor
-    TrueSmoking.Options.PipeSprintingFactor = SandboxVars.TrueSmoking.PipeSprintingFactor
+    TrueSmoking.Options.Pipe = {
+        length = SandboxVars.TrueSmoking.PipeLength,
+        burnMin = SandboxVars.TrueSmoking.PipeBurnMin,
+        burnMax = SandboxVars.TrueSmoking.PipeBurnMax,
+        burnSpeed = SandboxVars.TrueSmoking.PipeBurnSpeed,
+        burnSpeedDecay = SandboxVars.TrueSmoking.PipeBurnSpeedDecay,
+        decayRate = SandboxVars.TrueSmoking.PipeDecayRate,
+        effectMultiplier = SandboxVars.TrueSmoking.PipeEffectMultiplier,
+        puffFactor = SandboxVars.TrueSmoking.PipePuffFactor,
+        walkingFactor = SandboxVars.TrueSmoking.PipeWalkingFactor,
+        runningFactor = SandboxVars.TrueSmoking.PipeRunningFactor,
+        sprintingFactor = SandboxVars.TrueSmoking.PipeSprintingFactor
+    }
 
     TrueSmoking.Options.CanLength = SandboxVars.TrueSmoking.CanLength
-    TrueSmoking.Options.CanBurnMin = SandboxVars.TrueSmoking.CanBurnMin
-    TrueSmoking.Options.CanBurnMax = SandboxVars.TrueSmoking.CanBurnMax
-    TrueSmoking.Options.CanBurnSpeed = SandboxVars.TrueSmoking.CanBurnSpeed
-    TrueSmoking.Options.CanBurnSpeedDecay = SandboxVars.TrueSmoking.CanBurnSpeedDecay
-    TrueSmoking.Options.CanDecayRate = SandboxVars.TrueSmoking.CanDecayRate
-    TrueSmoking.Options.CanEffectMultiplier = SandboxVars.TrueSmoking.CanEffectMultiplier
-    TrueSmoking.Options.CanPuffFactor = SandboxVars.TrueSmoking.CanPuffFactor
-    TrueSmoking.Options.CanWalkingFactor = SandboxVars.TrueSmoking.CanWalkingFactor
-    TrueSmoking.Options.CanRunningFactor = SandboxVars.TrueSmoking.CanRunningFactor
-    TrueSmoking.Options.CanSprintingFactor = SandboxVars.TrueSmoking.CanSprintingFactor
+    TrueSmoking.Options.Can = {
+        length = SandboxVars.TrueSmoking.CanLength,
+        burnMin = SandboxVars.TrueSmoking.CanBurnMin,
+        burnMax = SandboxVars.TrueSmoking.CanBurnMax,
+        burnSpeed = SandboxVars.TrueSmoking.CanBurnSpeed,
+        burnSpeedDecay = SandboxVars.TrueSmoking.CanBurnSpeedDecay,
+        decayRate = SandboxVars.TrueSmoking.CanDecayRate,
+        effectMultiplier = SandboxVars.TrueSmoking.CanEffectMultiplier,
+        puffFactor = SandboxVars.TrueSmoking.CanPuffFactor,
+        walkingFactor = SandboxVars.TrueSmoking.CanWalkingFactor,
+        runningFactor = SandboxVars.TrueSmoking.CanRunningFactor,
+        sprintingFactor = SandboxVars.TrueSmoking.CanSprintingFactor
+    }
 
+    -- Nicotine system options
+    TrueSmoking.Options.UseNicotineSystem = SandboxVars.TrueSmoking.UseNicotineSystem
+
+    NicotineSystem.Options.BASE_DECAY_RATE = SandboxVars.TrueSmoking.MetabolismBaseDecayRate
+
+    NicotineSystem.Options.GAIN_RATE = SandboxVars.TrueSmoking.AddictionGainRate
+    NicotineSystem.Options.DECAY_RATE = SandboxVars.TrueSmoking.AddictionDecayRate
+
+    NicotineSystem.Options.GROWTH_THRESHOLD = SandboxVars.TrueSmoking.AddictionGrowthThreshold
+    NicotineSystem.Options.TRAIT_THRESHOLD = SandboxVars.TrueSmoking.AddictionTraitThreshold
+    NicotineSystem.Options.CURE_THRESHOLD = SandboxVars.TrueSmoking.AddictionCureThreshold
+
+    NicotineSystem.Options.INTAKE_CONVERSION = SandboxVars.TrueSmoking.AddictionIntakeConversion
+    NicotineSystem.Options.ACTIVE_SMOKING_BONUS = SandboxVars.TrueSmoking.AddictionActiveSmoking
 end)

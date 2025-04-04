@@ -64,11 +64,11 @@ function LightSmoke:start()
             -- Play custom sound when no sound is playing
             if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
                 local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
-                print(self.eatSound)
+                -- print(self.eatSound)
                 if self.eatSound == '' or self.eatSound == nil then -- No sound running for first time
                     self.eatSound = sound
                     -- Check if we previously started a puff and its audio is still playing
-                    print(self.trueSmoking.lightingEatSound)
+                    -- print(self.trueSmoking.lightingEatSound)
                     if not self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound) then
                         self.trueSmoking.lightingEatSound = self.eatSound
                         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
