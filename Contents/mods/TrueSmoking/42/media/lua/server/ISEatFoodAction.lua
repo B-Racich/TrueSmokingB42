@@ -64,13 +64,5 @@ function ISEatFoodAction:start()
         else
             self:setOverrideHandModels(nil, self.item)
         end
-
-        if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
-            if (self.eatAudio == 0 and (self.eatSound == '' or self.eatSound == 'm' or self.eatSound == 'f')) then
-                self.eatSound = SmokingSoundsOverhaul:getLightingSound(self.character)
-                self.table.lightingEatSound = self.eatSound
-                self.eatAudio = self.eatSound
-            end
-        end
     end
 end

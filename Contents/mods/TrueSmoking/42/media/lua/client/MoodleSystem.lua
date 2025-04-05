@@ -187,10 +187,11 @@ function NicotineMoodle:update()
     if addictionMoodle then
         addictionMoodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
 
-        local value = 1 - (data.addictionLevel / 100)
-        if not player:HasTrait('Smoker') and not TrueSmoking.Config.DebugMoodles then
-            value = 0.5
+        local value = 0.5
+        if self.table.isSmoking or TrueSmoking.Config.DebugMoodles then
+            value = 1 - (data.addictionLevel / 100)
         end
+
         addictionMoodle:setValue(value)
 
         local levelDesc = self:getAddictionRecoveryText()
@@ -223,6 +224,9 @@ function NicotineMoodle:generateDebugInfo(data)
     local days = math.floor(addictionTime / 24)
     local hours = math.floor(addictionTime % 24)
     debugText = debugText .. string.format("\nTime to 0: %d days, %d hours", days, hours)
+    local daysT = math.floor(data.addictionDurationThreshold / 24)
+    local hoursT = math.floor(data.addictionDurationThreshold % 24)
+    debugText = debugText .. string.format("\nTime to Threshold: %d days, %d hours", daysT, hoursT)
 
     debugText = debugText .. "\n\n[Withdrawal]"
     if data.nicotineLevel < NicotineSystem.Options.GROWTH_THRESHOLD then
@@ -239,10 +243,11 @@ function NicotineMoodle:generateDebugInfo(data)
     debugText = debugText .. string.format("\nMetabolic Factor: %.2fx", data.metabolicFactor)
     debugText = debugText .. string.format("\nStress Change: %.8f/hr", data.longTermStressChangeRate * 60)
     debugText = debugText ..
-    string.format("\nUnhappiness Total: %.6f, Change: %.8f/hr", data.unhappinessAccumulation,
-        data.longTermUnhappinessChangeRate * 60)
+        string.format("\nUnhappiness Total: %.6f, Change: %.8f/hr", data.unhappinessAccumulation,
+            data.longTermUnhappinessChangeRate * 60)
     debugText = debugText ..
-    string.format("\nBoredom Total: %.6f, Change: %.8f/hr", data.boredomAccumulation, data.longTermBoredomChangeRate * 60)
+        string.format("\nBoredom Total: %.6f, Change: %.8f/hr", data.boredomAccumulation,
+        data.longTermBoredomChangeRate * 60)
     debugText = debugText .. string.format("\nFatigue Change: %.8f/hr", data.longTermFatigueChangeRate * 60)
     debugText = debugText .. string.format("\nHunger Change: %.8f/hr", data.longTermHungerChangeRate * 60)
 
@@ -264,7 +269,7 @@ function NicotineMoodle:getAddictionRecoveryText()
 
         if data.addictionDuration then
             return getText("Moodles_nicotine_addiction",
-                string.format("%d days", data.addictionDurationDays, data.addictionDuration))
+                string.format("%d days", data.addictionDuration / 24))
         end
     else
         local level = data.withdrawalLevel

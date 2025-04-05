@@ -264,10 +264,12 @@ ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
 
     if mask and mask:getFullType():contains('Shemagh') and mask:getTags():contains('CantSmoke') and o.CheckMaskSmoking then
         o.shemagh = mask
+        o.mask = false
         TrueSmoking:adjustShemagh(playerObj, mask, true)
     else --let the game handle it normally
         mask = originalGetEatingMask(playerObj, removeMask)
         o.mask = mask
+        o.shemagh = false
     end
 
     --If we want to handle re-equipping tell the game we took nothing off
@@ -338,8 +340,7 @@ function TrueSmoking:start(playerNum, player)
     end
 
     -- 460 is vanilla
-    self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 400 or 220
-    self.relightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 400 or 120
+    self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 460 or 220
 
     local function keyWrapper(key)
         self:onKeyStartPressed(key)
@@ -535,11 +536,13 @@ Events.OnInitGlobalModData.Add(function()
 
     -- Nicotine system options
     TrueSmoking.Options.UseNicotineSystem = SandboxVars.TrueSmoking.UseNicotineSystem
+    TrueSmoking.Options.DynamicSmokerTrait = SandboxVars.TrueSmoking.DynamicSmokerTrait
 
     NicotineSystem.Options.BASE_DECAY_RATE = SandboxVars.TrueSmoking.MetabolismBaseDecayRate
 
     NicotineSystem.Options.GAIN_RATE = SandboxVars.TrueSmoking.AddictionGainRate
     NicotineSystem.Options.DECAY_RATE = SandboxVars.TrueSmoking.AddictionDecayRate
+    NicotineSystem.Options.MIN_DECAY = SandboxVars.TrueSmoking.AddictionMinDecay
 
     NicotineSystem.Options.GROWTH_THRESHOLD = SandboxVars.TrueSmoking.AddictionGrowthThreshold
     NicotineSystem.Options.TRAIT_THRESHOLD = SandboxVars.TrueSmoking.AddictionTraitThreshold

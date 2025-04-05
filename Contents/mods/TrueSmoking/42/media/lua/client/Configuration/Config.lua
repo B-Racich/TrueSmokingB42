@@ -23,7 +23,7 @@ Events.OnCreatePlayer.Add(function()
             idle = should go out when idle
             walking/running/sprinting/strafing = should increase burn while doing
             canDrop = if the smoke should be dropped when falling (trees,zombies,walls)
-            
+
         [idleFactor]: the multiplier to decrease the burn rate when idle
         [walkingFactor]: the multiplier to increase the burn rate to min when walking
         [runningFactor]: the multiplier to increase the burn rate to min when running
@@ -138,7 +138,8 @@ Events.OnCreatePlayer.Add(function()
     TrueSmoking:setSmokableObjects(smokableObjects)
 
     local TRUE_SMOKING_DEFAULT_HOTKEY_SMOKES = {
-        'Base.CigaretteSingle',
+        'Base.RolledCigarette','Base.CigaretteSingle','Base.Cigarillo',
+        'Base.Cigar','Base.CanPipe_Tobacco','SmokingPipe_Tobacco'
     }
 
     local TRUE_SMOKING_DEFAULT_HOTKEY_PACKS = {
@@ -149,37 +150,77 @@ Events.OnCreatePlayer.Add(function()
     TrueSmoking:setHotkeyPacks(TRUE_SMOKING_DEFAULT_HOTKEY_PACKS)
 end)
 
+local HeadGearToTag = {
+    'Hat_NBCmask_nofilter',
+    'Hat_NBCmask',
+    'Hat_ShemaghFull',
+    'Hat_ShemaghFull_Green',
+    'Hat_Spiffo',
+    'Hat_ShemaghFull_Burlap',
+    'Hat_ShemaghFull_Cotton',
+    'Hat_HeadSack_Burlap',
+    'Hat_HeadSack_Cotton',
+    'Hat_MetalHelmet',
+    'Hat_MetalScrapHelmet',
+    'ShemaghScarfFace',
+    'ShemaghScarfFace_Green',
+    'WeldingMask',
+    'Hat_RiotHelmet',
+    'Hat_CrashHelmetFULL',
+    'Hat_CrashHelmetFULL_Black',
+    'Hat_DustMask',
+    'Hat_GasMask',
+    'Hat_GasMask_nofilter',
+    'Hat_HalloweenMaskDevil',
+    'Hat_HalloweenMaskMonster',
+    'Hat_HalloweenMaskPumpkin',
+    'Hat_HalloweenMaskSkeleton',
+    'Hat_HalloweenMaskVampire',
+    'Hat_HalloweenMaskWitch',
+    'Hat_HockeyMask',
+    'Hat_BoneMask',
+    'Hat_HockeyMask_Wood',
+    'Hat_HockeyMask_Metal',
+    'Hat_HockeyMask_Copper',
+    'Hat_HockeyMask_Gold',
+    'Hat_HockeyMask_Silver',
+    'Hat_HockeyMask_MetalScrap',
+    'Hat_SurgicalMask',
+    'Hat_BuildersRespirator',
+    'Hat_BandanaMask_Green',
+    'Hat_BandanaMask',
+    'Hat_BandanaMaskTINT',
+    'Hat_BuildersRespirator_nofilter',
+}
 
---[[
-    Placeholder for when we need to do some item edits at some point
-]]
---Kalilynx
-local function appendSample()
+local function ItemFixer()
     if not ScriptManager.instance then return end -- Ensure ScriptManager exists
 
-    local item = ScriptManager.instance:getItem("Base.Item")
-    if not item then return end
+    for index, value in ipairs(HeadGearToTag) do
+        local item = ScriptManager.instance:getItem("Base." .. value)
+        if not item then return end
 
-    local currentTags = item:getTags()
-    local newTagsList = { "Tag1", "Tag2" }
-    local tagsSet = {} -- use  set to avoid dup tags
+        local currentTags = item:getTags()
+        local newTagsList = { "CantSmoke" }
+        local tagsSet = {} -- use  set to avoid dup tags
 
-    -- here we add existing tags to the set
-    if currentTags and not currentTags:isEmpty() then
-        for i = 0, currentTags:size() - 1 do
-            tagsSet[currentTags:get(i)] = true
+        -- here we add existing tags to the set
+        if currentTags and not currentTags:isEmpty() then
+            for i = 0, currentTags:size() - 1 do
+                tagsSet[currentTags:get(i)] = true
+            end
         end
+        -- add new tags
+        for _, tag in ipairs(newTagsList) do
+            tagsSet[tag] = true
+        end
+        -- convert the set back to a list and update it
+        local mergedTags = {}
+        for tag in pairs(tagsSet) do
+            table.insert(mergedTags, tag)
+        end
+        item:DoParam("Tags = " .. table.concat(mergedTags, ";"))
     end
-    -- add new tags
-    for _, tag in ipairs(newTagsList) do
-        tagsSet[tag] = true
-    end
-    -- convert the set back to a list and update it
-    local mergedTags = {}
-    for tag in pairs(tagsSet) do
-        table.insert(mergedTags, tag)
-    end
-    item:DoParam("Tags = " .. table.concat(mergedTags, ";"))
 end
 
--- Events.OnGameBoot.Add(appendSample)
+Events.OnGameBoot.Add(ItemFixer)

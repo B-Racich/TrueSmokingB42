@@ -5,9 +5,9 @@
 local originalComplete = ISWearClothing.complete
 function ISWearClothing:complete()
     local rtn = originalComplete(self)
-    local o = TrueSmoking:getPlayerReference(self.character)
-    if self.item == o.mask then
-        o.mask = false
+    local table = TrueSmoking:getPlayerReference(self.character)
+    if self.item == table.mask then
+        table.mask = false
     end
     return rtn
 end
@@ -30,10 +30,10 @@ function ISWearClothing:new(character, item, time)
         SCBAnotank = true
     }
 
-    local playerRef = TrueSmoking:getPlayerReference(character)
+    local table = TrueSmoking:getPlayerReference(character)
 
-    if smokableBlacklist[item:getBodyLocation()] and not item:hasTag("CanEat") and playerRef.isSmoking then
-        playerRef.Smokable:putOut()
+    if smokableBlacklist[item:getBodyLocation()] and not item:hasTag("CanEat") and table.isSmoking then
+        table.Smokable:putOut()
     end
 
     return o

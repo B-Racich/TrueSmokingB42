@@ -107,7 +107,7 @@ function LightSmoke:new(character)
     o.item = o.trueSmoking.Smokable.item
     o.eatSound = ''
     o.eatAudio = 0
-    o.maxTime = TrueSmoking.relightTime
+    o.maxTime = TrueSmoking.lightTime
     o.carLighter = o.item:hasTag("Smokable") and o.character:getVehicle() and
     o.character:getVehicle():canLightSmoke(o.character)
     o.openFlame = false

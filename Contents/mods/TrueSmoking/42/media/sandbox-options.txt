@@ -103,6 +103,13 @@ option TrueSmoking.UseNicotineSystem
     page = TrueSmokingNicotine, translation=TrueSmoking_UseNicotineSystem,
 }
 
+option TrueSmoking.DynamicSmokerTrait
+{
+    type = boolean,
+    default = true,
+    page = TrueSmokingNicotine, translation=TrueSmoking_DynamicSmokerTrait,
+}
+
 /* Nicotine System - Metabolism Settings */
 
 option TrueSmoking.MetabolismBaseDecayRate
@@ -121,7 +128,7 @@ option TrueSmoking.AddictionGainRate
     type = double,
     min = 0.01,
     max = 2.0,
-    default = 0.7,
+    default = 0.0725,
     page = TrueSmokingNicotine, translation=TrueSmoking_AddictionGainRate,
 }
 
@@ -130,7 +137,7 @@ option TrueSmoking.AddictionDecayRate
     type = double,
     min = 0.01,
     max = 0.999,
-    default = 0.985,
+    default = 0.9899,
     page = TrueSmokingNicotine, translation=TrueSmoking_AddictionDecayRate,
 }
 
@@ -139,7 +146,7 @@ option TrueSmoking.AddictionMinDecay
     type = double,
     min = 0.001,
     max = 0.1,
-    default = 0.0075,
+    default = 0.0015,
     page = TrueSmokingNicotine, translation=TrueSmoking_AddictionMinDecay,
 }
 
@@ -193,7 +200,7 @@ option TrueSmoking.AddictionIntakeConversion
     type = double,
     min = 0.01,
     max = 1.0,
-    default = 0.2,
+    default = 0.025,
     page = TrueSmokingNicotine, translation=TrueSmoking_AddictionIntakeConversion,
 }
 
@@ -202,7 +209,7 @@ option TrueSmoking.AddictionActiveSmoking
     type = double,
     min = 0.1,
     max = 10.0,
-    default = 1.25,
+    default = 0.125,
     page = TrueSmokingNicotine, translation=TrueSmoking_AddictionActiveSmoking,
 }
 

@@ -22,6 +22,7 @@ function TakePuff:update()
         end
     end
 
+    -- Loop audio
     if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
@@ -66,12 +67,6 @@ function TakePuff:start()
     --Track puff
     self.trueSmoking.takingPuff = true
     self.puffTimeMark = os.time()
-
-    --2x for 1/2 speed anim
-    if anim == 'Smoke_Quiet' then
-        self.visualItemTimer = self.visualItemTimer * 2
-        self.visualItemAnimLength = self.visualItemAnimLength * 2
-    end
 
     if not self.trueSmoking.visualItem then
         local hasPrimary = self.character:getPrimaryHandItem()

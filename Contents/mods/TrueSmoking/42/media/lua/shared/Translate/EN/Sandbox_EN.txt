@@ -43,6 +43,9 @@ Sandbox_EN = {
 
     Sandbox_TrueSmoking_UseNicotineSystem = "Use Nicotine System",
         Sandbox_TrueSmoking_UseNicotineSystem_tooltip = "Enable the nicotine addiction and withdrawal system",
+
+    Sandbox_TrueSmoking_DynamicSmokerTrait = "Dynamic Smoker Trait",
+        Sandbox_TrueSmoking_DynamicSmokerTrait_tooltip = "Allows the player to gain/lose the Smoker trait",
     
    /* Nicotine System - Metabolism Settings */
     Sandbox_TrueSmoking_MetabolismBaseDecayRate = "Nicotine Base Decay Rate",
