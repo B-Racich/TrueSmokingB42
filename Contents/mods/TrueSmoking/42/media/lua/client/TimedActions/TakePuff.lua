@@ -3,7 +3,7 @@ require "TimedActions/ISBaseTimedAction"
 TakePuff = ISBaseTimedAction:derive("TakePuff")
 
 function TakePuff:isValid()
-    return self.trueSmoking.isSmoking
+    return self.trueSmoking.isSmoking and self.trueSmoking.Smokable.smokeLength > 0
 end
 
 function TakePuff:update()
