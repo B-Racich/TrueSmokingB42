@@ -22,6 +22,10 @@ function TakePuff:update()
         end
     end
 
+    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
+    end
+
     self.trueSmoking.Smokable.puffTimeMark = os.time()
 
     -- Reset job if keybind is held
@@ -123,10 +127,6 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
-    if self.character:getEmitter():isPlaying(self.eatSound) then
-        self.character:getEmitter():stopSound(self.eatAudio)
-    end
-
     self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
