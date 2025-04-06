@@ -86,6 +86,7 @@ function TrueSmoking:hasRequiredItem(smokable, player)
     end
 
     local function predicateNotEmpty(item)
+        -- return item:getCurrentUsesFloat() > 0 and ((item:getCurrentUsesFloat() - item:getUseDelta()) > 0)
         return item:getCurrentUsesFloat() > 0
     end
 
@@ -290,7 +291,7 @@ function TrueSmoking:onKeyStartPressed(key)
         elseif o.isSmoking and not o.Smokable.smokeLit and key == self.Config.keySmoke then
             o.Smokable:light()
         elseif self.Config.FindSmoke and not o.isSmoking and key == self.Config.keySmoke then
-            print('TRUESMOKING::Find smokable')
+            print('TRUESMOKING::Find Smokable')
             self:findSmokable(player)
         elseif o.isSmoking and key == self.Config.keyStopSmoke then
             o.Smokable:putOut()

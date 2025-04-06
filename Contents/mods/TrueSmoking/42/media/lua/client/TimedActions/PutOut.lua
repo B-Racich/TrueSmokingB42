@@ -4,7 +4,7 @@ PutOut = ISBaseTimedAction:derive("PutOut")
 
 function PutOut:isValid()
     --Check if we have a smoke lit
-    return self.trueSmoking.isSmoking
+    return self.table.isSmoking
 end
 
 function PutOut:update()
@@ -12,7 +12,7 @@ function PutOut:update()
     local curTime = os.time()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            self.trueSmoking.Smokable:removeVisualItem()
+            self.smokable:removeVisualItem()
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
             if hasPrimary then
@@ -43,7 +43,7 @@ function PutOut:start()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable("FoodType", self.item:getEatType())
-    if not self.trueSmoking.visualItem then
+    if not self.table.visualItem then
         self:setOverrideHandModels(nil, self.item)
     end
 end
@@ -52,13 +52,13 @@ function PutOut:stop()
     ISBaseTimedAction.stop(self)
     -- If we are cancelling the action and the smoke is finished just get rid of it
     if self.item:getModData().SmokeLength <= 0 then
-        self.trueSmoking.Smokable:stop()
+        self.smokable:stop()
     end
     self:forceComplete()
 end
 
 function PutOut:complete()
-    self.trueSmoking.Smokable:stop()
+    self.smokable:stop()
     return true
 end
 
@@ -75,8 +75,9 @@ function PutOut:new(character)
         character = character,
     }
 
-    o.trueSmoking = TrueSmoking:getPlayerReference(character)
-    o.item = o.trueSmoking.Smokable.item
+    o.table = TrueSmoking:getPlayerReference(character)
+    o.smokable = o.table.Smokable
+    o.item = o.table.Smokable.item
     o.maxTime = 120
 
     o.visualItemTimer = 0.7

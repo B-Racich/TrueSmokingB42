@@ -206,6 +206,12 @@ function Smokable:getVisualItem(item)
 end
 
 function Smokable:light()
+    if ((self.table.isSmoking or self.table.isSmoking) and self.table.smokeLit) and not ISTimedActionQueue.hasActionType(self.player, 'LightSmoke') then
+        ISTimedActionQueue.add(LightSmoke:new(self.player))
+    end
+end
+
+function Smokable:start()
     if not self.table.isSmoking then
         self.table.isSmoking = true
         if not TrueSmoking.Config.HideMoodles then
@@ -218,7 +224,9 @@ function Smokable:light()
         self.updateWrapper = updateWrapper
         self:equipVisualItem()
         self.player:getInventory():Remove(self.item)
+    end
 
+    if not self.smokeLit then
         self.smokeLit = true
         self.puffTimeMark = os.time()
         self.table.lightingEatSound = ''
@@ -228,13 +236,10 @@ function Smokable:light()
                 self.burnMax)
         end
     end
-    if not self.smokeLit then
-        ISTimedActionQueue.add(LightSmoke:new(self.player))
-    end
 end
 
 function Smokable:putOut()
-    if self.table.isSmoking then
+    if self.table.isSmoking and not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
         ISTimedActionQueue.add(PutOut:new(self.player))
     end
 end

@@ -3,7 +3,7 @@ require "TimedActions/ISBaseTimedAction"
 LightSmoke = ISBaseTimedAction:derive("LightSmoke")
 
 function LightSmoke:isValid()
-    return self.trueSmoking.isSmoking and self.hasLighter
+    return self.hasLighter
 end
 
 function LightSmoke:update()
@@ -39,10 +39,6 @@ function LightSmoke:getRequiredItem()
 end
 
 function LightSmoke:start()
-    if TrueSmoking.Config.HideAllActionBars then
-        self.action:setUseProgressBar(false)
-    end
-
     if self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
         local lighter = self:getRequiredItem()
         if not lighter then
@@ -54,7 +50,13 @@ function LightSmoke:start()
             self:setActionAnim(CharacterActionAnims.Eat)
             self:setAnimVariable("FoodType", self.item:getEatType())
 
-            if not self.trueSmoking.visualItem then
+            if TrueSmoking.Config.HideAllActionBars then
+                self.action:setUseProgressBar(false)
+            end
+            local hasPrimary = self.character:getPrimaryHandItem()
+            if hasPrimary then
+                self:setOverrideHandModels(hasPrimary, self.item)
+            else
                 self:setOverrideHandModels(nil, self.item)
             end
 
@@ -63,13 +65,13 @@ function LightSmoke:start()
                 local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
                 if self.eatSound == '' or self.eatSound == nil then -- No sound running for first time
                     self.eatSound = sound
-                    if not self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound) then
-                        self.trueSmoking.lightingEatSound = self.eatSound
+                    if not self.character:getEmitter():isPlaying(self.table.lightingEatSound) then
+                        self.table.lightingEatSound = self.eatSound
                         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
                     end
                 end
             end
-            self.character:reportEvent("EventEating");
+            -- self.character:reportEvent("EventEating");
         end
     end
 end
@@ -80,17 +82,14 @@ end
 
 function LightSmoke:perform()
     ISBaseTimedAction.perform(self)
-    self.trueSmoking.Smokable.smokeLit = true
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
-
-    if self.trueSmoking.Smokable.burnRate == 0 then
-        self.trueSmoking.Smokable.burnRate = ZombRandFloat(self.trueSmoking.Smokable.burnMax * .75,
-            self.trueSmoking.Smokable.burnMax * 1.15)
-    end
+    self.smokable.smokeLit = true
+    self.smokable.puffTimeMark = os.time()
 end
 
 function LightSmoke:complete()
-    self.trueSmoking.lightingEatSound = ''
+    self.table.lightingEatSound = ''
+
+    self.smokable:start()
     return true
 end
 
@@ -103,13 +102,14 @@ function LightSmoke:new(character)
         character = character,
     }
 
-    o.trueSmoking = TrueSmoking:getPlayerReference(character)
-    o.item = o.trueSmoking.Smokable.item
+    o.table = TrueSmoking:getPlayerReference(character)
+    o.smokable = o.table.Smokable
+    o.item = o.smokable.item
     o.eatSound = ''
     o.eatAudio = 0
     o.maxTime = TrueSmoking.lightTime
     o.carLighter = o.item:hasTag("Smokable") and o.character:getVehicle() and
-    o.character:getVehicle():canLightSmoke(o.character)
+        o.character:getVehicle():canLightSmoke(o.character)
     o.openFlame = false
     if o.item:hasTag("Smokable") then o.openFlame = ISInventoryPaneContextMenu.hasOpenFlame(o.character) end
 

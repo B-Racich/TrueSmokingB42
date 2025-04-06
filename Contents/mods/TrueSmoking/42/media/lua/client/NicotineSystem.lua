@@ -529,7 +529,7 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
 
-    local intensity = ((data.withdrawalLevel / 100) + (player:getTimeSinceLastSmoke() / 10))/2
+    local intensity = ((data.withdrawalLevel / 100) + (player:getTimeSinceLastSmoke() / 10)) / 2
 
     local stressChange = intensity * self.Constants.STRESS_BASE * hoursPassed
     local unhappinessChange = intensity * self.Constants.UNHAPPINESS_BASE * hoursPassed
@@ -553,20 +553,22 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
     -- self:trackValueChange(data, "stress", stressChange, hoursPassed)
     -- stats:setStressFromCigarettes(math.min(0.51, stats:getStressFromCigarettes() + stressChange))
 
-    local currentTime = getGameTime():getWorldAgeHours()
-    if not data.lastWithdrawalMessage then data.lastWithdrawalMessage = 0 end
+    if player:HasTrait('Smoker') then
+        local currentTime = getGameTime():getWorldAgeHours()
+        if not data.lastWithdrawalMessage then data.lastWithdrawalMessage = 0 end
 
-    local messageCooldown = self:calculateMessageCooldown(data.withdrawalLevel)
-    data.messageCooldown = messageCooldown
-    local timeSinceLastMessage = currentTime - data.lastWithdrawalMessage
-    data.timeSinceLastMessage = timeSinceLastMessage
+        local messageCooldown = self:calculateMessageCooldown(data.withdrawalLevel)
+        data.messageCooldown = messageCooldown
+        local timeSinceLastMessage = currentTime - data.lastWithdrawalMessage
+        data.timeSinceLastMessage = timeSinceLastMessage
 
-    if timeSinceLastMessage >= messageCooldown then
-        local messageChance = 50 -- Fixed chance, adjustable
-        if ZombRand(100) < messageChance then
-            local symptomIndex = ZombRand(1, 10)
-            player:Say(getText("UI_TRUESMOKING_WITHDRAWAL_SYMPTOM_" .. symptomIndex))
-            data.lastWithdrawalMessage = currentTime
+        if timeSinceLastMessage >= messageCooldown then
+            local messageChance = 50 -- Fixed chance, adjustable
+            if ZombRand(100) < messageChance then
+                local symptomIndex = ZombRand(1, 10)
+                player:Say(getText("UI_TRUESMOKING_WITHDRAWAL_SYMPTOM_" .. symptomIndex))
+                data.lastWithdrawalMessage = currentTime
+            end
         end
     end
 end
@@ -587,7 +589,7 @@ function NicotineSystem:relieveWithdrawalEffects(player, hoursPassed)
     data.boredomChange = boredomChange
 
     if data.boredomAccumulation > 0 then
-        data.boredomAccumulation = math.max(0,data.boredomAccumulation - boredomChange)
+        data.boredomAccumulation = math.max(0, data.boredomAccumulation - boredomChange)
         self:trackValueChange(data, "boredom", boredomChange, hoursPassed)
         bodyDamage:setBoredomLevel(math.max(0, bodyDamage:getBoredomLevel() - boredomChange))
     end
