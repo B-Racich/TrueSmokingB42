@@ -46,8 +46,8 @@ function LightSmoke:start()
         else
             lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
 
-            --Set the animation
-            self:setActionAnim(CharacterActionAnims.Eat)
+            local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
+            self:setActionAnim(anim)
             self:setAnimVariable("FoodType", self.item:getEatType())
 
             if TrueSmoking.Config.HideAllActionBars then
