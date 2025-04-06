@@ -99,7 +99,7 @@ option TrueSmoking.DroppingChanceNonSmoker
 option TrueSmoking.UseNicotineSystem
 {
     type = boolean,
-    default = false,
+    default = true,
     page = TrueSmokingNicotine, translation=TrueSmoking_UseNicotineSystem,
 }
 
