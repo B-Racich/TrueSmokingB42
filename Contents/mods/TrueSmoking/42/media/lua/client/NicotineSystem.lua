@@ -345,9 +345,9 @@ function NicotineSystem:updateNicotineLevel(data, hoursPassed, player)
         data.nicotineLevel = data.nicotineLevel * (dynamicDecayRate ^ hoursPassed)
     end
 
-    if data.nicotineLevel < self.Options.GROWTH_THRESHOLD then
+    if data.nicotineLevel < self.Options.GROWTH_THRESHOLD and data.addictionLevel > self.Options.GROWTH_THRESHOLD then
         local timeFactor = player:getTimeSinceLastSmoke() / 10
-        if timeFactor == 0 then timeFactor = 0.05 end
+        if timeFactor == 0 then timeFactor = 0.15 end
         local increaseRate = (data.addictionLevel / 100) * self.Constants.INCREASE_FACTOR * timeFactor
         data.withdrawalLevel = math.min(100, data.withdrawalLevel + increaseRate * hoursPassed)
         self:applyWithdrawalEffects(player, hoursPassed)
