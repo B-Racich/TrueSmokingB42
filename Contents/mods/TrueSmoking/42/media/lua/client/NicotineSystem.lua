@@ -345,19 +345,18 @@ function NicotineSystem:updateNicotineLevel(data, hoursPassed, player)
         data.nicotineLevel = data.nicotineLevel * (dynamicDecayRate ^ hoursPassed)
     end
 
-    if player:HasTrait('Smoker') then
-        if data.nicotineLevel < self.Options.GROWTH_THRESHOLD then
-            local timeFactor = player:getTimeSinceLastSmoke() / 10
-            local increaseRate = (data.addictionLevel / 100) * self.Constants.INCREASE_FACTOR * timeFactor
-            data.withdrawalLevel = math.min(100, data.withdrawalLevel + increaseRate * hoursPassed)
-            self:applyWithdrawalEffects(player, hoursPassed)
-        else
-            local decreaseRate = self.Constants.DECREASE_FACTOR
-            if isSmoking then decreaseRate = decreaseRate * 5 end
-            data.withdrawalLevel = math.max(0, data.withdrawalLevel - decreaseRate * hoursPassed)
-            if data.nicotineLevel > 1 and data.withdrawalLevel >= 0 then
-                self:relieveWithdrawalEffects(player, hoursPassed)
-            end
+    if data.nicotineLevel < self.Options.GROWTH_THRESHOLD then
+        local timeFactor = player:getTimeSinceLastSmoke() / 10
+        if timeFactor == 0 then timeFactor = 0.05 end
+        local increaseRate = (data.addictionLevel / 100) * self.Constants.INCREASE_FACTOR * timeFactor
+        data.withdrawalLevel = math.min(100, data.withdrawalLevel + increaseRate * hoursPassed)
+        self:applyWithdrawalEffects(player, hoursPassed)
+    else
+        local decreaseRate = self.Constants.DECREASE_FACTOR
+        if isSmoking then decreaseRate = decreaseRate * 5 end
+        data.withdrawalLevel = math.max(0, data.withdrawalLevel - (decreaseRate * hoursPassed))
+        if data.nicotineLevel > 1 and data.withdrawalLevel >= 0 then
+            self:relieveWithdrawalEffects(player, hoursPassed)
         end
     end
 
