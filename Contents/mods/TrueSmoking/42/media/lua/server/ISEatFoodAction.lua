@@ -13,7 +13,7 @@ function ISEatFoodAction:new(character, item, percentage)
 
     local table = TrueSmoking:getPlayerReference(character)
 
-    if (isInList(onEat, funcsToHook) or hasSmokableTag) then
+    if (isInList(onEat, funcsToHook) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         if not table.isSmoking then
             print('TRUESMOKING::Hooking: ' .. onEat)
             local replace = item:getReplaceOnUseFullType()

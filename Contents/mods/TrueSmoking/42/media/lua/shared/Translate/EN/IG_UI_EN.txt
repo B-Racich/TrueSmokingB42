@@ -40,4 +40,12 @@ IG_UI_EN = {
 
     IGUI_TRUESMOKING_DEBUG_MOODLES = "Debug Info",
     IGUI_TRUESMOKING_DEBUG_MOODLES_DESC = "Shows Debug information on the moodle tooltips",
+
+    IGUI_TRUESMOKING_SMOKE_KEYS = "Hotkeys For Smokes",
+    IGUI_TRUESMOKING_ROLLED_HK = "Rolled Cigarette",
+    IGUI_TRUESMOKING_CIG_HK = "Cigarette",
+    IGUI_TRUESMOKING_CIGARILLO_HK = "Cigarillo",
+    IGUI_TRUESMOKING_CIGAR_HK = "Cigar",
+    IGUI_TRUESMOKING_CAN_HK = "Can",
+    IGUI_TRUESMOKING_PIPE_HK = "Smoking Pipe",
 }

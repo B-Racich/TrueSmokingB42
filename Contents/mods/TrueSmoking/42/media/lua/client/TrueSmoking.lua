@@ -220,8 +220,29 @@ function TrueSmoking:useRecipe(item, player, recipeString)
 end
 
 function TrueSmoking:findSmokable(player)
+    local map = {
+        [1] = 'Base.RolledCigarette',
+        [2] = 'Base.CigaretteSingle',
+        [3] = 'Base.Cigarillo',
+        [4] = 'Base.Cigar',
+        [5] = 'Base.CanPipe_Tobacco',
+        [6] = 'Base.SmokingPipe_Tobacco'
+    }
+
+    local smokes = {}
+
+    for i = 1, #map do
+        if self.Config['HotKeySmokes_' .. tostring(i)] then
+            table.insert(smokes, map[i])
+        end
+    end
+
+    for _, item in ipairs(self.HotkeySmokes) do
+        table.insert(smokes, item)
+    end
+
     local cigarette = false
-    for _, value in ipairs(self.HotkeySmokes) do
+    for _, value in ipairs(smokes) do
         cigarette = player:getInventory():getFirstTypeRecurse(value)
         if cigarette then break end
     end
@@ -236,7 +257,7 @@ function TrueSmoking:findSmokable(player)
 
     if not cigarette and pack and recipe then
         self:useRecipe(pack, player, recipe)
-        for index, value in ipairs(self.HotkeySmokes) do
+        for index, value in ipairs(smokes) do
             cigarette = player:getInventory():getFirstTypeRecurse(value)
         end
     end
