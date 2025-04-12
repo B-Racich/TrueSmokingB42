@@ -4,40 +4,42 @@ NicotineSystem.__index = NicotineSystem
 -- Sandbox Options
 NicotineSystem.Options = {
     -- nicotine
-    BASE_DECAY_RATE = 0.9,
+    NICOTINE_DECAY_RATE = 0.9,
 
     --Addiction
-    GAIN_RATE = 0.0725,
-    DECAY_RATE = 0.9899,
-    MIN_DECAY = 0.0015,
+    ADDICTION_GAIN_RATE = 0.0725,
+    ADDICTION_DECAY_RATE = 0.9899,
+    ADDICTION_MIN_DECAY = 0.0015,
+    ADDICTION_GAIN_THRESHOLD = 10.0,
 
-    GROWTH_THRESHOLD = 10.0,
-    TRAIT_THRESHOLD = 60,
-    CURE_THRESHOLD = 15,
+    SMOKER_TRAIT_THRESHOLD = 60,
+    SMOKER_TRAIT_LOSE_THRESHOLD = 15,
 
-    CURVE = {
+    ADDICTION_GROWTH_CURVE = {
         EXPONENT = 2,
         MULTIPLIER = 50,
     },
 
     INTAKE_CONVERSION = 0.025,
-    ACTIVE_SMOKING_BONUS = 0.125
-}
+    ACTIVE_SMOKING_BONUS = 0.125,
 
-NicotineSystem.Constants = {
-    ADDICTION_CAP = 10000,
-    INCREASE_FACTOR = 25,
-    DECREASE_FACTOR = 60,
-    BASE_RELIEF = 8,
+    FATIGUE_BASE = 0.0001,
+    HUNGER_BASE = 0.0001,
 
     STRESS_BASE = 0.2,
     UNHAPPINESS_BASE = 1,
     BOREDOM_BASE = 1,
-    FATIGUE_BASE = 0.0001,
-    HUNGER_BASE = 0.0001,
 
     UNHAPPINESS_MAX = 35,
     BOREDOM_MAX = 35,
+
+    ADDICTION_CAP = 10000,
+}
+
+NicotineSystem.Constants = {
+    INCREASE_FACTOR = 25,
+    DECREASE_FACTOR = 60,
+    BASE_RELIEF = 8,
 
     HIGH_ADDICTION_THRESHOLD = 80,
     HIGH_ADDICTION_BOOST = 0.5,
@@ -204,20 +206,20 @@ function NicotineSystem:calculateAddictionDuration(player)
     while simulatedAddiction > 1 and hoursPassed < maxSimulationHours do
         hoursPassed = hoursPassed + 1
 
-        if simulatedAddiction > self.Options.CURE_THRESHOLD then
+        if simulatedAddiction > self.Options.SMOKER_TRAIT_LOSE_THRESHOLD then
             hoursPassedThreshold = hoursPassed
         end
 
-        local exponentialDecay = simulatedAddiction * (self.Options.DECAY_RATE ^ 1)
+        local exponentialDecay = simulatedAddiction * (self.Options.ADDICTION_DECAY_RATE ^ 1)
         local linearComponent = 0
 
-        if simulatedAddiction < self.Options.CURE_THRESHOLD * 1.5 then
-            local factor = 1 - (simulatedAddiction / (self.Options.CURE_THRESHOLD * 1.5))
-            linearComponent = self.Options.GAIN_RATE * 1 * factor * 2
+        if simulatedAddiction < self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 1.5 then
+            local factor = 1 - (simulatedAddiction / (self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 1.5))
+            linearComponent = self.Options.ADDICTION_GAIN_RATE * 1 * factor * 2
         end
 
         if simulatedAddiction < 10 then
-            linearComponent = linearComponent + self.Options.MIN_DECAY
+            linearComponent = linearComponent + self.Options.ADDICTION_MIN_DECAY
         end
 
         simulatedAddiction = math.max(0, exponentialDecay - linearComponent)
@@ -289,7 +291,7 @@ function NicotineSystem:calculateMessageCooldown(withdrawalLevel)
 end
 
 function NicotineSystem:calculateWithdrawalIntensity(addictionLevel, hoursPassed)
-    local normalizedAddiction = addictionLevel / self.Constants.ADDICTION_CAP
+    local normalizedAddiction = addictionLevel / self.Options.ADDICTION_CAP
 
     local intensity = (normalizedAddiction * normalizedAddiction * normalizedAddiction) * hoursPassed
 
@@ -346,7 +348,7 @@ function NicotineSystem:updateNicotineLevel(data, hoursPassed, player)
         data.nicotineLevel = data.nicotineLevel * (dynamicDecayRate ^ hoursPassed)
     end
 
-    if data.nicotineLevel < self.Options.GROWTH_THRESHOLD and data.addictionLevel > self.Options.GROWTH_THRESHOLD then
+    if data.nicotineLevel < self.Options.ADDICTION_GAIN_THRESHOLD and data.addictionLevel > self.Options.ADDICTION_GAIN_THRESHOLD then
         local timeFactor = player:getTimeSinceLastSmoke() / 10
         if timeFactor == 0 then timeFactor = 0.15 end
         local increaseRate = (data.addictionLevel / 100) * self.Constants.INCREASE_FACTOR * timeFactor
@@ -368,8 +370,8 @@ function NicotineSystem:updateNicotineLevel(data, hoursPassed, player)
         local factor = math.exp(k * nicotineContent) - 1
 
         local stats = player:getStats()
-        local fatigueReduction = stats:getFatigue() * self.Constants.FATIGUE_BASE * factor
-        local hungerReduction = stats:getHunger() * self.Constants.HUNGER_BASE * factor
+        local fatigueReduction = stats:getFatigue() * self.Options.FATIGUE_BASE * factor
+        local hungerReduction = stats:getHunger() * self.Options.HUNGER_BASE * factor
 
         data.fatigueChange = fatigueReduction
         data.hungerChange = hungerReduction
@@ -396,35 +398,35 @@ function NicotineSystem:updateAddictionLevel(player, data, hoursPassed)
 
     local isSmoking = TrueSmoking:getPlayerReference(player).Smokable.smokeLit
 
-    if data.nicotineLevel >= self.Options.GROWTH_THRESHOLD then
+    if data.nicotineLevel >= self.Options.ADDICTION_GAIN_THRESHOLD then
         local normalizedLevel = data.nicotineLevel / 100
 
-        local thresholdFactor = math.max(0, (normalizedLevel - self.Options.GROWTH_THRESHOLD / 100) /
-            (1 - self.Options.GROWTH_THRESHOLD / 100))
+        local thresholdFactor = math.max(0, (normalizedLevel - self.Options.ADDICTION_GAIN_THRESHOLD / 100) /
+            (1 - self.Options.ADDICTION_GAIN_THRESHOLD / 100))
 
-        local exponentialComponent = (thresholdFactor ^ self.Options.CURVE.EXPONENT) *
-            self.Options.CURVE.MULTIPLIER *
-            self.Options.GAIN_RATE
+        local exponentialComponent = (thresholdFactor ^ self.Options.ADDICTION_GROWTH_CURVE.EXPONENT) *
+            self.Options.ADDICTION_GROWTH_CURVE.MULTIPLIER *
+            self.Options.ADDICTION_GAIN_RATE
 
         local activeSmokingBonus = 0
 
         if isSmoking then
-            activeSmokingBonus = self.Options.GAIN_RATE * self.Options.ACTIVE_SMOKING_BONUS * normalizedLevel
+            activeSmokingBonus = self.Options.ADDICTION_GAIN_RATE * self.Options.ACTIVE_SMOKING_BONUS * normalizedLevel
         end
 
         local addictionChange = (exponentialComponent + activeSmokingBonus) * hoursPassed
-        data.addictionLevel = math.min(self.Constants.ADDICTION_CAP, data.addictionLevel + addictionChange)
+        data.addictionLevel = math.min(self.Options.ADDICTION_CAP, data.addictionLevel + addictionChange)
     elseif not TrueSmoking:getPlayerReference(player).Smokable.smokeLit then
-        local exponentialDecay = data.addictionLevel * (self.Options.DECAY_RATE ^ hoursPassed)
+        local exponentialDecay = data.addictionLevel * (self.Options.ADDICTION_DECAY_RATE ^ hoursPassed)
         local linearComponent = 0
 
-        if data.addictionLevel < self.Options.CURE_THRESHOLD * 1.5 then
-            local factor = 1 - (data.addictionLevel / (self.Options.CURE_THRESHOLD * 1.5))
-            linearComponent = self.Options.GAIN_RATE * hoursPassed * factor * 2
+        if data.addictionLevel < self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 1.5 then
+            local factor = 1 - (data.addictionLevel / (self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 1.5))
+            linearComponent = self.Options.ADDICTION_GAIN_RATE * hoursPassed * factor * 2
         end
 
         if data.addictionLevel < 10 then
-            linearComponent = linearComponent + (self.Options.MIN_DECAY * hoursPassed)
+            linearComponent = linearComponent + (self.Options.ADDICTION_MIN_DECAY * hoursPassed)
         end
 
         local endurance = player:getStats():getEndurance() -- 0.0 to 1.0
@@ -449,7 +451,7 @@ function NicotineSystem:updateAddictionLevel(player, data, hoursPassed)
 end
 
 function NicotineSystem:calculateDynamicDecayRate(addiction, player)
-    local baseRate = self.Options.BASE_DECAY_RATE
+    local baseRate = self.Options.NICOTINE_DECAY_RATE
     local addictionFactor = addiction / 100
 
     local metabolicFactor = self:calculateDynamicMetabolicFactor(player)
@@ -474,7 +476,7 @@ function NicotineSystem:addNicotine(player, amount)
 
     local adjustedAmount = amount * self.Constants.INTAKE_MULTIPLIER
 
-    local addictionFactor = data.addictionLevel / self.Constants.ADDICTION_CAP
+    local addictionFactor = data.addictionLevel / self.Options.ADDICTION_CAP
 
     local metabolicFactor = self:calculateDynamicMetabolicFactor(player)
     data.metabolicFactor = metabolicFactor
@@ -488,25 +490,25 @@ function NicotineSystem:addNicotine(player, amount)
 
     local baseAddiction = finalAmount * 0.01
 
-    if data.nicotineLevel >= self.Options.GROWTH_THRESHOLD then
+    if data.nicotineLevel >= self.Options.ADDICTION_GAIN_THRESHOLD then
         local nicotineAdded = data.nicotineLevel - previousNicotineLevel
         local normalizedLevel = data.nicotineLevel / 100
 
-        local thresholdFactor = math.max(0, (normalizedLevel - self.Options.GROWTH_THRESHOLD / 100) /
-            (1 - self.Options.GROWTH_THRESHOLD / 100))
+        local thresholdFactor = math.max(0, (normalizedLevel - self.Options.ADDICTION_GAIN_THRESHOLD / 100) /
+            (1 - self.Options.ADDICTION_GAIN_THRESHOLD / 100))
 
         local baseImpact = nicotineAdded * self.Options.INTAKE_CONVERSION
-        local curveImpact = nicotineAdded * 0.12 * thresholdFactor ^ self.Options.CURVE.EXPONENT
+        local ADDICTION_GROWTH_CURVEImpact = nicotineAdded * 0.12 * thresholdFactor ^ self.Options.ADDICTION_GROWTH_CURVE.EXPONENT
 
         local earlyBoostMultiplier = 1.0
         if data.addictionLevel < 40 then
             earlyBoostMultiplier = 1.5
         end
 
-        local totalAddiction = (baseAddiction + baseImpact + curveImpact) * earlyBoostMultiplier
-        data.addictionLevel = math.min(self.Constants.ADDICTION_CAP, data.addictionLevel + totalAddiction)
+        local totalAddiction = (baseAddiction + baseImpact + ADDICTION_GROWTH_CURVEImpact) * earlyBoostMultiplier
+        data.addictionLevel = math.min(self.Options.ADDICTION_CAP, data.addictionLevel + totalAddiction)
     else
-        data.addictionLevel = math.min(self.Constants.ADDICTION_CAP, data.addictionLevel + (baseAddiction * 0.1))
+        data.addictionLevel = math.min(self.Options.ADDICTION_CAP, data.addictionLevel + (baseAddiction * 0.1))
     end
 
     local nicotineDelta = data.nicotineLevel - previousNicotineLevel
@@ -532,20 +534,20 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
 
     local intensity = ((data.withdrawalLevel / 100) + (player:getTimeSinceLastSmoke() / 10)) / 2
 
-    local stressChange = intensity * self.Constants.STRESS_BASE * hoursPassed
-    local unhappinessChange = intensity * self.Constants.UNHAPPINESS_BASE * hoursPassed
-    local boredomChange = intensity * self.Constants.BOREDOM_BASE * hoursPassed
+    local stressChange = intensity * self.Options.STRESS_BASE * hoursPassed
+    local unhappinessChange = intensity * self.Options.UNHAPPINESS_BASE * hoursPassed
+    local boredomChange = intensity * self.Options.BOREDOM_BASE * hoursPassed
     data.stressChange = stressChange
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
 
-    if data.boredomAccumulation < self.Constants.BOREDOM_MAX then
+    if data.boredomAccumulation < self.Options.BOREDOM_MAX then
         data.boredomAccumulation = data.boredomAccumulation + boredomChange
         self:trackValueChange(data, "boredom", boredomChange, hoursPassed)
         bodyDamage:setBoredomLevel(math.min(100, bodyDamage:getBoredomLevel() + boredomChange))
     end
 
-    if data.unhappinessAccumulation < self.Constants.UNHAPPINESS_MAX then
+    if data.unhappinessAccumulation < self.Options.UNHAPPINESS_MAX then
         data.unhappinessAccumulation = data.unhappinessAccumulation + unhappinessChange
         self:trackValueChange(data, "unhappiness", unhappinessChange, hoursPassed)
         bodyDamage:setUnhappynessLevel(math.min(100, bodyDamage:getUnhappynessLevel() + unhappinessChange))
@@ -583,12 +585,12 @@ function NicotineSystem:relieveWithdrawalEffects(player, hoursPassed)
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
 
-    local addictionFactor = data.addictionLevel / self.Constants.ADDICTION_CAP
+    local addictionFactor = data.addictionLevel / self.Options.ADDICTION_CAP
     local reliefFactor = 1.0 - (addictionFactor * 0.7)
 
-    local stressChange = reliefFactor * self.Constants.STRESS_BASE
-    local unhappinessChange = reliefFactor * self.Constants.UNHAPPINESS_BASE
-    local boredomChange = reliefFactor * self.Constants.BOREDOM_BASE
+    local stressChange = reliefFactor * self.Options.STRESS_BASE
+    local unhappinessChange = reliefFactor * self.Options.UNHAPPINESS_BASE
+    local boredomChange = reliefFactor * self.Options.BOREDOM_BASE
     data.stressChange = stressChange
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
@@ -616,14 +618,14 @@ end
 function NicotineSystem:manageSmokerTrait(player)
     local data = player:getModData().nicotineSystem
 
-    if data.addictionLevel >= self.Options.TRAIT_THRESHOLD and not player:HasTrait("Smoker") then
+    if data.addictionLevel >= self.Options.SMOKER_TRAIT_THRESHOLD and not player:HasTrait("Smoker") then
         player:getTraits():add("Smoker")
         data.withdrawalLevel = 0
         player:getStats():setStressFromCigarettes(0)
         player:setTimeSinceLastSmoke(0)
         HaloTextHelper.addTextWithArrow(player, getText("UI_TRUESMOKING_BECAME_SMOKER"), true,
             HaloTextHelper.getColorRed())
-    elseif data.addictionLevel <= self.Options.CURE_THRESHOLD and player:HasTrait("Smoker") then
+    elseif data.addictionLevel <= self.Options.SMOKER_TRAIT_LOSE_THRESHOLD and player:HasTrait("Smoker") then
         player:getTraits():remove("Smoker")
         data.withdrawalLevel = 0
         player:getStats():setStressFromCigarettes(0)

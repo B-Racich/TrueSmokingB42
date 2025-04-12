@@ -233,7 +233,7 @@ function NicotineMoodle:generateDebugInfo(data)
     debugText = debugText .. string.format("\nTime to Threshold: %d days, %d hours", daysT, hoursT)
 
     debugText = debugText .. "\n\n[Withdrawal]"
-    if data.nicotineLevel < NicotineSystem.Options.GROWTH_THRESHOLD then
+    if data.nicotineLevel < NicotineSystem.Options.ADDICTION_GAIN_THRESHOLD then
         local symptomTime = data.messageCooldown - data.timeSinceLastMessage
         debugText = debugText .. string.format("\nNext Symptom: %d hours, %d minutes", symptomTime, (symptomTime * 60) %
             60)

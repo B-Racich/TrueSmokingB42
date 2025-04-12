@@ -213,6 +213,77 @@ option TrueSmoking.AddictionActiveSmoking
     page = TrueSmokingNicotine, translation=TrueSmoking_AddictionActiveSmoking,
 }
 
+option TrueSmoking.HungerReduction
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 0.0001,
+    page = TrueSmokingNicotine, translation=TrueSmoking_HungerReduction,
+}
+option TrueSmoking.FatigueReduction
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 0.0001,
+    page = TrueSmokingNicotine, translation=TrueSmoking_FatigueReduction,
+}
+
+option TrueSmoking.StressGain
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 0.2,
+    page = TrueSmokingNicotine, translation=TrueSmoking_StressGain,
+}
+
+option TrueSmoking.UnhappinessGain
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingNicotine, translation=TrueSmoking_UnhappinessGain,
+}
+
+option TrueSmoking.BoredomGain
+{
+    type = double,
+    min = 0.0,
+    max = 10.0,
+    default = 1.0,
+    page = TrueSmokingNicotine, translation=TrueSmoking_BoredomGain,
+}
+
+option TrueSmoking.UnhappinessMax
+{
+    type = double,
+    min = 0.0,
+    max = 100.0,
+    default = 25.0,
+    page = TrueSmokingNicotine, translation=TrueSmoking_UnhappinessMax,
+}
+
+option TrueSmoking.BoredomMax
+{
+    type = double,
+    min = 0.0,
+    max = 100.0,
+    default = 35.0,
+    page = TrueSmokingNicotine, translation=TrueSmoking_BoredomMax,
+}
+
+option TrueSmoking.AddictionCap
+{
+    type = double,
+    min = 0.0,
+    max = 99999999.0,
+    default = 10000.0,
+    page = TrueSmokingNicotine, translation=TrueSmoking_AddictionCap,
+}
+
 /* Vanilla Smokables Configuration */
 
 /* Cigarette */
