@@ -37,6 +37,75 @@ Sandbox_RU = {
     Sandbox_TrueSmoking_DroppingChanceNonSmoker = "Шанс выронить % (некурящие)",
         Sandbox_TrueSmoking_DroppingChanceNonSmoker_tooltip = "Вероятность выронить сигарету при падении для некурящих",
 	
+        /* Nicotine System */
+
+    Sandbox_TrueSmokingNicotine = "Реалистичное курение - Система никотина",
+
+    Sandbox_TrueSmoking_UseNicotineSystem = "Использовать систему никотина",
+        Sandbox_TrueSmoking_UseNicotineSystem_tooltip = "Включить систему никотиновой зависимости и синдрома отмены",
+
+    Sandbox_TrueSmoking_DynamicSmokerTrait = "Динамическая черта курильщика",
+        Sandbox_TrueSmoking_DynamicSmokerTrait_tooltip = "Позволяет игроку получать/терять черту Курильщик",
+    
+   /* Nicotine System - Metabolism Settings */
+    Sandbox_TrueSmoking_MetabolismBaseDecayRate = "Базовая скорость метаболизма никотина",
+        Sandbox_TrueSmoking_MetabolismBaseDecayRate_tooltip = "Как быстро никотин выводится из организма (выше = медленнее)",
+
+    /* Nicotine System - Addiction Settings */
+    Sandbox_TrueSmoking_AddictionGainRate = "Скорость развития зависимости",
+        Sandbox_TrueSmoking_AddictionGainRate_tooltip = "Как быстро растет зависимость при высоком уровне никотина",
+
+    Sandbox_TrueSmoking_AddictionDecayRate = "Скорость снижения зависимости",
+        Sandbox_TrueSmoking_AddictionDecayRate_tooltip = "Как медленно снижается зависимость при низком уровне никотина (выше = медленнее)",
+
+    Sandbox_TrueSmoking_AddictionMinDecay = "Минимальное снижение зависимости",
+        Sandbox_TrueSmoking_AddictionMinDecay_tooltip = "Минимальное снижение зависимости в час",
+
+    Sandbox_TrueSmoking_AddictionGrowthThreshold = "Порог роста зависимости",
+        Sandbox_TrueSmoking_AddictionGrowthThreshold_tooltip = "Минимальный уровень никотина для увеличения зависимости",
+
+    Sandbox_TrueSmoking_AddictionTraitThreshold = "Порог черты Курильщик",
+        Sandbox_TrueSmoking_AddictionTraitThreshold_tooltip = "Уровень зависимости, при котором игрок становится 'Курильщиком'",
+
+    Sandbox_TrueSmoking_AddictionCureThreshold = "Порог излечения от зависимости",
+        Sandbox_TrueSmoking_AddictionCureThreshold_tooltip = "Уровень зависимости, ниже которого удаляется черта 'Курильщик'",
+
+    Sandbox_TrueSmoking_AddictionCurveExponent = "Экспонента кривой зависимости",
+        Sandbox_TrueSmoking_AddictionCurveExponent_tooltip = "Управляет формой кривой роста зависимости",
+
+    Sandbox_TrueSmoking_AddictionCurveMultiplier = "Множитель кривой зависимости",
+        Sandbox_TrueSmoking_AddictionCurveMultiplier_tooltip = "Множитель для кривой роста зависимости",
+
+    Sandbox_TrueSmoking_AddictionIntakeConversion = "Конверсия никотина в зависимость",
+        Sandbox_TrueSmoking_AddictionIntakeConversion_tooltip = "% никотина, напрямую преобразуемого в зависимость",
+
+    Sandbox_TrueSmoking_AddictionActiveSmoking = "Бонус зависимости при активном курении",
+        Sandbox_TrueSmoking_AddictionActiveSmoking_tooltip = "Дополнительная зависимость при активном курении",
+
+    Sandbox_TrueSmoking_HungerReduction = "Снижение голода",
+        Sandbox_TrueSmoking_HungerReduction_tooltip = "Насколько снижается голод при курении",
+
+    Sandbox_TrueSmoking_FatigueReduction = "Снижение усталости",
+        Sandbox_TrueSmoking_FatigueReduction_tooltip = "Насколько снижается усталость при курении",
+
+    Sandbox_TrueSmoking_StressGain = "Прирост стресса",
+        Sandbox_TrueSmoking_StressGain_tooltip = "Насколько повышается стресс при синдроме отмены",
+
+    Sandbox_TrueSmoking_UnhappinessGain = "Прирост несчастья",
+        Sandbox_TrueSmoking_UnhappinessGain_tooltip = "Насколько повышается несчастье при синдроме отмены",
+
+    Sandbox_TrueSmoking_BoredomGain = "Прирост скуки",
+        Sandbox_TrueSmoking_BoredomGain_tooltip = "Насколько повышается скука при синдроме отмены",
+
+    Sandbox_TrueSmoking_UnhappinessMax = "Максимум несчастья",
+        Sandbox_TrueSmoking_UnhappinessMax_tooltip = "Максимальный уровень несчастья от синдрома отмены",
+
+    Sandbox_TrueSmoking_BoredomMax = "Максимум скуки",
+        Sandbox_TrueSmoking_BoredomMax_tooltip = "Максимальный уровень скуки от синдрома отмены",
+
+    Sandbox_TrueSmoking_AddictionCap = "Предел зависимости",
+        Sandbox_TrueSmoking_AddictionCap_tooltip = "Максимальный уровень зависимости",
+
     /* Smokable translations */
 
     Sandbox_TrueSmokingSmokables = "Реалистичное курение - Курительные принадлежности",

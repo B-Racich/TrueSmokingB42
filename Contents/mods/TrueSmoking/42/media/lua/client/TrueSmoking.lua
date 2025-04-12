@@ -264,7 +264,6 @@ function TrueSmoking:findSmokable(player)
 
     if cigarette and self:hasRequiredItem(cigarette, player) then
         print('TRUESMOKING::FOUND CIG/PACK')
-        ISInventoryPaneContextMenu.transferIfNeeded(player, cigarette)
         ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
     end
 end

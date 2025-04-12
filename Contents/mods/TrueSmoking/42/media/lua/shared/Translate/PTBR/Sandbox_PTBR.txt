@@ -107,4 +107,71 @@ Sandbox_TrueSmoking_DecayRate = "Taxa de Decaimento",
 
 Sandbox_TrueSmoking_EffectMultiplier = "Multiplicador de Efeito",
     Sandbox_TrueSmoking_EffectMultiplier_tooltip = "Multiplica a eficácia do cigarro para reduzir o estresse e outras estatísticas de fumantes",
+
+
+
+Sandbox_TrueSmokingNicotine = "True Smoking - Sistema de Nicotina",
+
+Sandbox_TrueSmoking_UseNicotineSystem = "Usar Sistema de Nicotina",
+    Sandbox_TrueSmoking_UseNicotineSystem_tooltip = "Ativar o sistema de dependência e abstinência de nicotina",
+
+Sandbox_TrueSmoking_DynamicSmokerTrait = "Traço Dinâmico de Fumante",
+    Sandbox_TrueSmoking_DynamicSmokerTrait_tooltip = "Permite ao jogador ganhar/perder o traço de Fumante",
+
+Sandbox_TrueSmoking_MetabolismBaseDecayRate = "Taxa Base de Declínio de Nicotina",
+    Sandbox_TrueSmoking_MetabolismBaseDecayRate_tooltip = "Quão rápido a nicotina sai do sistema (maior = declínio mais lento)",
+
+Sandbox_TrueSmoking_AddictionGainRate = "Taxa de Ganho de Dependência",
+    Sandbox_TrueSmoking_AddictionGainRate_tooltip = "Quão rapidamente a dependência aumenta com altos níveis de nicotina",
+
+Sandbox_TrueSmoking_AddictionDecayRate = "Taxa de Declínio de Dependência",
+    Sandbox_TrueSmoking_AddictionDecayRate_tooltip = "Quão lentamente a dependência diminui com baixos níveis de nicotina (maior = declínio mais lento)",
+
+Sandbox_TrueSmoking_AddictionMinDecay = "Declínio Mínimo de Dependência",
+    Sandbox_TrueSmoking_AddictionMinDecay_tooltip = "Declínio mínimo de dependência por hora",
+
+Sandbox_TrueSmoking_AddictionGrowthThreshold = "Limite de Crescimento de Dependência",
+    Sandbox_TrueSmoking_AddictionGrowthThreshold_tooltip = "Nível mínimo de nicotina necessário para aumentar a dependência",
+
+Sandbox_TrueSmoking_AddictionTraitThreshold = "Limite do Traço de Fumante",
+    Sandbox_TrueSmoking_AddictionTraitThreshold_tooltip = "Nível de dependência no qual o jogador se torna um 'Fumante'",
+
+Sandbox_TrueSmoking_AddictionCureThreshold = "Limite de Cura da Dependência",
+    Sandbox_TrueSmoking_AddictionCureThreshold_tooltip = "Nível de dependência abaixo do qual o traço 'Fumante' é removido",
+
+Sandbox_TrueSmoking_AddictionCurveExponent = "Expoente da Curva de Dependência",
+    Sandbox_TrueSmoking_AddictionCurveExponent_tooltip = "Controla a forma da curva de crescimento da dependência",
+
+Sandbox_TrueSmoking_AddictionCurveMultiplier = "Multiplicador da Curva de Dependência",
+    Sandbox_TrueSmoking_AddictionCurveMultiplier_tooltip = "Multiplicador para a curva de crescimento da dependência",
+
+Sandbox_TrueSmoking_AddictionIntakeConversion = "Conversão de Nicotina para Dependência",
+    Sandbox_TrueSmoking_AddictionIntakeConversion_tooltip = "% de nicotina diretamente convertida em dependência",
+
+Sandbox_TrueSmoking_AddictionActiveSmoking = "Bônus de Dependência por Fumar Ativamente",
+    Sandbox_TrueSmoking_AddictionActiveSmoking_tooltip = "Bônus de dependência ao fumar ativamente",
+
+Sandbox_TrueSmoking_HungerReduction = "Redução de Fome",
+    Sandbox_TrueSmoking_HungerReduction_tooltip = "Quanto a fome é reduzida ao fumar",
+
+Sandbox_TrueSmoking_FatigueReduction = "Redução de Fadiga",
+    Sandbox_TrueSmoking_FatigueReduction_tooltip = "Quanto a fadiga é reduzida ao fumar",
+
+Sandbox_TrueSmoking_StressGain = "Ganho de Estresse",
+    Sandbox_TrueSmoking_StressGain_tooltip = "Quanto estresse é ganho por Abstinência",
+
+Sandbox_TrueSmoking_UnhappinessGain = "Ganho de Infelicidade",
+    Sandbox_TrueSmoking_UnhappinessGain_tooltip = "Quanto infelicidade é ganha por Abstinência",
+
+Sandbox_TrueSmoking_BoredomGain = "Ganho de Tédio",
+    Sandbox_TrueSmoking_BoredomGain_tooltip = "Quanto tédio é ganho por Abstinência",
+
+Sandbox_TrueSmoking_UnhappinessMax = "Infelicidade Máxima",
+    Sandbox_TrueSmoking_UnhappinessMax_tooltip = "Infelicidade máxima por Abstinência",
+
+Sandbox_TrueSmoking_BoredomMax = "Tédio Máximo",
+    Sandbox_TrueSmoking_BoredomMax_tooltip = "Tédio máximo por Abstinência",
+
+Sandbox_TrueSmoking_AddictionCap = "Limite de Dependência",
+    Sandbox_TrueSmoking_AddictionCap_tooltip = "Nível máximo de dependência",
 }

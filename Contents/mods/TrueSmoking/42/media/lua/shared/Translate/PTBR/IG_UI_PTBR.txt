@@ -28,4 +28,24 @@ IG_UI_PTBR = {
 
     IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS = "Ocultar todas as barras de ações para fumar",
     IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS_DESC = "Ocultar todas as barras de ação relacionadas ao ato de fumar",
+    
+    IGUI_TRUESMOKING_HIDE_MOODLES = "Ocultar Moodles",
+    IGUI_TRUESMOKING_HIDE_MOODLES_DESC = "Ocultar os moodles",
+
+    IGUI_TRUESMOKING_SHOW_DAYS_REMAINING = "Mostrar Dias Restantes",
+    IGUI_TRUESMOKING_SHOW_DAYS_REMAINING_DESC = "Mostrar o número de dias restantes até a recuperação da dependência",
+
+    IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT = "Mostrar Percentual Restante do Cigarro",
+    IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT_DESC = "Mostrar a porcentagem restante do cigarro",
+
+    IGUI_TRUESMOKING_DEBUG_MOODLES = "Informações de Depuração",
+    IGUI_TRUESMOKING_DEBUG_MOODLES_DESC = "Mostrar informações de depuração nas dicas dos moodles",
+    
+    IGUI_TRUESMOKING_SMOKE_KEYS = "Teclas de Atalho para Cigarros",
+    IGUI_TRUESMOKING_ROLLED_HK = "Cigarro Enrolado",
+    IGUI_TRUESMOKING_CIG_HK = "Cigarro",
+    IGUI_TRUESMOKING_CIGARILLO_HK = "Cigarrilha",
+    IGUI_TRUESMOKING_CIGAR_HK = "Charuto",
+    IGUI_TRUESMOKING_CAN_HK = "Lata",
+    IGUI_TRUESMOKING_PIPE_HK = "Cachimbo",
 }
