@@ -138,6 +138,7 @@ function NicotineSystem:initialize(player)
 
         unhappinessAccumulation = 0,
         boredomAccumulation = 0,
+        stressAccumulation = 0,
     }
 
     local modData = player:getModData()
@@ -541,6 +542,13 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
 
+    if data.stressAccumulation < self.Options.STRESS_MAX and stats:getStressFromCigarettes() >= 0.5 then
+        data.stressAccumulation = data.stressAccumulation + stressChange
+        local trueStress = stats:getStress() - stats:getStressFromCigarettes()
+        self:trackValueChange(data, "stress", stressChange, hoursPassed)
+        stats:setStress(math.min(1.51, trueStress + stressChange))
+    end
+
     if data.boredomAccumulation < self.Options.BOREDOM_MAX then
         data.boredomAccumulation = data.boredomAccumulation + boredomChange
         self:trackValueChange(data, "boredom", boredomChange, hoursPassed)
@@ -553,11 +561,6 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
         bodyDamage:setUnhappynessLevel(math.min(100, bodyDamage:getUnhappynessLevel() + unhappinessChange))
     end
 
-    if stats:getStressFromCigarettes() >= 0.5 then
-        self:trackValueChange(data, "stress", stressChange, hoursPassed)
-        local trueStress = stats:getStress() - stats:getStressFromCigarettes()
-        stats:setStress(math.min(1.51, trueStress + stressChange))
-    end
     -- stats:setStressFromCigarettes(math.min(0.51, stats:getStressFromCigarettes() + stressChange))
 
     if player:HasTrait('Smoker') then
@@ -594,6 +597,12 @@ function NicotineSystem:relieveWithdrawalEffects(player, hoursPassed)
     data.stressChange = stressChange
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
+
+    if data.stressAccumulation > 0 then
+        data.stressAccumulation = math.max(0, data.stressAccumulation - stressChange)
+        self:trackValueChange(data, "stress", stressChange, hoursPassed)
+        stats:setStress(math.max(0, stats:getStress() - stressChange))
+    end
 
     if data.boredomAccumulation > 0 then
         data.boredomAccumulation = math.max(0, data.boredomAccumulation - boredomChange)

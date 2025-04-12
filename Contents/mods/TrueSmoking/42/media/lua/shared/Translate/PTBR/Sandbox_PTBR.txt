@@ -166,6 +166,9 @@ Sandbox_TrueSmoking_UnhappinessGain = "Ganho de Infelicidade",
 Sandbox_TrueSmoking_BoredomGain = "Ganho de Tédio",
     Sandbox_TrueSmoking_BoredomGain_tooltip = "Quanto tédio é ganho por Abstinência",
 
+Sandbox_TrueSmoking_StressMax = "Estresse Máximo",
+    Sandbox_TrueSmoking_StressMax_tooltip = "Nível máximo de estresse causado pela abstinência",
+
 Sandbox_TrueSmoking_UnhappinessMax = "Infelicidade Máxima",
     Sandbox_TrueSmoking_UnhappinessMax_tooltip = "Infelicidade máxima por Abstinência",
 

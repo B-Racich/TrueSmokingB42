@@ -97,6 +97,9 @@ Sandbox_EN = {
     Sandbox_TrueSmoking_BoredomGain = "Boredom Gain",
         Sandbox_TrueSmoking_BoredomGain_tooltip = "How much boredom is gained from Withdrawal",
 
+    Sandbox_TrueSmoking_StressMax = "Stress Max",
+        Sandbox_TrueSmoking_StressMax_tooltip = "Maximum stress from Withdrawal",
+
     Sandbox_TrueSmoking_UnhappinessMax = "Unhappiness Max",
         Sandbox_TrueSmoking_UnhappinessMax_tooltip = "Maximum unhappiness from Withdrawal",
 

@@ -584,6 +584,7 @@ Events.OnInitGlobalModData.Add(function()
     nic.UNHAPPINESS_BASE = sandbox.UnhappinessGain
     nic.BOREDOM_BASE = sandbox.BoredomGain
 
+    nic.STRESS_MAX = sandbox.StressMax
     nic.UNHAPPINESS_MAX = sandbox.UnhappinessMax
     nic.BOREDOM_MAX = sandbox.BoredomMax
 

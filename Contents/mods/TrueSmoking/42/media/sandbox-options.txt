@@ -266,6 +266,15 @@ option TrueSmoking.UnhappinessMax
     page = TrueSmokingNicotine, translation=TrueSmoking_UnhappinessMax,
 }
 
+option TrueSmoking.StressMax
+{
+    type = double,
+    min = 0.0,
+    max = 100.0,
+    default = 25.0,
+    page = TrueSmokingNicotine, translation=TrueSmoking_StressMax,
+}
+
 option TrueSmoking.BoredomMax
 {
     type = double,

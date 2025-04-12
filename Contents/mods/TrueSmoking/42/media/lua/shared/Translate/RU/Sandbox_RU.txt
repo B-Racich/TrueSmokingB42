@@ -97,6 +97,9 @@ Sandbox_RU = {
     Sandbox_TrueSmoking_BoredomGain = "Прирост скуки",
         Sandbox_TrueSmoking_BoredomGain_tooltip = "Насколько повышается скука при синдроме отмены",
 
+    Sandbox_TrueSmoking_StressMax = "Максимум стресса",
+        Sandbox_TrueSmoking_StressMax_tooltip = "Максимальный уровень стресса от синдрома отмены",
+
     Sandbox_TrueSmoking_UnhappinessMax = "Максимум несчастья",
         Sandbox_TrueSmoking_UnhappinessMax_tooltip = "Максимальный уровень несчастья от синдрома отмены",
 
