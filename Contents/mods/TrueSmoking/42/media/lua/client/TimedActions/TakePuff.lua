@@ -39,9 +39,11 @@ function TakePuff:update()
 end
 
 function TakePuff:waitToStart()
-    if self.character:getEmitter():isPlaying(self.trueSmoking.eatSound)
-        or (self.trueSmoking.lightingEatSound and self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound)) then
-        return true
+    if getGameSpeedMultiplier() == 1 then
+        if self.character:getEmitter():isPlaying(self.trueSmoking.eatSound)
+            or (self.trueSmoking.lightingEatSound and self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound)) then
+            return true
+        end
     end
     --Wait for timed actions to finish
     if self.character:isStrafing() or self.character:isRunning() or self.character:isSprinting()
@@ -131,6 +133,11 @@ function TakePuff:perform()
 end
 
 function TakePuff:complete()
+    if getGameSpeedMultiplier() > 1 then
+        if self.character:getEmitter():isPlaying(self.eatSound) then
+            self.character:getEmitter():stopSound(self.eatAudio)
+        end
+    end
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
         if self.character:HasTrait("Smoker") then

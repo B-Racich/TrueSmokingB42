@@ -137,11 +137,6 @@ Events.OnCreatePlayer.Add(function()
 
     TrueSmoking:setSmokableObjects(smokableObjects)
 
-    -- local TRUE_SMOKING_DEFAULT_HOTKEY_SMOKES = {
-    --     'Base.RolledCigarette','Base.CigaretteSingle','Base.Cigarillo',
-    --     'Base.Cigar','Base.CanPipe_Tobacco','SmokingPipe_Tobacco'
-    -- }
-
     local TRUE_SMOKING_DEFAULT_HOTKEY_PACKS = {
         ['Base.CigarettePack'] = 'TakeACigarette',
     }

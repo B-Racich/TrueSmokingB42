@@ -189,7 +189,11 @@ function NicotineMoodle:update()
 
         local value = 0.5
         if self.table.isSmoking or TrueSmoking.Config.DebugMoodles then
-            value = 1 - (data.addictionLevel / 100)
+            if data.addictionLevel > 0 and data.addictionLevel < 100 then
+                value = 1 - (data.addictionLevel / 100)
+            else
+                value = 1
+            end
         end
 
         addictionMoodle:setValue(value)
@@ -217,7 +221,7 @@ function NicotineMoodle:generateDebugInfo(data)
     debugText = debugText .. string.format("\nRate: %.4f%%/hr", math.abs(data.longTermNicotineChangeRate * 60))
 
     debugText = debugText .. "\n\n[Addiction]"
-    debugText = debugText .. string.format("\nLevel: %.2f%%", data.addictionLevel)
+    debugText = debugText .. string.format("\nLevel: %.2f", data.addictionLevel)
     debugText = debugText .. string.format("\nRate: %.4f%%/hr", math.abs(data.longTermAddictionChangeRate * 60))
 
     local addictionTime = data.addictionDuration
@@ -269,7 +273,7 @@ function NicotineMoodle:getAddictionRecoveryText()
 
         if data.addictionDuration then
             return getText("Moodles_nicotine_addiction",
-                string.format("%d days", data.addictionDuration / 24))
+                string.format("%d days", data.addictionDurationThreshold / 24))
         end
     else
         local level = data.withdrawalLevel

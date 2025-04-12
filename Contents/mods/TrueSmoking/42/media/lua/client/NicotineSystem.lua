@@ -25,11 +25,12 @@ NicotineSystem.Options = {
 }
 
 NicotineSystem.Constants = {
+    ADDICTION_CAP = 10000,
     INCREASE_FACTOR = 25,
     DECREASE_FACTOR = 60,
     BASE_RELIEF = 8,
 
-    STRESS_BASE = 0.0005,
+    STRESS_BASE = 0.2,
     UNHAPPINESS_BASE = 1,
     BOREDOM_BASE = 1,
     FATIGUE_BASE = 0.0001,
@@ -101,7 +102,7 @@ NicotineSystem.Effects = {
 function NicotineSystem:initialize(player)
     local defaultNicotineSystem = {
         nicotineLevel = 0,
-        addictionLevel = player:HasTrait("Smoker") and 80 or 0,
+        addictionLevel = player:HasTrait("Smoker") and 200 or 0,
         lastUpdate = getGameTime():getWorldAgeHours(),
         lastWithdrawalMessage = 0,
         withdrawalLevel = 0,
@@ -198,7 +199,7 @@ function NicotineSystem:calculateAddictionDuration(player)
     local simulatedAddiction = data.addictionLevel
     local hoursPassed = 0
     local hoursPassedThreshold = 0
-    local maxSimulationHours = 200
+    local maxSimulationHours = 2000
 
     while simulatedAddiction > 1 and hoursPassed < maxSimulationHours do
         hoursPassed = hoursPassed + 1
@@ -288,7 +289,7 @@ function NicotineSystem:calculateMessageCooldown(withdrawalLevel)
 end
 
 function NicotineSystem:calculateWithdrawalIntensity(addictionLevel, hoursPassed)
-    local normalizedAddiction = addictionLevel / 100
+    local normalizedAddiction = addictionLevel / self.Constants.ADDICTION_CAP
 
     local intensity = (normalizedAddiction * normalizedAddiction * normalizedAddiction) * hoursPassed
 
@@ -412,7 +413,7 @@ function NicotineSystem:updateAddictionLevel(player, data, hoursPassed)
         end
 
         local addictionChange = (exponentialComponent + activeSmokingBonus) * hoursPassed
-        data.addictionLevel = math.min(100, data.addictionLevel + addictionChange)
+        data.addictionLevel = math.min(self.Constants.ADDICTION_CAP, data.addictionLevel + addictionChange)
     elseif not TrueSmoking:getPlayerReference(player).Smokable.smokeLit then
         local exponentialDecay = data.addictionLevel * (self.Options.DECAY_RATE ^ hoursPassed)
         local linearComponent = 0
@@ -473,7 +474,7 @@ function NicotineSystem:addNicotine(player, amount)
 
     local adjustedAmount = amount * self.Constants.INTAKE_MULTIPLIER
 
-    local addictionFactor = data.addictionLevel / 100
+    local addictionFactor = data.addictionLevel / self.Constants.ADDICTION_CAP
 
     local metabolicFactor = self:calculateDynamicMetabolicFactor(player)
     data.metabolicFactor = metabolicFactor
@@ -503,9 +504,9 @@ function NicotineSystem:addNicotine(player, amount)
         end
 
         local totalAddiction = (baseAddiction + baseImpact + curveImpact) * earlyBoostMultiplier
-        data.addictionLevel = math.min(100, data.addictionLevel + totalAddiction)
+        data.addictionLevel = math.min(self.Constants.ADDICTION_CAP, data.addictionLevel + totalAddiction)
     else
-        data.addictionLevel = math.min(100, data.addictionLevel + (baseAddiction * 0.1))
+        data.addictionLevel = math.min(self.Constants.ADDICTION_CAP, data.addictionLevel + (baseAddiction * 0.1))
     end
 
     local nicotineDelta = data.nicotineLevel - previousNicotineLevel
@@ -550,7 +551,11 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
         bodyDamage:setUnhappynessLevel(math.min(100, bodyDamage:getUnhappynessLevel() + unhappinessChange))
     end
 
-    -- self:trackValueChange(data, "stress", stressChange, hoursPassed)
+    if stats:getStressFromCigarettes() >= 0.5 then
+        self:trackValueChange(data, "stress", stressChange, hoursPassed)
+        local trueStress = stats:getStress() - stats:getStressFromCigarettes()
+        stats:setStress(math.min(1.51, trueStress + stressChange))
+    end
     -- stats:setStressFromCigarettes(math.min(0.51, stats:getStressFromCigarettes() + stressChange))
 
     if player:HasTrait('Smoker') then
@@ -578,7 +583,7 @@ function NicotineSystem:relieveWithdrawalEffects(player, hoursPassed)
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
 
-    local addictionFactor = data.addictionLevel / 100
+    local addictionFactor = data.addictionLevel / self.Constants.ADDICTION_CAP
     local reliefFactor = 1.0 - (addictionFactor * 0.7)
 
     local stressChange = reliefFactor * self.Constants.STRESS_BASE

@@ -221,7 +221,7 @@ end
 
 function TrueSmoking:findSmokable(player)
     local map = {
-        [1] = 'Base.RolledCigarette',
+        [1] = 'Base.CigaretteRolled',
         [2] = 'Base.CigaretteSingle',
         [3] = 'Base.Cigarillo',
         [4] = 'Base.Cigar',
@@ -392,9 +392,9 @@ function TrueSmoking:stop(player)
         o.NicotineMoodle:stop()
     end
 
-    if o.Smokable then
-        o.Smokable:putOut()
-    end
+    -- if o.Smokable then
+    --     o.Smokable:putOut()
+    -- end
     o.SmokingMoodle = nil
     o.Smokable = nil
 
