@@ -88,7 +88,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.GlassSmokingPipe_Hemp'] = {
-                visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
+                visualItem = false,                     -- Visual item to be displayed on mouth
                 smokeLength = TrueSmoking.Options.PipeLength, -- Length of smoke
                 burnMin = 0.000125,                           -- Minimum burn rate target
                 burnMax = 0.000300,                           -- Maximum burn rate target
@@ -105,7 +105,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 puffFactor = TrueSmoking.Options.PuffFactor
             },
             ['Base.GlassSmokingPipe_Tobacco'] = {
-                visualItem = 'Mask_Pipe',                     -- Visual item to be displayed on mouth
+                visualItem = false,                     -- Visual item to be displayed on mouth
                 smokeLength = TrueSmoking.Options.PipeLength, -- Length of smoke
                 burnMin = 0.000125,                           -- Minimum burn rate target
                 burnMax = 0.000300,                           -- Maximum burn rate target

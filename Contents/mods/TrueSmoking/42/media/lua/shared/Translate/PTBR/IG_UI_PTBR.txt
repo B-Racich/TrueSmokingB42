@@ -40,6 +40,9 @@ IG_UI_PTBR = {
 
     IGUI_TRUESMOKING_DEBUG_MOODLES = "Informações de Depuração",
     IGUI_TRUESMOKING_DEBUG_MOODLES_DESC = "Mostrar informações de depuração nas dicas dos moodles",
+
+    IGUI_TRUESMOKING_WITHDRAWAL_TEXT = "Texto de Sintoma de Abstinência",
+    IGUI_TRUESMOKING_WITHDRAWAL_TEXT_DESC = "Exibe texto acima da cabeça do jogador para sintomas de abstinência",
     
     IGUI_TRUESMOKING_SMOKE_KEYS = "Teclas de Atalho para Cigarros",
     IGUI_TRUESMOKING_ROLLED_HK = "Cigarro Enrolado",

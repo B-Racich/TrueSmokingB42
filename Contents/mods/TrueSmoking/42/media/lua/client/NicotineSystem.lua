@@ -563,7 +563,7 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
 
     -- stats:setStressFromCigarettes(math.min(0.51, stats:getStressFromCigarettes() + stressChange))
 
-    if player:HasTrait('Smoker') then
+    if TrueSmoking.Config.WithdrawalText and player:HasTrait('Smoker') then
         local currentTime = getGameTime():getWorldAgeHours()
         if not data.lastWithdrawalMessage then data.lastWithdrawalMessage = 0 end
 
