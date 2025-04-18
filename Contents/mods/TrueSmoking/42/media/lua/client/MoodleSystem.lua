@@ -192,7 +192,7 @@ function NicotineMoodle:update()
             if data.addictionLevel > 0 and data.addictionLevel < 100 then
                 value = 1 - (data.addictionLevel / 100)
             else
-                value = 1
+                value = 0
             end
         end
 
