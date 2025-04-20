@@ -206,7 +206,7 @@ function Smokable:getVisualItem(item)
 end
 
 function Smokable:light()
-    if ((self.table.isSmoking or self.table.isSmoking) and self.table.smokeLit) and not ISTimedActionQueue.hasActionType(self.player, 'LightSmoke') then
+    if not ISTimedActionQueue.hasActionType(self.player, 'LightSmoke') then
         ISTimedActionQueue.add(LightSmoke:new(self.player))
     end
 end

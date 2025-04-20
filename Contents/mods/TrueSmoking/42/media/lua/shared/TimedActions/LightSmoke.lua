@@ -84,6 +84,11 @@ function LightSmoke:perform()
     ISBaseTimedAction.perform(self)
     self.smokable.smokeLit = true
     self.smokable.puffTimeMark = os.time()
+
+    if self.smokable.burnRate == 0 then
+        self.smokable.burnRate = ZombRandFloat(self.smokable.burnMin,
+            self.smokable.burnMax)
+    end
 end
 
 function LightSmoke:complete()
