@@ -216,6 +216,20 @@ local function ItemFixer()
         end
         item:DoParam("Tags = " .. table.concat(mergedTags, ";"))
     end
+
+    item = ScriptManager.instance:getItem("Base.Lighter")
+    if item then
+        item:DoParam('UseDelta = 0.05')
+    end
+    item = ScriptManager.instance:getItem("Base.DisposableLighter")
+    if item then
+        item:DoParam('UseDelta = 0.075')
+    end
+    item = ScriptManager.instance:getItem("Base.LighterBBQ")
+    if item then
+        item:DoParam('UseDelta = 0.0875')
+    end
+
 end
 
 Events.OnGameBoot.Add(ItemFixer)

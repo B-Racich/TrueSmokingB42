@@ -371,8 +371,8 @@ function NicotineSystem:updateNicotineLevel(data, hoursPassed, player)
         local factor = math.exp(k * nicotineContent) - 1
 
         local stats = player:getStats()
-        local fatigueReduction = stats:getFatigue() * self.Options.FATIGUE_BASE * factor
-        local hungerReduction = stats:getHunger() * self.Options.HUNGER_BASE * factor
+        local fatigueReduction = stats:getFatigue() * self.Options.FATIGUE_BASE * factor * getGameSpeedMultiplier()
+        local hungerReduction = stats:getHunger() * self.Options.HUNGER_BASE * factor * getGameSpeedMultiplier()
 
         data.fatigueChange = fatigueReduction
         data.hungerChange = hungerReduction
@@ -533,7 +533,7 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
 
-    local intensity = ((data.withdrawalLevel / 100) + (player:getTimeSinceLastSmoke() / 10)) / 2
+    local intensity = (((data.withdrawalLevel / 100) + (player:getTimeSinceLastSmoke() / 10)) / 2 ) * getGameSpeedMultiplier()
 
     local stressChange = intensity * self.Options.STRESS_BASE * hoursPassed
     local unhappinessChange = intensity * self.Options.UNHAPPINESS_BASE * hoursPassed
@@ -542,7 +542,7 @@ function NicotineSystem:applyWithdrawalEffects(player, hoursPassed)
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
 
-    if data.stressAccumulation < self.Options.STRESS_MAX and stats:getStressFromCigarettes() >= 0.5 then
+    if stats:getStressFromCigarettes() >= 0.5 then
         data.stressAccumulation = data.stressAccumulation + stressChange
         local trueStress = stats:getStress() - stats:getStressFromCigarettes()
         self:trackValueChange(data, "stress", stressChange, hoursPassed)
@@ -589,7 +589,7 @@ function NicotineSystem:relieveWithdrawalEffects(player, hoursPassed)
     local bodyDamage = player:getBodyDamage()
 
     local addictionFactor = data.addictionLevel / self.Options.ADDICTION_CAP
-    local reliefFactor = 1.0 - (addictionFactor * 0.7)
+    local reliefFactor = (1.0 - (addictionFactor * 0.7)) * getGameSpeedMultiplier()
 
     local stressChange = reliefFactor * self.Options.STRESS_BASE
     local unhappinessChange = reliefFactor * self.Options.UNHAPPINESS_BASE
