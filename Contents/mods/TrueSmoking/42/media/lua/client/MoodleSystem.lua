@@ -1,11 +1,9 @@
 require 'MF_ISMoodle'
 
 MoodleSystem = MoodleSystem or {}
+MoodleSystem.__index = MoodleSystem
 
-Moodle = Moodle or {}
-Moodle.__index = Moodle
-
-function Moodle:new(table, playerNum, moodleId)
+function MoodleSystem:new(table, playerNum, moodleId)
     local obj = {}
     setmetatable(obj, self)
 
@@ -20,7 +18,7 @@ function Moodle:new(table, playerNum, moodleId)
     return obj
 end
 
-function Moodle:start()
+function MoodleSystem:start()
     local function updateWrapper()
         self:update()
     end
@@ -28,7 +26,7 @@ function Moodle:start()
     self.updateWrapper = updateWrapper
 end
 
-function Moodle:stop()
+function MoodleSystem:stop()
     local moodle = MF.getMoodle(self.moodleId, self.playerNum)
     if moodle ~= nil then
         moodle:setValue(0.5)
@@ -39,18 +37,18 @@ function Moodle:stop()
     end
 end
 
-function Moodle:update()
+function MoodleSystem:update()
     -- Base update method - to be overridden by child classes
 end
 
 -- Smoking Moodle Implementation
 SmokingMoodle = SmokingMoodle or {}
-setmetatable(SmokingMoodle, { __index = Moodle })
+setmetatable(SmokingMoodle, { __index = MoodleSystem })
 SmokingMoodle.__index = SmokingMoodle
 
 function SmokingMoodle:new(table, playerNum)
     local moodleImage = TrueSmoking.Options.UseNewMoodle and 'smoking_new' or 'smoking_old'
-    local obj = Moodle.new(self, table, playerNum, moodleImage)
+    local obj = MoodleSystem.new(self, table, playerNum, moodleImage)
     return obj
 end
 
@@ -168,11 +166,11 @@ end
 
 -- Nicotine Moodle Implementation
 NicotineMoodle = NicotineMoodle or {}
-setmetatable(NicotineMoodle, { __index = Moodle })
+setmetatable(NicotineMoodle, { __index = MoodleSystem })
 NicotineMoodle.__index = NicotineMoodle
 
 function NicotineMoodle:new(table, playerNum)
-    local obj = Moodle.new(self, table, playerNum, "nicotine")
+    local obj = MoodleSystem.new(self, table, playerNum, "nicotine")
     obj.player = getSpecificPlayer(playerNum)
     return obj
 end
@@ -188,7 +186,7 @@ function NicotineMoodle:update()
         addictionMoodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
 
         local value = 0.5
-        if self.table.isSmoking or TrueSmoking.Config.DebugMoodles then
+        if self.table.isSmoking or TrueSmoking.Config.DebugMoodles or TrueSmoking.Config.AlwaysShowMoodle then
             if data.addictionLevel > 0 and data.addictionLevel < 100 then
                 value = 1 - (data.addictionLevel / 100)
             else

@@ -328,7 +328,6 @@ function Smokable:update()
     end
     if self.smokeLit then
         local gameSpeed = getGameSpeedMultiplier()
-        self:idlePuff()
         local isWalking = self.player:isWalking() and self.conditions['walking']
         local isRunning = self.player:isRunning() and self.conditions['running']
         local isSprinting = self.player:isSprinting() and self.conditions['sprinting']
@@ -392,6 +391,8 @@ function Smokable:update()
         if TrueSmoking.Config.AutoPutOut then
             self:putOut()
         end
+    else
+        self:idlePuff()
     end
 end
 

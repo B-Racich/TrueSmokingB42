@@ -43,6 +43,9 @@ IG_UI_RU = {
 
     IGUI_TRUESMOKING_WITHDRAWAL_TEXT = "Текст Симптома Абстиненции",
     IGUI_TRUESMOKING_WITHDRAWAL_TEXT_DESC = "Отображает текст над головой игрока для симптомов абстиненции",
+
+    IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE = "Всегда показывать Moodle зависимости",
+    IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC = "Всегда показывать Moodle
     
     IGUI_TRUESMOKING_SMOKE_KEYS = "Горячие клавиши для курения",
     IGUI_TRUESMOKING_ROLLED_HK = "Самокрутка",

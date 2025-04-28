@@ -44,6 +44,9 @@ IG_UI_PTBR = {
     IGUI_TRUESMOKING_WITHDRAWAL_TEXT = "Texto de Sintoma de Abstinência",
     IGUI_TRUESMOKING_WITHDRAWAL_TEXT_DESC = "Exibe texto acima da cabeça do jogador para sintomas de abstinência",
     
+    IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE = "Sempre Mostrar Moodle de Vício",
+    IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC = "Sempre mostrar o moodle de vício",
+
     IGUI_TRUESMOKING_SMOKE_KEYS = "Teclas de Atalho para Cigarros",
     IGUI_TRUESMOKING_ROLLED_HK = "Cigarro Enrolado",
     IGUI_TRUESMOKING_CIG_HK = "Cigarro",

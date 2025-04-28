@@ -44,6 +44,9 @@ IG_UI_EN = {
     IGUI_TRUESMOKING_WITHDRAWAL_TEXT = "Withdrawal Symptom Text",
     IGUI_TRUESMOKING_WITHDRAWAL_TEXT_DESC = "Display text above the players head for withdrawal symptoms",
 
+    IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE = "Always Show Addiction Moodle",
+    IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC = "Always show the addiction moodle",
+
     IGUI_TRUESMOKING_SMOKE_KEYS = "Hotkeys For Smokes",
     IGUI_TRUESMOKING_ROLLED_HK = "Rolled Cigarette",
     IGUI_TRUESMOKING_CIG_HK = "Cigarette",
