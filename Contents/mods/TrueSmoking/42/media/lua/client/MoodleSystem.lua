@@ -262,30 +262,17 @@ function NicotineMoodle:getAddictionRecoveryText()
 
     local data = player:getModData().nicotineSystem
 
-    local useDays = TrueSmoking.Config.ShowDaysRemaining
-
-    if useDays then
-        if data.addictionLevel <= 0.1 then
-            return getText("Moodles_nicotine_no_addiction")
-        end
-
-        if data.addictionDuration then
-            return getText("Moodles_nicotine_addiction",
-                string.format("%d days", data.addictionDurationThreshold / 24))
-        end
-    else
-        local level = data.withdrawalLevel
-        if level >= 80 then
-            return getText("Moodles_nicotine_withdrawal_4")
-        elseif level >= 60 then
-            return getText("Moodles_nicotine_withdrawal_3")
-        elseif level >= 40 then
-            return getText("Moodles_nicotine_withdrawal_2")
-        elseif level >= 20 then
-            return getText("Moodles_nicotine_withdrawal_1")
-        elseif level >= 0 then
-            return getText("Moodles_nicotine_withdrawal_0")
-        end
+    local level = data.withdrawalLevel
+    if level >= 80 then
+        return getText("Moodles_nicotine_withdrawal_4")
+    elseif level >= 60 then
+        return getText("Moodles_nicotine_withdrawal_3")
+    elseif level >= 40 then
+        return getText("Moodles_nicotine_withdrawal_2")
+    elseif level >= 20 then
+        return getText("Moodles_nicotine_withdrawal_1")
+    elseif level >= 0 then
+        return getText("Moodles_nicotine_withdrawal_0")
     end
 
     return ""

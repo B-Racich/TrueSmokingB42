@@ -404,7 +404,7 @@ end
 
 function Smokable:idlePuff()
     local timeDiff = os.difftime(os.time(), self.puffTimeMark)
-    if (TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck) or (TrueSmoking.Config.KeepLit and self.burnRate < 0.00001) then
+    if (TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck) or (TrueSmoking.Config.KeepLit and self.burnRate < 0.00001 and self.smokeLit) then
         self:puff()
     end
 end
