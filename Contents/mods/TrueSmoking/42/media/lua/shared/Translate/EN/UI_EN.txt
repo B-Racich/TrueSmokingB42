@@ -1,15 +1,12 @@
 UI_EN = {
-    /* -- Existing control strings */
     UI_TRUESMOKING_PUFF = "Take Puff",
     UI_TRUESMOKING_PUT_OUT = "Put Out Smoke",
     UI_TRUESMOKING_RELIGHT = "Relight Smoke",
     UI_TRUESMOKING_GET_SMOKE = "Get/Light Smoke",
     
-    /* -- Status messages */
     UI_TRUESMOKING_BECAME_SMOKER = "I've become dependent on nicotine",
     UI_TRUESMOKING_QUIT_SMOKING = "I've overcome my nicotine addiction",
     
-    /* -- Extended withdrawal symptoms (more variety) */
     UI_TRUESMOKING_WITHDRAWAL_SYMPTOM_1 = "*irritated*",
     UI_TRUESMOKING_WITHDRAWAL_SYMPTOM_2 = "*fidgeting*",
     UI_TRUESMOKING_WITHDRAWAL_SYMPTOM_3 = "*hands trembling*",
