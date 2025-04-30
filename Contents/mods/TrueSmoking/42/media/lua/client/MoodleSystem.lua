@@ -189,7 +189,9 @@ function NicotineMoodle:update()
         if self.table.isSmoking or TrueSmoking.Config.DebugMoodles or TrueSmoking.Config.AlwaysShowMoodle then
             if data.addictionLevel > 0 and data.addictionLevel < 100 then
                 value = 1 - (data.addictionLevel / 100)
-            else
+            elseif data.addictionLevel >= 100 then
+                value = 1
+            elseif data.addictionLevel <= 0 then
                 value = 0
             end
         end
