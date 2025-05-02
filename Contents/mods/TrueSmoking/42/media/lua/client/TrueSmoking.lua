@@ -391,9 +391,6 @@ function TrueSmoking:stop(player)
         o.NicotineMoodle:stop()
     end
 
-    -- if o.Smokable then
-    --     o.Smokable:putOut()
-    -- end
     o.SmokingMoodle = nil
     o.Smokable = nil
 
@@ -419,10 +416,8 @@ local remainingSmokeTooltip = function(tooltip, layout, item)
     end
 end
 
-local function onPlayerUpdate(player)
-    if player and TrueSmoking.Options.UseNicotineSystem and player:getModData().nicotineSystem then
-        NicotineSystem:update(player)
-    end
+local function NicotineUpdate(player)
+    NicotineSystem:update(player)
 end
 
 InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
@@ -431,12 +426,16 @@ BodyLocations.getGroup("Human"):getOrCreateLocation("Mask_Smoke")
 
 Events.OnCreatePlayer.Add(function(playerNum, player)
     TrueSmoking:start(playerNum, player)
-    Events.OnPlayerUpdate.Add(onPlayerUpdate)
+    if player and TrueSmoking.Options.UseNicotineSystem and player:getModData().nicotineSystem then
+        Events.EveryOneMinute.Add(function() NicotineUpdate(player) end)
+    end
 end)
 
 Events.OnPlayerDeath.Add(function(player)
     TrueSmoking:stop(player)
-    Events.OnPlayerUpdate.Remove(onPlayerUpdate)
+    if player and TrueSmoking.Options.UseNicotineSystem and player:getModData().nicotineSystem then
+        Events.EveryOneMinute.Remove(function() NicotineUpdate(player) end)
+    end
 end)
 
 Events.OnInitGlobalModData.Add(function()
@@ -562,31 +561,31 @@ Events.OnInitGlobalModData.Add(function()
     opt.UseNicotineSystem = sandbox.UseNicotineSystem
     opt.DynamicSmokerTrait = sandbox.DynamicSmokerTrait
 
-    local nic = NicotineSystem.Options
+    -- local nic = NicotineSystem.Options
 
-    nic.NICOTINE_DECAY_RATE = sandbox.MetabolismBaseDecayRate
+    -- nic.NICOTINE_DECAY_RATE = sandbox.MetabolismBaseDecayRate
 
-    nic.ADDICTION_GAIN_RATE = sandbox.AddictionGainRate
-    nic.ADDICTION_DECAY_RATE = sandbox.AddictionDecayRate
-    nic.ADDICTION_MIN_DECAY = sandbox.AddictionMinDecay
-    nic.ADDICTION_GAIN_THRESHOLD = sandbox.AddictionGrowthThreshold
+    -- nic.ADDICTION_GAIN_RATE = sandbox.AddictionGainRate
+    -- nic.ADDICTION_DECAY_RATE = sandbox.AddictionDecayRate
+    -- nic.ADDICTION_MIN_DECAY = sandbox.AddictionMinDecay
+    -- nic.ADDICTION_GAIN_THRESHOLD = sandbox.AddictionGrowthThreshold
 
-    nic.SMOKER_TRAIT_THRESHOLD = sandbox.AddictionTraitThreshold
-    nic.SMOKER_TRAIT_LOSE_THRESHOLD = sandbox.AddictionCureThreshold
+    -- nic.SMOKER_TRAIT_THRESHOLD = sandbox.AddictionTraitThreshold
+    -- nic.SMOKER_TRAIT_LOSE_THRESHOLD = sandbox.AddictionCureThreshold
 
-    nic.INTAKE_CONVERSION = sandbox.AddictionIntakeConversion
-    nic.ACTIVE_SMOKING_BONUS = sandbox.AddictionActiveSmoking
+    -- nic.INTAKE_CONVERSION = sandbox.AddictionIntakeConversion
+    -- nic.ACTIVE_SMOKING_BONUS = sandbox.AddictionActiveSmoking
 
-    nic.HUNGER_BASE = sandbox.HungerReduction
-    nic.FATIGUE_BASE = sandbox.FatigueReduction
+    -- nic.HUNGER_BASE = sandbox.HungerReduction
+    -- nic.FATIGUE_BASE = sandbox.FatigueReduction
 
-    nic.STRESS_BASE = sandbox.StressGain
-    nic.UNHAPPINESS_BASE = sandbox.UnhappinessGain
-    nic.BOREDOM_BASE = sandbox.BoredomGain
+    -- nic.STRESS_BASE = sandbox.StressGain
+    -- nic.UNHAPPINESS_BASE = sandbox.UnhappinessGain
+    -- nic.BOREDOM_BASE = sandbox.BoredomGain
 
-    nic.STRESS_MAX = sandbox.StressMax
-    nic.UNHAPPINESS_MAX = sandbox.UnhappinessMax
-    nic.BOREDOM_MAX = sandbox.BoredomMax
+    -- nic.STRESS_MAX = sandbox.StressMax
+    -- nic.UNHAPPINESS_MAX = sandbox.UnhappinessMax
+    -- nic.BOREDOM_MAX = sandbox.BoredomMax
 
-    nic.ADDICTION_CAP = sandbox.AddictionCap
+    -- nic.ADDICTION_CAP = sandbox.AddictionCap
 end)

@@ -38,10 +38,8 @@ function MoodleSystem:stop()
 end
 
 function MoodleSystem:update()
-    -- Base update method - to be overridden by child classes
 end
 
--- Smoking Moodle Implementation
 SmokingMoodle = SmokingMoodle or {}
 setmetatable(SmokingMoodle, { __index = MoodleSystem })
 SmokingMoodle.__index = SmokingMoodle
@@ -164,7 +162,6 @@ function SmokingMoodle:generateDebugInfo(item)
     return debugText
 end
 
--- Nicotine Moodle Implementation
 NicotineMoodle = NicotineMoodle or {}
 setmetatable(NicotineMoodle, { __index = MoodleSystem })
 NicotineMoodle.__index = NicotineMoodle
@@ -218,11 +215,8 @@ function NicotineMoodle:generateDebugInfo(data)
 
     debugText = debugText .. "\n[Nicotine]"
     debugText = debugText .. string.format("\nLevel: %.2f%%", data.nicotineLevel)
-    debugText = debugText .. string.format("\nRate: %.4f%%/hr", math.abs(data.longTermNicotineChangeRate * 60))
-
     debugText = debugText .. "\n\n[Addiction]"
     debugText = debugText .. string.format("\nLevel: %.2f", data.addictionLevel)
-    debugText = debugText .. string.format("\nRate: %.4f%%/hr", math.abs(data.longTermAddictionChangeRate * 60))
 
     local addictionTime = data.addictionDuration
     local days = math.floor(addictionTime / 24)
@@ -235,8 +229,9 @@ function NicotineMoodle:generateDebugInfo(data)
     debugText = debugText .. "\n\n[Withdrawal]"
     if data.nicotineLevel < NicotineSystem.Options.ADDICTION_GAIN_THRESHOLD then
         local symptomTime = data.messageCooldown - data.timeSinceLastMessage
-        debugText = debugText .. string.format("\nNext Symptom: %d hours, %d minutes", symptomTime, (symptomTime * 60) %
-            60)
+        local hoursS = math.floor(symptomTime)
+        local minutesS = math.floor((symptomTime * 60) % 60)
+        debugText = debugText .. string.format("\nNext Symptom: %d hours, %d minutes", hoursS, minutesS)
     else
         debugText = debugText .. string.format("\nNext Symptom: ~~")
     end
@@ -245,15 +240,6 @@ function NicotineMoodle:generateDebugInfo(data)
     debugText = debugText .. "\n\n[Stats]"
     debugText = debugText .. string.format("\nTolerance Factor: %.2fx", data.toleranceFactor)
     debugText = debugText .. string.format("\nMetabolic Factor: %.2fx", data.metabolicFactor)
-    debugText = debugText .. string.format("\nStress Change: %.8f/hr", data.longTermStressChangeRate * 60)
-    debugText = debugText ..
-        string.format("\nUnhappiness Total: %.6f, Change: %.8f/hr", data.unhappinessAccumulation,
-            data.longTermUnhappinessChangeRate * 60)
-    debugText = debugText ..
-        string.format("\nBoredom Total: %.6f, Change: %.8f/hr", data.boredomAccumulation,
-        data.longTermBoredomChangeRate * 60)
-    debugText = debugText .. string.format("\nFatigue Change: %.8f/hr", data.longTermFatigueChangeRate * 60)
-    debugText = debugText .. string.format("\nHunger Change: %.8f/hr", data.longTermHungerChangeRate * 60)
 
     return debugText
 end

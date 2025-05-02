@@ -285,7 +285,6 @@ function Smokable:stop()
 end
 
 function Smokable:dropSmoke()
-    self.hasRolledForDrop = false
     local dropX, dropY, dropZ = ISTransferAction.GetDropItemOffset(self.player, self.player:getCurrentSquare(), self
         .item)
     self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
