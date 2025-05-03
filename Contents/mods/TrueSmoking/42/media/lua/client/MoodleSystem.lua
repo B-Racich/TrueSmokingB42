@@ -218,14 +218,6 @@ function NicotineMoodle:generateDebugInfo(data)
     debugText = debugText .. "\n\n[Addiction]"
     debugText = debugText .. string.format("\nLevel: %.2f", data.addictionLevel)
 
-    local addictionTime = data.addictionDuration
-    local days = math.floor(addictionTime / 24)
-    local hours = math.floor(addictionTime % 24)
-    debugText = debugText .. string.format("\nTime to 0: %d days, %d hours", days, hours)
-    local daysT = math.floor(data.addictionDurationThreshold / 24)
-    local hoursT = math.floor(data.addictionDurationThreshold % 24)
-    debugText = debugText .. string.format("\nTime to Threshold: %d days, %d hours", daysT, hoursT)
-
     debugText = debugText .. "\n\n[Withdrawal]"
     if data.nicotineLevel < NicotineSystem.Options.ADDICTION_GAIN_THRESHOLD then
         local symptomTime = data.messageCooldown - data.timeSinceLastMessage

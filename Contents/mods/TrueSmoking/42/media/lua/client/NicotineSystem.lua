@@ -90,8 +90,6 @@ function NicotineSystem:initialize(player)
         previousNicotineLevel = 0,
         previousAddictionLevel = 0,
         lastIntakeTimestamp = 0,
-        addictionDuration = 0,
-        addictionDurationThreshold = 0,
         timeToNextWithdrawal = 0,
         timeSinceLastMessage = 0,
         messageCooldown = 0,
@@ -118,40 +116,6 @@ function NicotineSystem:initialize(player)
         end
     end
     modData.nicotineSystem.player = player
-end
-
-function NicotineSystem:calculateAddictionDuration(player)
-    local data = player:getModData().nicotineSystem
-    if not data or data.addictionLevel <= 0 then return 0 end
-    local simulatedAddiction = data.addictionLevel
-    local minutesPassed = 0
-    local minutesPassedThreshold = 0
-    local maxSimulationMinutes = 120000 -- ~83 days
-    local timeDelta = 0.01667 -- 1 minute
-    local endurance = player:getStats():getEndurance()
-    local enduranceModifier = 1.0 + (1.0 - endurance) * 0.5
-    while simulatedAddiction > 1 and minutesPassed < maxSimulationMinutes do
-        minutesPassed = minutesPassed + 1
-        if simulatedAddiction > self.Options.SMOKER_TRAIT_LOSE_THRESHOLD then
-            minutesPassedThreshold = minutesPassed
-        end
-        local addictionFactor = math.min(simulatedAddiction / (self.Options.SMOKER_TRAIT_THRESHOLD * 2), 1.0)
-        local decayScaler = 1.0 + (1.0 - addictionFactor) * 2.0
-        local adjustedDecayRate = self.Options.ADDICTION_DECAY_RATE * decayScaler
-        local hasSmokerTrait = simulatedAddiction > self.Options.SMOKER_TRAIT_THRESHOLD
-        local smokerMultiplier = hasSmokerTrait and 0.5 or 1.0
-        local exponentialDecay = simulatedAddiction * (adjustedDecayRate * smokerMultiplier * timeDelta)
-        local lowAddictionBoost = 0
-        if simulatedAddiction < self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 2 then
-            lowAddictionBoost = self.Options.ADDICTION_MIN_DECAY * timeDelta * (1.0 - simulatedAddiction / (self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 2))
-        end
-        local totalDecay = (exponentialDecay + lowAddictionBoost) * enduranceModifier
-        simulatedAddiction = math.max(0, simulatedAddiction - totalDecay)
-    end
-    data.addictionDuration = minutesPassed / 60
-    data.addictionDurationThreshold = minutesPassedThreshold / 60
-    print("TRUESMOKING::AddictionDuration: " .. data.addictionDuration .. " hours, Threshold: " .. data.addictionDurationThreshold .. " hours")
-    return data.addictionDuration, data.addictionDurationThreshold
 end
 
 function NicotineSystem:calculateDynamicMetabolicFactor(player)
@@ -222,9 +186,6 @@ function NicotineSystem:update(player)
     self:updateAddictionLevel(player, data, timeDelta)
     if TrueSmoking.Options.DynamicSmokerTrait then
         self:manageSmokerTrait(player)
-    end
-    if math.floor(currentTime) > math.floor(data.lastUpdate) then
-        self:calculateAddictionDuration(player)
     end
 end
 
