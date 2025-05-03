@@ -187,6 +187,16 @@ function NicotineSystem:update(player)
     if TrueSmoking.Options.DynamicSmokerTrait then
         self:manageSmokerTrait(player)
     end
+
+    local metabolicFactor = self:calculateDynamicMetabolicFactor(player)
+    data.metabolicFactor = metabolicFactor
+    local toleranceFactor = 1.0
+    if data.addictionLevel > self.Options.SMOKER_TRAIT_THRESHOLD then
+        toleranceFactor = (1.6 - toleranceFactor) * (1.0 / metabolicFactor)
+    else
+        toleranceFactor = 1.5 * (1.0 / metabolicFactor)
+    end
+    data.toleranceFactor = toleranceFactor
 end
 
 function NicotineSystem:updateNicotineLevel(data, player, timeDelta)
@@ -267,7 +277,7 @@ end
 function NicotineSystem:calculateDynamicDecayRate(player)
     local data = player:getModData().nicotineSystem
     if not data then return 0.0001 end
-    local baseRate = 0.975
+    local baseRate = 0.38  -- Much lower value for faster decay
     local nicotineLevel = data.nicotineLevel
     local addictionLevel = data.addictionLevel
     local hasSmokerTrait = addictionLevel > self.Options.SMOKER_TRAIT_THRESHOLD
@@ -277,7 +287,7 @@ function NicotineSystem:calculateDynamicDecayRate(player)
     player:getModData().nicotineSystem.metabolicFactor = metabolicFactor
     local adjustedBaseRate = baseRate * metabolicFactor
     local traitMultiplier = hasSmokerTrait and 1.5 or 1.0
-    local decayRate = math.min(0.99, adjustedBaseRate * traitMultiplier + addictionFactor * nicotineLevel / self.Options.SMOKER_TRAIT_THRESHOLD * 0.01)
+    local decayRate = math.min(0.95, adjustedBaseRate * traitMultiplier + addictionFactor * nicotineLevel / self.Options.SMOKER_TRAIT_THRESHOLD * 0.01)
     return math.max(0.0001, decayRate)
 end
 
@@ -287,16 +297,8 @@ function NicotineSystem:addNicotine(player, amount)
     data = player:getModData().nicotineSystem
     local previousNicotineLevel = data.nicotineLevel
     local adjustedAmount = amount * self.Constants.INTAKE_MULTIPLIER
-    local metabolicFactor = self:calculateDynamicMetabolicFactor(player)
-    data.metabolicFactor = metabolicFactor
-    local toleranceFactor = 1.0
-    if data.addictionLevel > self.Options.SMOKER_TRAIT_THRESHOLD then
-        toleranceFactor = (1.6 - toleranceFactor) * (1.0 / metabolicFactor)
-    else
-        toleranceFactor = 1.5 * (1.0 / metabolicFactor)
-    end
-    data.toleranceFactor = toleranceFactor
-    local finalAmount = adjustedAmount * toleranceFactor
+
+    local finalAmount = adjustedAmount * data.toleranceFactor
     data.nicotineLevel = math.min(100, data.nicotineLevel + finalAmount)
     local baseAddiction = finalAmount * 0.01
     if data.nicotineLevel >= self.Options.ADDICTION_GAIN_THRESHOLD then
