@@ -17,7 +17,6 @@ options:addTickBox("HideAllActionBars", getText("IGUI_TRUESMOKING_HIDE_ALL_ACTIO
 options:addTickBox('AlwaysShowMoodle', getText("IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE"), false, getText("IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC"))
 options:addTickBox('HideMoodles', getText("IGUI_TRUESMOKING_HIDE_MOODLES"), false, getText("IGUI_TRUESMOKING_HIDE_MOODLES_DESC"))
 options:addTickBox('ShowSmokePercent', getText("IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT"), false, getText("IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT_DESC"))
-options:addTickBox('ShowDaysRemaining', getText("IGUI_TRUESMOKING_SHOW_DAYS_REMAINING"), false, getText("IGUI_TRUESMOKING_SHOW_DAYS_REMAINING_DESC"))
 local hotkeySmokes = options:addMultipleTickBox('HotKeySmokes',getText('IGUI_TRUESMOKING_SMOKE_KEYS'))
     hotkeySmokes:addTickBox(getText('IGUI_TRUESMOKING_ROLLED_HK'),true)
     hotkeySmokes:addTickBox(getText('IGUI_TRUESMOKING_CIG_HK'),true)
@@ -26,19 +25,19 @@ local hotkeySmokes = options:addMultipleTickBox('HotKeySmokes',getText('IGUI_TRU
     hotkeySmokes:addTickBox(getText('IGUI_TRUESMOKING_CAN_HK'),false)
     hotkeySmokes:addTickBox(getText('IGUI_TRUESMOKING_PIPE_HK'),false)
 options:addTickBox("DebugMoodles", getText("IGUI_TRUESMOKING_DEBUG_MOODLES"), false, getText("IGUI_TRUESMOKING_DEBUG_MOODLES_DESC"))
-options:addButton('TestButton', '100 nicotine', '100 nicotine', function()
-    local data = getPlayer():getModData().nicotineSystem
-    data.nicotineLevel = 100
-end)
-options:addButton('TestButton2', '100 addiction', '100 addiction', function()
-    local data = getPlayer():getModData().nicotineSystem
-    data.addictionLevel = data.addictionLevel + 100
-end)
-options:addButton('TestButton3', '0 levels', '0 levels', function()
-    local data = getPlayer():getModData().nicotineSystem
-    data.nicotineLevel = 0
-    data.addictionLevel = 0
-end)
+-- options:addButton('TestButton', '100 nicotine', '100 nicotine', function()
+--     local data = getPlayer():getModData().nicotineSystem
+--     data.nicotineLevel = 100
+-- end)
+-- options:addButton('TestButton2', '100 addiction', '100 addiction', function()
+--     local data = getPlayer():getModData().nicotineSystem
+--     data.addictionLevel = data.addictionLevel + 100
+-- end)
+-- options:addButton('TestButton3', '0 levels', '0 levels', function()
+--     local data = getPlayer():getModData().nicotineSystem
+--     data.nicotineLevel = 0
+--     data.addictionLevel = 0
+-- end)
 options:addSeparator()
 
 -- This is a helper function that will automatically populate the "config" table.
