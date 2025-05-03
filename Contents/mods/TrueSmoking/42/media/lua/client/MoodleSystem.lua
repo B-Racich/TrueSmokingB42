@@ -214,9 +214,9 @@ function NicotineMoodle:generateDebugInfo(data)
     local debugText = "\n\n[DEBUG INFO]"
 
     debugText = debugText .. "\n[Nicotine]"
-    debugText = debugText .. string.format("\nLevel: %.2f%%", data.nicotineLevel)
+    debugText = debugText .. string.format("\nLevel: %.3f%%", data.nicotineLevel)
     debugText = debugText .. "\n\n[Addiction]"
-    debugText = debugText .. string.format("\nLevel: %.2f", data.addictionLevel)
+    debugText = debugText .. string.format("\nLevel: %.3f", data.addictionLevel)
 
     debugText = debugText .. "\n\n[Withdrawal]"
     if data.nicotineLevel < NicotineSystem.Options.ADDICTION_GAIN_THRESHOLD then

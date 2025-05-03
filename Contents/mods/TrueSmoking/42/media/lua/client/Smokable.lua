@@ -82,7 +82,7 @@ function Smokable:getObject(item)
         ['OnEat_Cigarettes'] = {
             smokeLength = TrueSmoking.Options.CigaretteLength,
             foodSick = 14,
-            nicotineContent = 25,
+            nicotineContent = 40,
             effectMultiplier = 1.0,
             callback = OnEat_Tobacco,
             visualItem = 'Mask_Cigarette'
@@ -91,7 +91,7 @@ function Smokable:getObject(item)
         ['OnEat_Cigarillo'] = {
             smokeLength = TrueSmoking.Options.CigarilloLength,
             foodSick = 21,
-            nicotineContent = 40,
+            nicotineContent = 60,
             effectMultiplier = 2.0,
             callback = OnEat_Tobacco,
             visualItem = 'Mask_Cigarillo'
@@ -100,7 +100,7 @@ function Smokable:getObject(item)
         ['OnEat_Cigar'] = {
             smokeLength = TrueSmoking.Options.CigarLength,
             foodSick = 28,
-            nicotineContent = 65,
+            nicotineContent = 100,
             effectMultiplier = 3.0,
             callback = OnEat_Tobacco,
             visualItem = 'Mask_Cigar'

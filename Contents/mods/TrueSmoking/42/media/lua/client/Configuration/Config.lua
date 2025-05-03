@@ -46,7 +46,7 @@ Events.OnCreatePlayer.Add(function()
             runningFactor = TrueSmoking.Options.Cigarette.runningFactor,
             sprintingFactor = TrueSmoking.Options.Cigarette.sprintingFactor,
             puffFactor = TrueSmoking.Options.Cigarette.puffFactor,
-            nicotineContent = 25,
+            nicotineContent = 40,
         },
         ['Base.CigaretteRolled'] = {
             visualItem = 'Mask_Cigarette',
@@ -63,7 +63,7 @@ Events.OnCreatePlayer.Add(function()
             runningFactor = TrueSmoking.Options.RolledCigarette.runningFactor,
             sprintingFactor = TrueSmoking.Options.RolledCigarette.sprintingFactor,
             puffFactor = TrueSmoking.Options.RolledCigarette.puffFactor,
-            nicotineContent = 30,
+            nicotineContent = 45,
         },
         ['Base.Cigarillo'] = {
             visualItem = 'Mask_Cigarillo',
@@ -80,7 +80,7 @@ Events.OnCreatePlayer.Add(function()
             runningFactor = TrueSmoking.Options.Cigarillo.runningFactor,
             sprintingFactor = TrueSmoking.Options.Cigarillo.sprintingFactor,
             puffFactor = TrueSmoking.Options.Cigarillo.puffFactor,
-            nicotineContent = 45,
+            nicotineContent = 60,
         },
         ['Base.Cigar'] = {
             visualItem = 'Mask_Cigar',
@@ -97,7 +97,7 @@ Events.OnCreatePlayer.Add(function()
             runningFactor = TrueSmoking.Options.Cigar.runningFactor,
             sprintingFactor = TrueSmoking.Options.Cigar.sprintingFactor,
             puffFactor = TrueSmoking.Options.Cigar.puffFactor,
-            nicotineContent = 75,
+            nicotineContent = 100,
         },
         ['Base.SmokingPipe_Tobacco'] = {
             visualItem = 'Mask_Pipe',
@@ -114,7 +114,7 @@ Events.OnCreatePlayer.Add(function()
             runningFactor = TrueSmoking.Options.Pipe.runningFactor,
             sprintingFactor = TrueSmoking.Options.Pipe.sprintingFactor,
             puffFactor = TrueSmoking.Options.Pipe.puffFactor,
-            nicotineContent = 65,
+            nicotineContent = 80,
         },
         ['Base.CanPipe_Tobacco'] = {
             visualItem = false,
@@ -131,7 +131,7 @@ Events.OnCreatePlayer.Add(function()
             runningFactor = TrueSmoking.Options.Can.runningFactor,
             sprintingFactor = TrueSmoking.Options.Can.sprintingFactor,
             puffFactor = TrueSmoking.Options.Can.puffFactor,
-            nicotineContent = 40,
+            nicotineContent = 50,
         }
     }
 

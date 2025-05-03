@@ -3,17 +3,17 @@ NicotineSystem.__index = NicotineSystem
 
 NicotineSystem.Options = {
     NICOTINE_DECAY_RATE = 0.9,
-    ADDICTION_GAIN_RATE = 0.0725,
-    ADDICTION_DECAY_RATE = 0.002,
-    ADDICTION_MIN_DECAY = 0.1,
+    ADDICTION_GAIN_RATE = 0.065,
+    ADDICTION_DECAY_RATE = 0.0012,
+    ADDICTION_MIN_DECAY = 0.08,
     ADDICTION_GAIN_THRESHOLD = 10.0,
     SMOKER_TRAIT_THRESHOLD = 60,
     SMOKER_TRAIT_LOSE_THRESHOLD = 15,
     ADDICTION_GROWTH_CURVE = {
-        EXPONENT = 2,
+        EXPONENT = 1.8,
         MULTIPLIER = 50,
     },
-    INTAKE_CONVERSION = 0.025,
+    INTAKE_CONVERSION = 0.022,
     ACTIVE_SMOKING_BONUS = 0.125,
     FATIGUE_BASE = 0.0001,
     HUNGER_BASE = 0.0001,
@@ -179,9 +179,11 @@ end
 function NicotineSystem:update(player)
     local data = player:getModData().nicotineSystem
     if not data then return end
+
     local currentTime = getGameTime():getWorldAgeHours()
     local timeDelta = currentTime - data.lastUpdate
     data.lastUpdate = currentTime
+
     self:updateNicotineLevel(data, player, timeDelta)
     self:updateAddictionLevel(player, data, timeDelta)
     if TrueSmoking.Options.DynamicSmokerTrait then
@@ -207,7 +209,7 @@ function NicotineSystem:updateNicotineLevel(data, player, timeDelta)
     if not isSmoking then
         data.nicotineLevel = data.nicotineLevel * (dynamicDecayRate ^ timeDelta)
     end
-    if data.nicotineLevel < self.Options.ADDICTION_GAIN_THRESHOLD and data.addictionLevel > self.Options.ADDICTION_GAIN_THRESHOLD then
+    if data.nicotineLevel < self.Options.ADDICTION_GAIN_THRESHOLD and player:HasTrait('Smoker') then
         local timeFactor = player:getTimeSinceLastSmoke() / 10
         if timeFactor == 0 then timeFactor = 0.15 end
         local increaseRate = (data.addictionLevel / 100) * self.Constants.INCREASE_FACTOR * timeFactor * timeDelta
@@ -258,14 +260,15 @@ function NicotineSystem:updateAddictionLevel(player, data, timeDelta)
     elseif not isSmoking then
         local baseDecayRate = self.Options.ADDICTION_DECAY_RATE
         local addictionFactor = math.min(data.addictionLevel / (self.Options.SMOKER_TRAIT_THRESHOLD * 2), 1.0)
-        local decayScaler = 1.0 + (1.0 - addictionFactor) * 2.0
+        local decayScaler = 1.0 + (1.0 - addictionFactor) * 1.5
         local adjustedDecayRate = baseDecayRate * decayScaler
         local hasSmokerTrait = data.addictionLevel > self.Options.SMOKER_TRAIT_THRESHOLD
-        local smokerMultiplier = hasSmokerTrait and 0.5 or 1.0
+        local smokerMultiplier = hasSmokerTrait and 0.4 or 1.0
         local exponentialDecay = data.addictionLevel * (adjustedDecayRate * smokerMultiplier * timeDelta)
         local lowAddictionBoost = 0
         if data.addictionLevel < self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 2 then
-            lowAddictionBoost = self.Options.ADDICTION_MIN_DECAY * timeDelta * (1.0 - data.addictionLevel / (self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 2))
+            lowAddictionBoost = self.Options.ADDICTION_MIN_DECAY * timeDelta *
+                (1.0 - data.addictionLevel / (self.Options.SMOKER_TRAIT_LOSE_THRESHOLD * 2))
         end
         local endurance = player:getStats():getEndurance()
         local enduranceModifier = 1.0 + (1.0 - endurance) * 0.5
@@ -277,7 +280,7 @@ end
 function NicotineSystem:calculateDynamicDecayRate(player)
     local data = player:getModData().nicotineSystem
     if not data then return 0.0001 end
-    local baseRate = 0.38  -- Much lower value for faster decay
+    local baseRate = 0.38 -- Much lower value for faster decay
     local nicotineLevel = data.nicotineLevel
     local addictionLevel = data.addictionLevel
     local hasSmokerTrait = addictionLevel > self.Options.SMOKER_TRAIT_THRESHOLD
@@ -287,7 +290,8 @@ function NicotineSystem:calculateDynamicDecayRate(player)
     player:getModData().nicotineSystem.metabolicFactor = metabolicFactor
     local adjustedBaseRate = baseRate * metabolicFactor
     local traitMultiplier = hasSmokerTrait and 1.5 or 1.0
-    local decayRate = math.min(0.95, adjustedBaseRate * traitMultiplier + addictionFactor * nicotineLevel / self.Options.SMOKER_TRAIT_THRESHOLD * 0.01)
+    local decayRate = math.min(0.95,
+        adjustedBaseRate * traitMultiplier + addictionFactor * nicotineLevel / self.Options.SMOKER_TRAIT_THRESHOLD * 0.01)
     return math.max(0.0001, decayRate)
 end
 
@@ -326,30 +330,42 @@ end
 function NicotineSystem:applyWithdrawalEffects(player, timeDelta)
     local data = player:getModData().nicotineSystem
     if not data then return end
+
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
-    local intensity = (((data.withdrawalLevel / 100) + (player:getTimeSinceLastSmoke() / 10)) / 2)
-    local stressChange = intensity * self.Options.STRESS_BASE * timeDelta
+    local timeSinceFactor = math.min(player:getTimeSinceLastSmoke() / 10, 0.8)
+    local intensity = (((data.withdrawalLevel / 100) + timeSinceFactor) / 2)
+
+    local maxStressPerUpdate = 0.002 * timeDelta
+    local rawStressChange = intensity * self.Options.STRESS_BASE * timeDelta
+    local stressChange = math.min(rawStressChange, maxStressPerUpdate)
+
     local unhappinessChange = intensity * self.Options.UNHAPPINESS_BASE * timeDelta
     local boredomChange = intensity * self.Options.BOREDOM_BASE * timeDelta
+
     data.stressChange = stressChange
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
-    if stats:getStressFromCigarettes() >= 0.5 then
-        local trueStress = stats:getStress() - stats:getStressFromCigarettes()
-        if trueStress <= 1.0 then
-            data.stressAccumulation = data.stressAccumulation + stressChange
-            stats:setStress(math.min(1.51, trueStress + stressChange))
-        end
-    end
+
+    -- if stats:getStressFromCigarettes() >= 0.5 then
+    --     local trueStress = stats:getStress() - stats:getStressFromCigarettes()
+    --     if trueStress <= 1.0 then
+    --         data.stressAccumulation = data.stressAccumulation + stressChange
+    --         print('Stress Change: ' .. stressChange)
+    --         stats:setStress(math.min(1.51, trueStress + stressChange))
+    --     end
+    -- end
+
     if data.boredomAccumulation < self.Options.BOREDOM_MAX then
         data.boredomAccumulation = data.boredomAccumulation + boredomChange
         bodyDamage:setBoredomLevel(math.min(100, bodyDamage:getBoredomLevel() + boredomChange))
     end
+
     if data.unhappinessAccumulation < self.Options.UNHAPPINESS_MAX then
         data.unhappinessAccumulation = data.unhappinessAccumulation + unhappinessChange
         bodyDamage:setUnhappynessLevel(math.min(100, bodyDamage:getUnhappynessLevel() + unhappinessChange))
     end
+
     if TrueSmoking.Config.WithdrawalText and player:HasTrait('Smoker') then
         local currentTime = getGameTime():getWorldAgeHours()
         if not data.lastWithdrawalMessage then data.lastWithdrawalMessage = 0 end
@@ -371,30 +387,36 @@ end
 function NicotineSystem:relieveWithdrawalEffects(player, timeDelta)
     local data = player:getModData().nicotineSystem
     if not data then return end
+
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
     local addiction = data.nicotineLevel > self.Options.SMOKER_TRAIT_THRESHOLD and self.Options.SMOKER_TRAIT_THRESHOLD or
         data.nicotineLevel
     local addictionFactor = addiction / self.Options.SMOKER_TRAIT_THRESHOLD
     local reliefFactor = (1.0 - (addictionFactor * 0.7))
+
     local stressChange = reliefFactor * self.Options.STRESS_BASE * timeDelta
     local unhappinessChange = reliefFactor * self.Options.UNHAPPINESS_BASE * timeDelta
     local boredomChange = reliefFactor * self.Options.BOREDOM_BASE * timeDelta
     data.stressChange = stressChange
     data.unhappinessChange = unhappinessChange
     data.boredomChange = boredomChange
-    if data.stressAccumulation > 0 then
-        data.stressAccumulation = math.max(0, data.stressAccumulation - stressChange)
-        stats:setStress(math.max(0, stats:getStress() - stressChange))
-    end
+
+    -- if data.stressAccumulation > 0 then
+    --     data.stressAccumulation = math.max(0, data.stressAccumulation - stressChange)
+    --     stats:setStress(math.max(0, stats:getStress() - stressChange))
+    -- end
+
     if data.boredomAccumulation > 0 then
         data.boredomAccumulation = math.max(0, data.boredomAccumulation - boredomChange)
         bodyDamage:setBoredomLevel(math.max(0, bodyDamage:getBoredomLevel() - boredomChange))
     end
+
     if data.unhappinessAccumulation > 0 then
         data.unhappinessAccumulation = math.max(0, data.unhappinessAccumulation - unhappinessChange)
         bodyDamage:setUnhappynessLevel(math.min(100, bodyDamage:getUnhappynessLevel() - unhappinessChange))
     end
+
     data.lastWithdrawalMessage = getGameTime():getWorldAgeHours()
     data.timeToNextWithdrawal = self:calculateMessageCooldown(data.withdrawalLevel)
 end
