@@ -194,7 +194,7 @@ function NicotineSystem:update(player)
     data.metabolicFactor = metabolicFactor
     local toleranceFactor = 1.0
     if data.addictionLevel > self.Options.SMOKER_TRAIT_THRESHOLD then
-        toleranceFactor = (1.6 - toleranceFactor) * (1.0 / metabolicFactor)
+        toleranceFactor = (1.625 - toleranceFactor) * (1.0 / metabolicFactor)
     else
         toleranceFactor = 1.5 * (1.0 / metabolicFactor)
     end
@@ -202,7 +202,7 @@ function NicotineSystem:update(player)
 end
 
 function NicotineSystem:updateNicotineLevel(data, player, timeDelta)
-    if not data then return end
+    if not data or TrueSmoking:getPlayerReference(player).Smokable then return end
     local dynamicDecayRate = self:calculateDynamicDecayRate(player)
     data.currentDecayRate = dynamicDecayRate
     local isSmoking = TrueSmoking:getPlayerReference(player).Smokable.smokeLit

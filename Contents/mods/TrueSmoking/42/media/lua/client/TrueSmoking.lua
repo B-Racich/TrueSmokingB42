@@ -432,10 +432,10 @@ Events.OnCreatePlayer.Add(function(playerNum, player)
 end)
 
 Events.OnPlayerDeath.Add(function(player)
-    TrueSmoking:stop(player)
     if player and TrueSmoking.Options.UseNicotineSystem and player:getModData().nicotineSystem then
         Events.EveryOneMinute.Remove(function() NicotineUpdate(player) end)
     end
+    TrueSmoking:stop(player)
 end)
 
 Events.OnInitGlobalModData.Add(function()
