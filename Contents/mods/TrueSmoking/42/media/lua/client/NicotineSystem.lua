@@ -83,7 +83,7 @@ NicotineSystem.Effects = {
 function NicotineSystem:initialize(player)
     local defaultNicotineSystem = {
         nicotineLevel = 0,
-        addictionLevel = player:HasTrait("Smoker") and 200 or 0,
+        addictionLevel = player:HasTrait("Smoker") and 100 or 0,
         lastUpdate = getGameTime():getWorldAgeHours(),
         lastWithdrawalMessage = 0,
         withdrawalLevel = 0,
@@ -202,10 +202,11 @@ function NicotineSystem:update(player)
 end
 
 function NicotineSystem:updateNicotineLevel(data, player, timeDelta)
-    if not data or TrueSmoking:getPlayerReference(player).Smokable then return end
+    local table = TrueSmoking:getPlayerReference(player)
+    if not data or not table or not table.Smokable then return end
     local dynamicDecayRate = self:calculateDynamicDecayRate(player)
     data.currentDecayRate = dynamicDecayRate
-    local isSmoking = TrueSmoking:getPlayerReference(player).Smokable.smokeLit
+    local isSmoking = table.Smokable.smokeLit
     if not isSmoking then
         data.nicotineLevel = data.nicotineLevel * (dynamicDecayRate ^ timeDelta)
     end

@@ -373,6 +373,11 @@ function TrueSmoking:start(playerNum, player)
     end
     o.contextWrapper = contextWrapper
 
+    local function NicotineUpdate()
+        NicotineSystem:update(player)
+    end
+    o.NicotineUpdate = NicotineUpdate
+
     if player:getModData().Smokable then
         local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
         smokable:getModData().SmokeLength = player:getModData().Smokable[2]
@@ -381,6 +386,7 @@ function TrueSmoking:start(playerNum, player)
 
     Events.OnKeyStartPressed.Add(o.keyWrapper)
     Events.OnFillInventoryObjectContextMenu.Add(o.contextWrapper)
+    Events.EveryOneMinute.Add(o.NicotineUpdate)
 end
 
 function TrueSmoking:stop(player)
@@ -389,6 +395,10 @@ function TrueSmoking:stop(player)
     if not TrueSmoking.Config.HideMoodles then
         o.SmokingMoodle:stop()
         o.NicotineMoodle:stop()
+    end
+
+    if o.Smokable.smokeLit then
+        o.Smokable:stop()
     end
 
     o.SmokingMoodle = nil
@@ -403,6 +413,11 @@ function TrueSmoking:stop(player)
         Events.OnFillInventoryObjectContextMenu.Remove(o.contextWrapper)
         o.contextWrapper = nil
     end
+
+    if o.NicotineUpdate then
+        Events.EveryOneMinute.Remove(o.NicotineUpdate)
+        o.NicotineUpdate = nil
+    end
 end
 
 local remainingSmokeTooltip = function(tooltip, layout, item)
@@ -416,25 +431,15 @@ local remainingSmokeTooltip = function(tooltip, layout, item)
     end
 end
 
-local function NicotineUpdate(player)
-    NicotineSystem:update(player)
-end
-
 InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
 BodyLocations.getGroup("Human"):getOrCreateLocation("Mask_Smoke")
 
 Events.OnCreatePlayer.Add(function(playerNum, player)
     TrueSmoking:start(playerNum, player)
-    if player and TrueSmoking.Options.UseNicotineSystem and player:getModData().nicotineSystem then
-        Events.EveryOneMinute.Add(function() NicotineUpdate(player) end)
-    end
 end)
 
 Events.OnPlayerDeath.Add(function(player)
-    if player and TrueSmoking.Options.UseNicotineSystem and player:getModData().nicotineSystem then
-        Events.EveryOneMinute.Remove(function() NicotineUpdate(player) end)
-    end
     TrueSmoking:stop(player)
 end)
 
