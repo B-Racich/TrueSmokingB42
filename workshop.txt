@@ -110,6 +110,6 @@ description=
 description=[h3]Translations[/h3]
 description=RU - M1ST0R
 description=PTBR - Simba
-description=KR, JP, TR, CN - Claude 3.7
+description=KR, JP, TR, CN - Claude 3.7
 tags=Build 42;Balance;Framework;Hardmode;Military;Multiplayer;Realistic;Silly/Fun;QoL
 visibility=public
