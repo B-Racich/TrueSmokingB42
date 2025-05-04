@@ -183,7 +183,7 @@ function NicotineMoodle:update()
         addictionMoodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
 
         local value = 0.5
-        if self.table.isSmoking or TrueSmoking.Config.DebugMoodles or (TrueSmoking.Config.AlwaysShowMoodle and self.player:HasTrait('Smoker')) then
+        if (TrueSmoking.Options.UseNicotineSystem or TrueSmoking.Config.DebugMoodles) and (self.table.isSmoking or (TrueSmoking.Config.AlwaysShowMoodle and self.player:HasTrait('Smoker'))) then
             if data.addictionLevel > 0 and data.addictionLevel < 100 then
                 value = 1 - (data.addictionLevel / 100)
             elseif data.addictionLevel >= 100 then

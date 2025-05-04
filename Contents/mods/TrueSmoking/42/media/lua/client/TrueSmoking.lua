@@ -350,8 +350,14 @@ function TrueSmoking:start(playerNum, player)
     o.Smokable = {}
     o.Smokable.smokeLit = false
 
+    local function NicotineUpdate()
+        NicotineSystem:update(player)
+    end
+    o.NicotineUpdate = NicotineUpdate
+
     if TrueSmoking.Options.UseNicotineSystem then
         NicotineSystem:initialize(player)
+        Events.EveryOneMinute.Add(o.NicotineUpdate)
     end
 
     if not TrueSmoking.Config.HideMoodles then
@@ -373,11 +379,6 @@ function TrueSmoking:start(playerNum, player)
     end
     o.contextWrapper = contextWrapper
 
-    local function NicotineUpdate()
-        NicotineSystem:update(player)
-    end
-    o.NicotineUpdate = NicotineUpdate
-
     if player:getModData().Smokable then
         local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
         smokable:getModData().SmokeLength = player:getModData().Smokable[2]
@@ -386,7 +387,6 @@ function TrueSmoking:start(playerNum, player)
 
     Events.OnKeyStartPressed.Add(o.keyWrapper)
     Events.OnFillInventoryObjectContextMenu.Add(o.contextWrapper)
-    Events.EveryOneMinute.Add(o.NicotineUpdate)
 end
 
 function TrueSmoking:stop(player)
