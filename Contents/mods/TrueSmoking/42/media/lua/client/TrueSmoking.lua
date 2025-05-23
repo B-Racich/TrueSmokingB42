@@ -96,7 +96,6 @@ function TrueSmoking:hasRequiredItem(smokable, player)
             for j = 1, items:size() do
                 if typesTable[items:get(j - 1):getFullType()] and predicateNotEmpty(items:get(j - 1)) then
                     lightSource = items:get(j - 1)
-                    ISInventoryPaneContextMenu.transferIfNeeded(player, lightSource)
                     break
                 end
             end
@@ -106,7 +105,6 @@ function TrueSmoking:hasRequiredItem(smokable, player)
             for v, _ in pairs(typesTable) do
                 lightSource = player:getInventory():getFirstTypeRecurse(v)
                 if lightSource and predicateNotEmpty(lightSource) then
-                    ISInventoryPaneContextMenu.transferIfNeeded(player, lightSource)
                     break
                 end
             end

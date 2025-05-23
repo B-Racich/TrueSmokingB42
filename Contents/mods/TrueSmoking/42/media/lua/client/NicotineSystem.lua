@@ -257,7 +257,11 @@ function NicotineSystem:updateAddictionLevel(player, data, timeDelta)
             activeSmokingBonus = self.Options.ADDICTION_GAIN_RATE * self.Options.ACTIVE_SMOKING_BONUS * normalizedLevel
         end
         local addictionChange = (exponentialComponent + activeSmokingBonus) * timeDelta
-        data.addictionLevel = math.min(self.Options.ADDICTION_CAP, data.addictionLevel + addictionChange)
+        local totalChange = data.addictionLevel + addictionChange
+        if totalChange < 0 then
+            totalChange = 0
+        end
+        data.addictionLevel = math.min(self.Options.ADDICTION_CAP, totalChange)
     elseif not isSmoking then
         local baseDecayRate = self.Options.ADDICTION_DECAY_RATE
         local addictionFactor = math.min(data.addictionLevel / (self.Options.SMOKER_TRAIT_THRESHOLD * 2), 1.0)
@@ -322,6 +326,9 @@ function NicotineSystem:addNicotine(player, amount)
         data.addictionLevel = math.min(self.Options.ADDICTION_CAP, data.addictionLevel + totalAddiction)
     else
         data.addictionLevel = math.min(self.Options.ADDICTION_CAP, data.addictionLevel + (baseAddiction * 0.1))
+    end
+    if data.addictionLevel < 0 then
+        data.addictionLevel = 0
     end
     local currentTime = getGameTime():getWorldAgeHours()
     data.lastIntakeTimestamp = currentTime
