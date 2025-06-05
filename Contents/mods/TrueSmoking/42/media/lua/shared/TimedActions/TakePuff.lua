@@ -79,6 +79,10 @@ function TakePuff:start()
         end
     end
 
+    if self.eatSound ~= '' then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+    end
+
     -- Play custom sound when no sound is playing
     if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
         local gender = self.character:isFemale()
@@ -164,7 +168,7 @@ function TakePuff:new(character)
 
     o.trueSmoking = TrueSmoking:getPlayerReference(character)
     o.item = o.trueSmoking.Smokable.item
-    o.eatSound = ''
+    o.eatSound = o.item:getCustomEatSound() or ''
     o.eatAudio = 0
     o.maxTime = 220
     o.visualItemAnimLength = 3.7

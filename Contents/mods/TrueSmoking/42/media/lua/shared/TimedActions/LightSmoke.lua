@@ -7,6 +7,9 @@ function LightSmoke:isValid()
 end
 
 function LightSmoke:update()
+     if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+    end
 end
 
 function LightSmoke:waitToStart()
@@ -46,7 +49,8 @@ function LightSmoke:start()
         else
             lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
 
-            local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
+            local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or
+                CharacterActionAnims.Eat
             self:setActionAnim(anim)
             self:setAnimVariable("FoodType", self.item:getEatType())
 
@@ -58,6 +62,10 @@ function LightSmoke:start()
                 self:setOverrideHandModels(hasPrimary, self.item)
             else
                 self:setOverrideHandModels(nil, self.item)
+            end
+
+            if self.eatSound ~= '' then
+                self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
             end
 
             -- Play custom sound when no sound is playing
@@ -110,7 +118,7 @@ function LightSmoke:new(character)
     o.table = TrueSmoking:getPlayerReference(character)
     o.smokable = o.table.Smokable
     o.item = o.smokable.item
-    o.eatSound = ''
+    o.eatSound = o.item:getCustomEatSound() or ''
     o.eatAudio = 0
     o.maxTime = TrueSmoking.lightTime
     o.carLighter = o.item:hasTag("Smokable") and o.character:getVehicle() and

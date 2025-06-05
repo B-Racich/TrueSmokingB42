@@ -47,6 +47,9 @@ IG_UI_PTBR = {
     IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE = "Sempre Mostrar Moodle de Vício",
     IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC = "Sempre mostrar o moodle de vício",
 
+    IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE = "Ocultar Moodle de Vício",
+    IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE_DESC = "Oculta o moodle relacionado ao vício",
+
     IGUI_TRUESMOKING_SMOKE_KEYS = "Teclas de Atalho para Cigarros",
     IGUI_TRUESMOKING_ROLLED_HK = "Cigarro Enrolado",
     IGUI_TRUESMOKING_CIG_HK = "Cigarro",

@@ -23,6 +23,10 @@ function PutOut:update()
             -- self:setOverrideHandModels(self.character:getPrimaryHandItem():getStaticModel(), self.item)
         end
     end
+
+    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+    end
 end
 
 function PutOut:waitToStart()
@@ -45,6 +49,10 @@ function PutOut:start()
     self:setAnimVariable("FoodType", self.item:getEatType())
     if not self.table.visualItem then
         self:setOverrideHandModels(nil, self.item)
+    end
+
+    if self.eatSound ~= '' then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
     end
 end
 
@@ -79,6 +87,9 @@ function PutOut:new(character)
     o.smokable = o.table.Smokable
     o.item = o.table.Smokable.item
     o.maxTime = 120
+
+    o.eatSound = o.item:getCustomEatSound() or ''
+    o.eatAudio = 0
 
     o.visualItemTimer = 0.7
     o.visualItemFlag = false

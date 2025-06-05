@@ -47,6 +47,9 @@ IG_UI_EN = {
     IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE = "Always Show Addiction Moodle",
     IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC = "Always show the addiction moodle",
 
+    IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE = "Hide Addiction Moodle",
+    IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE_DESC = "Hides the addiction moodle",
+
     IGUI_TRUESMOKING_SMOKE_KEYS = "Hotkeys For Smokes",
     IGUI_TRUESMOKING_ROLLED_HK = "Rolled Cigarette",
     IGUI_TRUESMOKING_CIG_HK = "Cigarette",

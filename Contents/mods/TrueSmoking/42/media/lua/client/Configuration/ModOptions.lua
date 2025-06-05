@@ -16,6 +16,7 @@ options:addTickBox("HidePuffActionBar", getText("IGUI_TRUESMOKING_HIDE_PUFF_ACTI
 options:addTickBox("HideAllActionBars", getText("IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS"), false, getText("IGUI_TRUESMOKING_HIDE_ALL_ACTION_BARS_DESC"))
 options:addTickBox('AlwaysShowMoodle', getText("IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE"), false, getText("IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC"))
 options:addTickBox('HideMoodles', getText("IGUI_TRUESMOKING_HIDE_MOODLES"), false, getText("IGUI_TRUESMOKING_HIDE_MOODLES_DESC"))
+options:addTickBox('HideAddictionMoodle', getText("IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE"), false, getText("IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE_DESC"))
 options:addTickBox('ShowSmokePercent', getText("IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT"), false, getText("IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT_DESC"))
 local hotkeySmokes = options:addMultipleTickBox('HotKeySmokes',getText('IGUI_TRUESMOKING_SMOKE_KEYS'))
     hotkeySmokes:addTickBox(getText('IGUI_TRUESMOKING_ROLLED_HK'),true)

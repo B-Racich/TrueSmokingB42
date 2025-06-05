@@ -2,6 +2,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
 
     function OnEat_WeedPipe_OverTime(smokable)
         if smokable.item:getOnEat() == 'OnEat_WeedPipe' then
+            local WeedPipe = 0.2
             local player = smokable.player -- The stored player here should also be the correct splitscreen player if present
             local moodle = MF.getMoodle("ReeferMadness_High", player:getPlayerNum())
             local currentMoodleValue = moodle:getValue()
@@ -12,7 +13,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 You can add another multipler to this to help scale it faster if you desire as it might not increase fast enough to negate
                 the decrease over time (largely depends on the smoke setttings)
             ]]
-            local additionMoodleValue = (ReeferMadness_THC.WeedPipe) * smokable.puffPercent
+            local additionMoodleValue = (WeedPipe) * smokable.puffPercent
             local myNewMoodleValue = math.max(currentMoodleValue + additionMoodleValue)
             if myNewMoodleValue > 0.9 then
                 myNewMoodleValue = 0.9
@@ -23,10 +24,11 @@ if getActivatedMods():contains('\\ReeferMadness') then
 
     function OnEat_WeedJoint_OverTime(smokable)
         if smokable.item:getOnEat() == 'OnEat_WeedJoint' then
+            local WeedJoint = 0.4
             local player = smokable.player
             local moodle = MF.getMoodle("ReeferMadness_High", player:getPlayerNum())
             local currentMoodleValue = moodle:getValue()
-            local additionMoodleValue = (ReeferMadness_THC.WeedJoint) * smokable.puffPercent
+            local additionMoodleValue = (WeedJoint) * smokable.puffPercent
             local myNewMoodleValue = math.max(currentMoodleValue + additionMoodleValue)
             if myNewMoodleValue > 0.9 then
                 myNewMoodleValue = 0.9
@@ -64,7 +66,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                          -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                       -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                           -- Decay rate when idle
-                callback = false,                            -- Callback function when smoked (mod support)
+                callback = OnEat_WeedPipe_OverTime,                            -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -79,7 +81,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -94,7 +96,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -109,7 +111,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -124,7 +126,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -139,7 +141,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                           -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                        -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                            -- Decay rate when idle
-                callback = false,                             -- Callback function when smoked (mod support)
+                callback = OnEat_WeedPipe_OverTime,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -154,7 +156,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                          -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                       -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                           -- Decay rate when idle
-                callback = false,                            -- Callback function when smoked (mod support)
+                callback = OnEat_WeedPipe_OverTime,                            -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -169,7 +171,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -184,7 +186,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -199,7 +201,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -214,7 +216,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                           -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                        -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                            -- Decay rate when idle
-                callback = false,                             -- Callback function when smoked (mod support)
+                callback = OnEat_WeedPipe_OverTime,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -229,7 +231,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                          -- Acceleration towards burnMax
                 burnSpeedDecay = 0.20,                       -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                           -- Decay rate when idle
-                callback = false,                            -- Callback function when smoked (mod support)
+                callback = OnEat_WeedPipe_OverTime,                            -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,
@@ -244,7 +246,7 @@ if getActivatedMods():contains('\\ReeferMadness') then
                 burnSpeed = 0.0025,                                -- Acceleration towards burnMax
                 burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
-                callback = false,                                  -- Callback function when smoked (mod support)
+                callback = OnEat_WeedJoint_OverTime,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
                 runningFactor = TrueSmoking.Options.RunningFactor,

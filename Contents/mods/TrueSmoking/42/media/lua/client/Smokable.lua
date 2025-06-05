@@ -32,6 +32,7 @@ function Smokable:init(item, player)
     end
 
     self.item = item
+    print('TRUESMOKING::Custom Eat Sound' .. tostring(item:getCustomEatSound()))
     self.onEat = item:getOnEat() or false
 
     local stats = self:getItemStats(item)

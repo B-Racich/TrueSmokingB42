@@ -47,6 +47,9 @@ IG_UI_TR = {
     IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE = "Bağımlılık Ruh Halini Her Zaman Göster",
     IGUI_TRUESMOKING_ALWAYS_SHOW_MOODLE_DESC = "Bağımlılık ruh halini her zaman göster",
 
+    IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE = "Bağımlılık Moodle'ını Gizle",
+    IGUI_TRUESMOKING_HIDE_ADDICTION_MOODLE_DESC = "Bağımlılıkla ilgili moodle'ı gizler",
+
     IGUI_TRUESMOKING_SMOKE_KEYS = "Sigara Kısayolları",
     IGUI_TRUESMOKING_ROLLED_HK = "Sarma Sigara",
     IGUI_TRUESMOKING_CIG_HK = "Sigara",

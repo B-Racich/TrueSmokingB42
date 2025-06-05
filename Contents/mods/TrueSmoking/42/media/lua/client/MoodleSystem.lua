@@ -95,6 +95,10 @@ function SmokingMoodle:update()
         moodle:doWiggle()
     end
 
+    if TrueSmoking.Config.HideMoodles then
+        percentVal = 0.5
+    end
+
     moodle:setValue(percentVal)
 
     local debugInfo = ""
@@ -191,6 +195,10 @@ function NicotineMoodle:update()
             elseif data.addictionLevel <= 0 then
                 value = 1
             end
+        end
+
+        if TrueSmoking.Config.HideAddictionMoodle or TrueSmoking.Config.HideMoodles then
+            value = 0.5
         end
 
         addictionMoodle:setValue(value)
