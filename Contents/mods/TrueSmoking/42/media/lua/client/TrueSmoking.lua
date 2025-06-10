@@ -120,6 +120,9 @@ function TrueSmoking:getShemagh(player, reCover)
     items['FullHat'] = player:getWornItem('FullHat') or ''
     items['Hat'] = player:getWornItem('Hat') or ''
     items['Neck'] = player:getWornItem('Neck') or ''
+    -- New Locations 42.9
+    items['Scarf'] = player:getWornItem('Scarf') or ''
+    items['Mask'] = player:getWornItem('Mask') or ''
     for _, item in pairs(items) do
         if item ~= '' then
             local type = item:getFullType()
