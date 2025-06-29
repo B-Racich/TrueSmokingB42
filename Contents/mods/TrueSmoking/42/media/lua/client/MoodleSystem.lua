@@ -91,8 +91,15 @@ function SmokingMoodle:update()
 
     moodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
 
-    if not smokeLit then
+    -- Only wiggle once every minute if the smoke is not lit
+    if not self.lastWiggleTime then
+        self.lastWiggleTime = os.time()
+    end
+
+    local currentTime = os.time()
+    if not smokeLit and (currentTime - self.lastWiggleTime >= 60) then
         moodle:doWiggle()
+        self.lastWiggleTime = currentTime
     end
 
     if TrueSmoking.Config.HideMoodles then
