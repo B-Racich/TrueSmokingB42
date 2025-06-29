@@ -97,7 +97,7 @@ function SmokingMoodle:update()
     end
 
     local currentTime = os.time()
-    if not smokeLit and (currentTime - self.lastWiggleTime >= 60) then
+    if not smokeLit and (currentTime - self.lastWiggleTime >= 10) then
         moodle:doWiggle()
         self.lastWiggleTime = currentTime
     end
