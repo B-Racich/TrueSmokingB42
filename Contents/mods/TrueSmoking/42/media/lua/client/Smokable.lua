@@ -332,6 +332,7 @@ function Smokable:update()
         local isRunning = self.player:isRunning() and self.conditions['running']
         local isSprinting = self.player:isSprinting() and self.conditions['sprinting']
         local isStrafing = self.player:isStrafing() and self.conditions['strafing']
+        local isReading = ISTimedActionQueue.hasActionType(self.player, 'ISReadABook')
 
         local targetBurnRate
         if self.table.takingPuff then
@@ -342,6 +343,10 @@ function Smokable:update()
             targetBurnRate = self.burnMin * self.runningFactor
         elseif isWalking or isStrafing then
             targetBurnRate = self.burnMin * self.walkingFactor
+        elseif isReading then
+            targetBurnRate = self.burnMin * self.walkingFactor * 0.5
+        else
+            targetBurnRate = nil
         end
 
         if targetBurnRate then
@@ -388,6 +393,7 @@ function Smokable:update()
 
     if self.smokeLength <= 0 then
         self.smokeLength = 0
+        self.smokeLit = false
         if TrueSmoking.Config.AutoPutOut then
             self:putOut()
         end
