@@ -382,6 +382,8 @@ function Smokable:update()
 
         self.item:getModData().SmokeLength = self.smokeLength
         self.player:getModData().Smokable = { self.item:getFullType(), self.smokeLength }
+
+        self:idlePuff()
     end
 
     if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000025 then
@@ -397,8 +399,6 @@ function Smokable:update()
         if TrueSmoking.Config.AutoPutOut then
             self:putOut()
         end
-    else
-        self:idlePuff()
     end
 end
 
