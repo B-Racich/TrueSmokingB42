@@ -39,7 +39,7 @@ function TakePuff:update()
 end
 
 function TakePuff:waitToStart()
-    if getGameSpeedMultiplier() == 1 then
+    if TrueSmoking.getGameSpeedMultiplier() == 1 then
         if self.character:getEmitter():isPlaying(self.trueSmoking.eatSound)
             or (self.trueSmoking.lightingEatSound and self.character:getEmitter():isPlaying(self.trueSmoking.lightingEatSound)) then
             return true
@@ -137,7 +137,7 @@ function TakePuff:perform()
 end
 
 function TakePuff:complete()
-    if getGameSpeedMultiplier() > 1 then
+    if TrueSmoking.getGameSpeedMultiplier() > 1 then
         if self.character:getEmitter():isPlaying(self.eatSound) then
             self.character:getEmitter():stopSound(self.eatAudio)
         end

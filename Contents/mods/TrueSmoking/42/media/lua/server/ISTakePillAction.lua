@@ -1,23 +1,21 @@
-require 'TimedActions/ISEatFoodAction'
+require 'TimedActions/ISTakePillAction'
 
-local originalActionNew = ISEatFoodAction.new
-function ISEatFoodAction:new(character, item, percentage)
-    local o = {}
+local originalActionNew = ISTakePillAction.new
+function ISTakePillAction:new(character, item)
+ local o = {}
     local onEat = item:getOnEat() or ''
     local hook = 'OnEat_Hook'
     local hasSmokableTag = item:getTags():contains('Smokable')
-    local funcsToHook = { 'RecipeCodeOnEat.cigarettes', 'RecipeCodeOnEat.cigarillo','RecipeCodeOnEat.cigar', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
-        'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnSmoke_Blunt', 'OnSmoke_Cannabis',
-        'OnSmoke_CannaCigar', 'OnSmoke_Spliff' }
+    local funcsToHook = { 'cigarettes', 'RecipeCodeOnEat.cigarettes', 'RecipeCodeOnEat.cigarillo','RecipeCodeOnEat.cigar', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
+        'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnEat_Weed' }
 
-    o = originalActionNew(self, character, item, percentage)
+    o = originalActionNew(self, character, item)
 
     local table = TrueSmoking:getPlayerReference(character)
 
     if (TrueSmoking.isInList(onEat, funcsToHook) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         print('TRUESMOKING::Checking item onEat: ' .. onEat)
         print('TRUESMOKING::Item ID: ' .. item:getID())
-
         if not table.isSmoking then
             print('TRUESMOKING::Hooking: ' .. onEat)
             local replace = item:getReplaceOnUseFullType()

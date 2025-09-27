@@ -11,7 +11,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 burnSpeedDecay = 0.25,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
                 effectMultiplier = 1.0,
-                callback = OnEat_Tobacco,                                  -- Callback function when smoked (mod support)
+                callback = TrueSmoking.OnEat_Tobacco,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -28,7 +28,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 burnSpeedDecay = 0.20,                         -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                             -- Decay rate when idle
                 effectMultiplier = 3.0,
-                callback = OnEat_Tobacco,                              -- Callback function when smoked (mod support)
+                callback = TrueSmoking.OnEat_Tobacco,                              -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -45,7 +45,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 burnSpeedDecay = 0.20,                             -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                                 -- Decay rate when idle
                 effectMultiplier = 2.0,
-                callback = OnEat_Tobacco,                                  -- Callback function when smoked (mod support)
+                callback = TrueSmoking.OnEat_Tobacco,                                  -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -62,7 +62,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 burnSpeedDecay = 0.20,                        -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                            -- Decay rate when idle
                 effectMultiplier = 2.0,
-                callback = OnEat_Tobacco,                             -- Callback function when smoked (mod support)
+                callback = TrueSmoking.OnEat_Tobacco,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -79,7 +79,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 burnSpeedDecay = 0.20,                       -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                           -- Decay rate when idle
                 effectMultiplier = 1.0,
-                callback = OnEat_Tobacco,                            -- Callback function when smoked (mod support)
+                callback = TrueSmoking.OnEat_Tobacco,                            -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -96,7 +96,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 burnSpeedDecay = 0.20,                        -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                            -- Decay rate when idle
                 effectMultiplier = 2.0,
-                callback = OnEat_Tobacco,                             -- Callback function when smoked (mod support)
+                callback = TrueSmoking.OnEat_Tobacco,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,
@@ -113,7 +113,7 @@ if getActivatedMods():contains("\\B42Hemp&Tobacco") then
                 burnSpeedDecay = 0.20,                        -- Acceleration decay rate after burnMax
                 decayRate = 0.998,                            -- Decay rate when idle
                 effectMultiplier = 2.0,
-                callback = OnEat_Tobacco,                             -- Callback function when smoked (mod support)
+                callback = TrueSmoking.OnEat_Tobacco,                             -- Callback function when smoked (mod support)
                 conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
                 idleFactor = TrueSmoking.Options.IdleFactor,
                 walkingFactor = TrueSmoking.Options.WalkingFactor,

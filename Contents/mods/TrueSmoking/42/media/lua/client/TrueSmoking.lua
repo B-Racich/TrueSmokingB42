@@ -325,18 +325,18 @@ end
 function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     for i, v in ipairs(items) do
         local item = v
-        local hasSmoke = nil
+        local smokable = nil
 
         local o = self:getPlayerReference(player)
 
         if not instanceof(v, 'InventoryItem') then item = v.items[1] end
 
-        hasSmoke = context:getOptionFromName(getText('ContextMenu_Smoke'))
-        if hasSmoke then
+        smokable = context:getOptionFromName(getText('ContextMenu_Smoke'))
+        if smokable then
             if o.isSmoking or not self:hasRequiredItem(item, getSpecificPlayer(player)) then
-                hasSmoke.notAvailable = true
+                smokable.notAvailable = true
             elseif not o.isSmoking and self:hasRequiredItem(item, getSpecificPlayer(player)) then
-                hasSmoke.notAvailable = false
+                smokable.notAvailable = false
             end
         end
     end
@@ -434,7 +434,9 @@ end
 
 InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
-BodyLocations.getGroup("Human"):getOrCreateLocation("Mask_Smoke")
+local group = BodyLocations.getGroup("Human")
+local bodyLocation = BodyLocation.new(group, "Mask_Smoke")
+group:getAllLocations():add(bodyLocation)
 
 Events.OnCreatePlayer.Add(function(playerNum, player)
     TrueSmoking:start(playerNum, player)

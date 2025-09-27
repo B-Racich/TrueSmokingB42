@@ -12,10 +12,17 @@ function Smokable:new(item, player)
 end
 
 function Smokable:init(item, player)
+    self.item = item
+
+    if instanceof(item, 'Drainable') then
+        self.item = instanceItem('Base.CigaretteSingle')
+        self.cigPack = item
+    end
+
     self.player = player
     self.table = TrueSmoking:getPlayerReference(player)
 
-    local data = self:getObject(item)
+    local data = self:getObject(self.item)
     for k, v in pairs(data) do
         self[k] = v
     end
@@ -25,17 +32,15 @@ function Smokable:init(item, player)
     if self.visualItem then
         self.table.visualItem = instanceItem(self.visualItem)
     else
-        local hasVisualItem = self:getVisualItem(item)
+        local hasVisualItem = self:getVisualItem(self.item)
         if hasVisualItem then
             self.table.visualItem = hasVisualItem
         end
     end
+    print('TRUESMOKING::Custom Eat Sound' .. tostring(self.item:getCustomEatSound() or ''))
+    self.onEat = self.item:getOnEat() or false
 
-    self.item = item
-    print('TRUESMOKING::Custom Eat Sound' .. tostring(item:getCustomEatSound()))
-    self.onEat = item:getOnEat() or false
-
-    local stats = self:getItemStats(item)
+    local stats = self:getItemStats(self.item)
     stats.foodSick = data.foodSick or 0
     for k, v in pairs(stats) do
         self[k] = v
@@ -43,7 +48,7 @@ function Smokable:init(item, player)
         self[originalKey] = v
     end
 
-    self.replaceOnUse = item:getModData().replaceOnUse or false
+    self.replaceOnUse = self.item:getModData().replaceOnUse or false
 
     self.smokePercent = self.smokeLength / self.originalSmokeLength
     self.smokeLit = false
@@ -75,7 +80,7 @@ function Smokable:getObject(item)
 
     if ob then
         print('TRUESMOKING::Retrieved Smokable Object')
-        o = deepCopy(ob)
+        o = TrueSmoking.deepCopy(ob)
     end
 
     local onEat = item:getOnEat()
@@ -85,7 +90,7 @@ function Smokable:getObject(item)
             foodSick = 14,
             nicotineContent = 40,
             effectMultiplier = 1.0,
-            callback = OnEat_Tobacco,
+            callback = TrueSmoking.OnEat_Tobacco,
             visualItem = 'Mask_Cigarette'
         },
 
@@ -94,7 +99,7 @@ function Smokable:getObject(item)
             foodSick = 21,
             nicotineContent = 60,
             effectMultiplier = 2.0,
-            callback = OnEat_Tobacco,
+            callback = TrueSmoking.OnEat_Tobacco,
             visualItem = 'Mask_Cigarillo'
         },
 
@@ -103,7 +108,7 @@ function Smokable:getObject(item)
             foodSick = 28,
             nicotineContent = 100,
             effectMultiplier = 3.0,
-            callback = OnEat_Tobacco,
+            callback = TrueSmoking.OnEat_Tobacco,
             visualItem = 'Mask_Cigar'
         },
     }
@@ -224,7 +229,11 @@ function Smokable:start()
         Events.OnPlayerUpdate.Add(updateWrapper)
         self.updateWrapper = updateWrapper
         self:equipVisualItem()
-        self.player:getInventory():Remove(self.item)
+        if self.cigPack then
+            self.cigPack:setUsedDelta(self.cigPack:getCurrentUsesFloat() - self.cigPack:getUseDelta())
+        else
+            self.player:getInventory():Remove(self.item)
+        end
     end
 
     if not self.smokeLit then
@@ -270,7 +279,7 @@ function Smokable:stop()
         local onUse = self.replaceOnUse
         if onUse and onUse ~= '' and self.smokeLength <= 0 then
             print('TRUESMOKING::adding item: ' .. self.replaceOnUse)
-            addOnUseItem(self.player)
+            TrueSmoking.addOnUseItem(self.player)
         end
 
         if self.smokeLength > 0 then
@@ -295,7 +304,7 @@ function Smokable:dropSmoke()
 end
 
 function Smokable:checkDropConditions()
-    local state = getPlayerState(self.player)
+    local state = TrueSmoking.getPlayerState(self.player)
     local dropStates = { ['CollideWithWallState'] = true }
 
     local ClimbFenceOutcome = self.player:GetVariable("ClimbFenceOutcome")
@@ -327,7 +336,7 @@ function Smokable:update()
         end
     end
     if self.smokeLit then
-        local gameSpeed = getGameSpeedMultiplier()
+        local gameSpeed = TrueSmoking.getGameSpeedMultiplier()
         local isWalking = self.player:isWalking() and self.conditions['walking']
         local isRunning = self.player:isRunning() and self.conditions['running']
         local isSprinting = self.player:isSprinting() and self.conditions['sprinting']
@@ -365,7 +374,7 @@ function Smokable:update()
         self.smokeLength = self.smokeLength - self.burnRate * gameSpeed
         self.smokePercent = self.smokeLength / self.originalSmokeLength
 
-        OnEat_ItemStats(self)
+        TrueSmoking.OnEat_ItemStats(self)
 
         if TrueSmoking.Options.UseNicotineSystem and self.puffPercent > 0 and self.nicotineContent then
             local nicotineAmount = self.nicotineContent * self.puffPercent

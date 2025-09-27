@@ -1,11 +1,35 @@
-function getPlayerState(player)
+require 'TrueSmoking'
+
+TrueSmoking = TrueSmoking or {}
+
+-- WIP need to add in checking to only add full cigs back to pack or create a new system to handle this
+-- Cigs that are re-added lose their item modData and get reset
+function TrueSmoking.canAddToPack(item)
+    if instanceof(item, 'Drainable') and item:getTags():contains('Packed') then
+        local useDelta = item:getUseDelta()
+        if useDelta and useDelta < 1 then
+            if item:getFullType() == 'Base.CigarettePack' then
+                local items = player:getInventory():getItems()
+                for j = 1, items:size() do
+                    local isNew = not item:getModData().OriginalSmokeLength or (item:getModData().OriginalSmokeLength and item:getModData().SmokeLength >= item:getModData().OriginalSmokeLength)
+                    if isNew then
+                        return true
+                    end
+                end
+            end
+            return true
+        end
+    end
+end
+
+function TrueSmoking.getPlayerState(player)
     local PlayerState = tostring(player:getCurrentState())
     local state = string.match(PlayerState, '([^%.]+)@')
     -- print(string.format('Character State: %s',state))
     return state or false
 end
 
-function isInList(str, list)
+function TrueSmoking.isInList(str, list)
     if str == "" then
         return false
     end
@@ -13,11 +37,11 @@ function isInList(str, list)
     return string.find(listString, str) ~= nil
 end
 
-function deepCopy(original)
+function TrueSmoking.deepCopy(original)
     local copy = {}
     for key, value in pairs(original) do
         if type(value) == "table" then
-            copy[key] = deepCopy(value)  -- Recursively copy nested tables
+            copy[key] = TrueSmoking.deepCopy(value)  -- Recursively copy nested tables
         else
             copy[key] = value  -- Copy primitive values directly
         end
@@ -25,7 +49,7 @@ function deepCopy(original)
     return copy
 end
 
-function addOnUseItem(player)
+function TrueSmoking.addOnUseItem(player)
     local trueSmoking = TrueSmoking:getPlayerReference(player)
     local type = trueSmoking.Smokable.fullType
     local item = trueSmoking.Smokable.replaceOnUse
@@ -40,7 +64,7 @@ function addOnUseItem(player)
     end
 end
 
-function getGameSpeedMultiplier()
+function TrueSmoking.getGameSpeedMultiplier()
     local speed = getGameSpeed()
     -- Game speed maps: 1=1x, 2=5x, 3=20x, 4=40x
     if speed == 1 then
@@ -57,7 +81,7 @@ function getGameSpeedMultiplier()
 end
 
 -- OnEat for applying item stats
-function OnEat_ItemStats(smokable)
+function TrueSmoking.OnEat_ItemStats(smokable)
     local percent = smokable.puffPercent
     local character = smokable.player
     local body = character:getBodyDamage()
@@ -159,7 +183,7 @@ function OnEat_ItemStats(smokable)
 end
 
 --OnEat method for distributing Tobacco effects from Vanilla
-function OnEat_Tobacco(smokable)
+function TrueSmoking.OnEat_Tobacco(smokable)
     local percent = smokable.puffPercent
     local character = smokable.player
     local data = character:getModData().nicotineSystem
@@ -229,4 +253,6 @@ function OnEat_Tobacco(smokable)
             end
         end
     end
+
+    OnEat_Tobacco = TrueSmoking.OnEat_Tobacco
 end
