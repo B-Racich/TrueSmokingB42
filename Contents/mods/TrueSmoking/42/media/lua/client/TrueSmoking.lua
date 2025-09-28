@@ -215,57 +215,79 @@ function TrueSmoking:useRecipe(item, player, recipeString)
     local recipes = CraftRecipeManager.getUniqueRecipeItems(item, player, containers)
     if recipes and recipes:size() > 0 then
         local recipe = recipes:get(0)
-        if recipe:getName() == recipeString then
-            ISInventoryPaneContextMenu.OnNewCraft(item, recipe, player:getPlayerNum(), false)
+        local name = recipe:getName()
+        if string.match(name, 'Take') then
+             ISInventoryPaneContextMenu.OnNewCraft(item, recipe, player:getPlayerNum(), false)
         end
     end
 end
 
 function TrueSmoking:findSmokable(player)
-    local map = {
-        [1] = 'Base.CigaretteRolled',
-        [2] = 'Base.CigaretteSingle',
-        [3] = 'Base.Cigarillo',
-        [4] = 'Base.Cigar',
-        [5] = 'Base.CanPipe_Tobacco',
-        [6] = 'Base.SmokingPipe_Tobacco'
+    local items = player:getInventory():getItems()
+    local itemData = {
+        ['packed'] = {
+            ['favorite'] = {},
+            ['nonfavorite'] = {}
+        },
+        ['smokable'] = {
+            ['favorite'] = {},
+            ['nonfavorite'] = {}
+        }
     }
 
-    local smokes = {}
-
-    for i = 1, #map do
-        if self.Config['HotKeySmokes_' .. tostring(i)] then
-            table.insert(smokes, map[i])
+    for i = 0, items:size()-1 do
+        local item = items:get(i)
+        if item:getTags():contains('Smokable') and not item:getTags():contains('Packed') then
+            print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
+            if item:isFavorite() then
+                table.insert(itemData.smokable.favorite, item)
+            else
+                table.insert(itemData.smokable.nonfavorite, item)
+            end
         end
     end
 
-    for _, item in ipairs(self.HotkeySmokes) do
-        table.insert(smokes, item)
-    end
-
-    local cigarette = false
-    for _, value in ipairs(smokes) do
-        cigarette = player:getInventory():getFirstTypeRecurse(value)
-        if cigarette then break end
-    end
-
-    local pack = false
-    local recipe = false
-    for key, val in pairs(self.HotkeyPacks) do
-        pack = player:getInventory():getFirstTypeRecurse(key)
-        recipe = val
-        if pack then break end
-    end
-
-    if not cigarette and pack and recipe then
-        self:useRecipe(pack, player, recipe)
-        for index, value in ipairs(smokes) do
-            cigarette = player:getInventory():getFirstTypeRecurse(value)
+    for i = 0, items:size()-1 do
+        local item = items:get(i)
+        if item:getTags():contains('Packed') then
+            print('TRUESMOKING::Found Pack: ' .. item:getFullType())
+            if item:isFavorite() then
+                table.insert(itemData.packed.favorite, item)
+            else
+                table.insert(itemData.packed.nonfavorite, item)
+            end
         end
+    end
+
+    -- for i, v in ipairs(itemData.packed.favorite) do
+    --     print("Packed Favorite:", v:getFullType())
+    -- end
+    -- for i, v in ipairs(itemData.packed.nonfavorite) do
+    --     print("Packed Nonfavorite:", v:getFullType())
+    -- end
+    -- for i, v in ipairs(itemData.smokable) do
+    --     print("Smokable:", v:getFullType())
+    -- end
+    local cigarette = itemData.smokable.nonfavorite[1] or false
+    local pack = itemData.packed.favorite[1] or itemData.packed.nonfavorite[1] or false
+    local hasFavCig = itemData.smokable.favorite[1] or false
+    local hasFavPack = itemData.packed.favorite[1] or false
+
+    if hasFavCig and self:hasRequiredItem(cigarette, player) then
+        print('TRUESMOKING::Using Favorite Cigarette')
+        ISInventoryPaneContextMenu.eatItem(hasFavCig, 1, player:getPlayerNum())
+    end
+
+    if not hasFavCig and hasFavPack then
+        print('TRUESMOKING::Using Favorite Pack to get Cigarette')
+        self:useRecipe(hasFavPack, player, '')
+    elseif not hasFavCig and not hasFavPack and not cigarette and pack then
+        print('TRUESMOKING::Using Pack to get Cigarette')
+        self:useRecipe(pack, player, 'TakeACigarette')
     end
 
     if cigarette and self:hasRequiredItem(cigarette, player) then
-        print('TRUESMOKING::FOUND CIG/PACK')
+        print('TRUESMOKING::Using Cigarette')
         ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
     end
 end
