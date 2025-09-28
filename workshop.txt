@@ -1,102 +1,99 @@
 version=1
 id=3423984426
 title=True Smoking [B42]
-description=[h1] True Smoking [B42] [/h1]
-description=[code][h3]This mod provides a more realistic and immersive smoking experience. Smoking is no longer a short action but now a tracked and passively handled mechanic where the stats and effects are distributed over time while smoking. There is also a optional Nicotine System that implements Addiction and Withdrawal[/h3][/code]
-description=
-description=[h1]Smoking[/h1]
-description=[code]
-description=[img]https://i.imgur.com/WBnGq4I.gif[/img]
-description=Light a smoke as normal, any restrictive headgear will be taken off. After lighting, a moodle will appear tracking the progress of your smoke. You can take puffs manually or enable passive smoking and your character will take puffs when idle or when the smoke is about to go out!
-description=[/code]
-description=
-description=[h1]Dynamic Burn Rate[/h1]
-description=[code]
-description=[img]https://i.imgur.com/QLxA9Ts.gif[/img]
-description=The smoke will burn faster as you puff or move around, when idle it will slowly go out. If it goes out you can relight it to keep smoking. Smokes can be put out and saved for later, the amount left will be visible on the item tooltip. Cigars, pipes, and cigarillos are more effective than a single cigarette so you don't need to smoke the whole thing to get the same effects as a single cigarette!
-description=[/code]
-description=
-description=[h1]Freedom[/h1]
-description=[code]
-description=[img]https://i.imgur.com/vQdNBdG.gif[/img]
-description=Lighting, puffing, and putting out the smoke are timed actions that your character performs, after a smoke has been lit you can now do whatever you like while smoking. Take puffs whenever you want but make sure your smoke doesn't go out or you will need to relight it or save it for later!
-description=[img]https://i.imgur.com/bkegWkz.gif[/img]
-description=[/code]
-description=
-description=[h3]Nicotine System[/h3]
-description=[code]The Nicotine system adds Nicotine, Addiction, and Withdrawal. This system allows the Smoker trait to be dynamically lost and gained based on Addiction levels. Nicotine is accumulated while smoking and leads to Addiction over time. Nicotine provides small amounts of fatigue and hunger reduction. Withdrawal causes small amounts of boredom and unhappyness gain. There are various traits that effect the metabolism rate of Nicotine on the player and your tolerance level varies based on Addiction. The more addicted you are the less effective smokes become at completely removing your stress. This system is completely optional and can be turned off in the Sandbox Options if desired.
-description=[img]https://i.imgur.com/yM6y7Cd.png[/img][img]https://i.imgur.com/RbVE9ES.png[/img]
-description=[/code]
-description=
-description=[h3] Features [/h3]
-description=[list]
-description=[*][b]Save Game Compatible![/b]
-description=[*]Controller support
-description=[*]Split-screen support
-description=[*]Compatible with Smoker Trait and [i]most[/i] mods
-description=[*]Options and Settings configurable via Sandbox Options and Mod Options
-description=[*]All vanilla smokes compatible with visual item displayed on face!
-description=[/list]
-description=
-description=[h3]Controls[/h3]
-description=[code]
-description=[h3]Default Keyboard[/h3]
-description=[b]K[/b] - Tap to take a short puff, hold to keep puffing. Will light a cigarette or unpack one. Relights the smoke when if it goes out.
-description=[b]; (semi colon)[/b] - Puts the smoke out. Re-equips headgear that was taken off.
-description=
-description=[h3]Controller[/h3]
-description=Button prompts will appear when the corresponding action can be done. LB is a modifier key that when held changes the B action as follows below:
-description=LB + B = Get/Light Cigarette
-description=LB + B = Put Out Smoke / Re-equip headgear
-description=B = (Hold) Take Puff / Relight
-description=[/code]
-description=
-description=[h3] Configurable[/h3]
-description=[code]
-description=I have made most of the mod configurable through Sandbox Options and in-game Mod Options. Most features can be toggled, or tuned to your liking. All vanilla smoke items can have their properties changed to have different smoking times, burn characteristics and effectiveness. The Nicotine system which adds more depth to the Smoker trait can be tweaked or turned off completely if desired, this system also allows the Smoker Trait to be gained or lost over time. Moodles can be toggled off or on if desired. I review comments almost daily and add options and fix bugs as quickly as I can so feel free to leave feedback or requests.
-description=
-description=I would highly recommend checking the in-game Mod Options to help configure the behaviour of the mod to your liking as there are many options to help automate smoking or you can disable them to make it completely manual.
-description=[/code]
-description=
-description=[h3] Mod Support [/h3]
-description=[list]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404563567]Hemp & Tobacco[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404956403]N&C's Narcotics[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3424309174]HGO Expansion (B42)[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2951287846]Clove Cigarettes[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3416588496][B42] Tobacco Hotkey Mod[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3421508458]<B42>Reefer Madness[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2857762294]Smoking Sounds Overhaul[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2883633728][B41/B42]I Might Need A Lighter[/url] (IDNAL also supported)
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2769706949]Tidy Up Meister[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3173649443]Medical Meister[/url] (Turn on the option for smoke cigarettes on stress)
-description=[/list]
-description=
-description=[code][h3]Most mods should be compatible, if not let me know and I'll look at making a patch. I've also added a config system for modders to directly integrate into the True Smoking system, some mods may require their authors to add a config to fully support their OnEat methods[/h3][/code]
-description=
-description=[h3]Future Updates[/h3]
-description=[list]
-description=[*]Custom Animations
-description=[*]Mod support as requested and needed
-description=[*]Further tweaks, options, etc
-description=[/list]
-description=
-description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
-description=
-description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
-description=
-description=[code]Do not modify or redistribute my mod/code without consent, ask for permission. Treat this mod as on 'lockdown'[/code]
-description=
-description=[h3]Credits[/h3]
-description=Credits to BongoRaccoon32 and CenturyOldRat for the wearable smokable assets
-description=Thanks to everyone in the discord for their contributions in sharing modding knowledge
-description=
-description=[h3]Translations[/h3]
-description=RU - M1ST0R
-description=PTBR - Simba
-description=KR, JP, TR, CN - Claude 3.7
-description=
-description=Workshop ID: 3423984426
-description=Mod ID: TrueSmoking
+description=[h1] True Smoking [B42] [/h1]
+description=[code][h3]This mod provides a more realistic and immersive smoking experience. Smoking is no longer a short action but now a tracked and passively handled mechanic where the stats and effects are distributed over time while smoking. There is also a optional Nicotine System that implements Addiction and Withdrawal[/h3][/code]
+description=
+description=[h1]Smoking[/h1]
+description=[code]
+description=[img]https://i.imgur.com/WBnGq4I.gif[/img]
+description=Light a smoke as normal, any restrictive headgear will be taken off. After lighting, a moodle will appear tracking the progress of your smoke. You can take puffs manually or enable passive smoking and your character will take puffs when idle or when the smoke is about to go out!
+description=[/code]
+description=
+description=[h1]Dynamic Burn Rate[/h1]
+description=[code]
+description=[img]https://i.imgur.com/QLxA9Ts.gif[/img]
+description=The smoke will burn faster as you puff or move around, when idle it will slowly go out. If it goes out you can relight it to keep smoking. Smokes can be put out and saved for later, the amount left will be visible on the item tooltip. Cigars, pipes, and cigarillos are more effective than a single cigarette so you don't need to smoke the whole thing to get the same effects as a single cigarette!
+description=[/code]
+description=
+description=[h1]Freedom[/h1]
+description=[code]
+description=[img]https://i.imgur.com/vQdNBdG.gif[/img]
+description=Lighting, puffing, and putting out the smoke are timed actions that your character performs, after a smoke has been lit you can now do whatever you like while smoking. Take puffs whenever you want but make sure your smoke doesn't go out or you will need to relight it or save it for later!
+description=[img]https://i.imgur.com/bkegWkz.gif[/img]
+description=[/code]
+description=
+description=[h3]Nicotine System[/h3]
+description=[code]The Nicotine system adds Nicotine, Addiction, and Withdrawal. This system allows the Smoker trait to be dynamically lost and gained based on Addiction levels. Nicotine is accumulated while smoking and leads to Addiction over time. Nicotine provides small amounts of fatigue and hunger reduction. Withdrawal causes small amounts of boredom and unhappyness gain. There are various traits that effect the metabolism rate of Nicotine on the player and your tolerance level varies based on Addiction. The more addicted you are the less effective smokes become at completely removing your stress. This system is completely optional and can be turned off in the Sandbox Options if desired.
+description=[img]https://i.imgur.com/yM6y7Cd.png[/img][img]https://i.imgur.com/RbVE9ES.png[/img]
+description=[/code]
+description=
+description=[h3] Features [/h3]
+description=[list]
+description=[*][b]Save Game Compatible![/b]
+description=[*]Controller support
+description=[*]Split-screen support
+description=[*]Compatible with Smoker Trait and [i]most[/i] mods
+description=[*]Options and Settings configurable via Sandbox Options and Mod Options
+description=[*]All vanilla smokes compatible with visual item displayed on face!
+description=[/list]
+description=
+description=[h3]Controls[/h3]
+description=[code]
+description=[h3]Default Keyboard[/h3]
+description=[b]K[/b] - Tap to take a short puff, hold to keep puffing. Will light a cigarette or unpack one. Relights the smoke when if it goes out.
+description=[b]; (semi colon)[/b] - Puts the smoke out. Re-equips headgear that was taken off.
+description=
+description=[h3]Controller[/h3]
+description=Button prompts will appear when the corresponding action can be done. LB is a modifier key that when held changes the B action as follows below:
+description=LB + B = Get/Light Cigarette
+description=LB + B = Put Out Smoke / Re-equip headgear
+description=B = (Hold) Take Puff / Relight
+description=[/code]
+description=
+description=[h3] Configurable[/h3]
+description=[code]
+description=I have made most of the mod configurable through Sandbox Options and in-game Mod Options. Most features can be toggled, or tuned to your liking. All vanilla smoke items can have their properties changed to have different smoking times, burn characteristics and effectiveness. The Nicotine system which adds more depth to the Smoker trait can be tweaked or turned off completely if desired, this system also allows the Smoker Trait to be gained or lost over time. Moodles can be toggled off or on if desired. I review comments almost daily and add options and fix bugs as quickly as I can so feel free to leave feedback or requests.
+description=
+description=I would highly recommend checking the in-game Mod Options to help configure the behaviour of the mod to your liking as there are many options to help automate smoking or you can disable them to make it completely manual.
+description=[/code]
+description=
+description=[h3] Mod Support [/h3]
+description=[list]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404563567]Hemp & Tobacco[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3404956403]N&C's Narcotics[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3424309174]HGO Expansion (B42)[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2951287846]Clove Cigarettes[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3416588496][B42] Tobacco Hotkey Mod[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3421508458]<B42>Reefer Madness[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2857762294]Smoking Sounds Overhaul[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2883633728][B41/B42]I Might Need A Lighter[/url] (IDNAL also supported)
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2769706949]Tidy Up Meister[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3173649443]Medical Meister[/url] (Turn on the option for smoke cigarettes on stress)
+description=[/list]
+description=
+description=[code][h3]Most mods should be compatible, if not let me know and I'll look at making a patch. I've also added a config system for modders to directly integrate into the True Smoking system, some mods may require their authors to add a config to fully support their OnEat methods[/h3][/code]
+description=
+description=[h3]Future Updates[/h3]
+description=[list]
+description=[*]Custom Animations
+description=[*]Mod support as requested and needed
+description=[*]Further tweaks, options, etc
+description=[/list]
+description=
+description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
+description=
+description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
+description=
+description=[code]Do not modify or redistribute my mod/code without consent, ask for permission. Treat this mod as on 'lockdown'[/code]
+description=
+description=[h3]Credits[/h3]
+description=Credits to BongoRaccoon32 and CenturyOldRat for the wearable smokable assets
+description=Thanks to everyone in the discord for their contributions in sharing modding knowledge
+description=
+description=[h3]Translations[/h3]
+description=RU - M1ST0R
+description=PTBR - Simba
+description=KR, JP, TR, CN - Claude 3.7
 tags=Build 42;Balance;Framework;Hardmode;Military;Multiplayer;Realistic;Silly/Fun;QoL
 visibility=public

@@ -2,22 +2,95 @@ require 'TrueSmoking'
 
 TrueSmoking = TrueSmoking or {}
 
--- WIP need to add in checking to only add full cigs back to pack or create a new system to handle this
--- Cigs that are re-added lose their item modData and get reset
+--Can probably remove this func and use vanilla logic here
 function TrueSmoking.canAddToPack(item)
     if instanceof(item, 'Drainable') and item:getTags():contains('Packed') then
         local useDelta = item:getUseDelta()
         if useDelta and useDelta < 1 then
-            if item:getFullType() == 'Base.CigarettePack' then
-                local items = player:getInventory():getItems()
-                for j = 1, items:size() do
-                    local isNew = not item:getModData().OriginalSmokeLength or (item:getModData().OriginalSmokeLength and item:getModData().SmokeLength >= item:getModData().OriginalSmokeLength)
-                    if isNew then
-                        return true
-                    end
+            -- print('TRUESMOKING::Checking if can add to pack: ' .. item:getFullType())
+            return true
+        end
+    else
+        return true
+    end
+end
+
+function TrueSmoking.addToPack(items, result, player)
+    local usedItems = items:getAllInputItems()
+    local pack = nil
+    local cig = nil
+    for i = 0, usedItems:size() - 1 do
+        local item = usedItems:get(i)
+        print('TRUESMOKING::Item: ' .. item:getFullType())
+        if item and item:getFullType() == 'Base.CigarettePack' then
+            pack = usedItems:get(i)
+            if pack:getUseDelta() < 1 then
+                pack:setUsedDelta(pack:getCurrentUsesFloat() + pack:getUseDelta())
+            end
+        elseif item and item:getFullType() == 'Base.CigaretteSingle' then
+            cig = item
+        end
+    end
+
+    if cig then
+        local data = cig:getModData()
+        if data and data.OriginalSmokeLength and data.SmokeLength < data.OriginalSmokeLength then
+            if pack then
+                if not pack:getModData().Cigs then
+                    pack:getModData().Cigs = {}
+                end
+                local packData = pack:getModData().Cigs
+                local cigID = cig:getID()
+
+                packData[cigID] = {
+                    OriginalSmokeLength = data.OriginalSmokeLength,
+                    SmokeLength = data.SmokeLength,
+                }
+
+                print('TRUESMOKING::Inserting cig data back to pack for ID: ' ..
+                    cigID .. ' | OriginalSmokeLength: ' .. data.OriginalSmokeLength .. ' | SmokeLength: ' .. data
+                    .SmokeLength)
+            end
+        end
+    end
+end
+
+function TrueSmoking.takeACigarette(items, result, player)
+    local usedItems = items:getAllInputItems()
+    local outputItems = items:getAllCreatedItems()
+    local hasData = false
+    local pack = nil
+    for i = 0, usedItems:size() - 1 do
+        local item = usedItems:get(i)
+        if item and item:getFullType() == 'Base.CigarettePack' then
+            print('TRUESMOKING::Found pack: ' .. item:getFullType())
+            if item:getUseDelta() > 0 then
+                print('TRUESMOKING::Taking a cig from pack: ' .. item:getFullType())
+                -- item:setUsedDelta(item:getCurrentUsesFloat() - item:getUseDelta())
+                if item:getModData().Cigs then
+                    hasData = true
+                    pack = item
+                    break
                 end
             end
-            return true
+        end
+    end
+
+    for i = 0, outputItems:size() - 1 do
+        local item = outputItems:get(i)
+        if item and item:getFullType() == 'Base.CigaretteSingle' then
+            print('TRUESMOKING::Hook cig: ' .. item:getFullType())
+            if pack and hasData then
+                for key, value in pairs(pack:getModData().Cigs) do
+                    item:getModData().OriginalSmokeLength = value.OriginalSmokeLength
+                    item:getModData().SmokeLength = value.SmokeLength
+                    print('TRUESMOKING::Restored cig data from pack for ID: ' ..
+                    key ..
+                    ' | OriginalSmokeLength: ' .. value.OriginalSmokeLength .. ' | SmokeLength: ' .. value.SmokeLength)
+                    pack:getModData().Cigs[key] = nil
+                    break
+                end
+            end
         end
     end
 end
@@ -41,9 +114,9 @@ function TrueSmoking.deepCopy(original)
     local copy = {}
     for key, value in pairs(original) do
         if type(value) == "table" then
-            copy[key] = TrueSmoking.deepCopy(value)  -- Recursively copy nested tables
+            copy[key] = TrueSmoking.deepCopy(value) -- Recursively copy nested tables
         else
-            copy[key] = value  -- Copy primitive values directly
+            copy[key] = value                       -- Copy primitive values directly
         end
     end
     return copy
@@ -55,9 +128,9 @@ function TrueSmoking.addOnUseItem(player)
     local item = trueSmoking.Smokable.replaceOnUse
     local base = type:match("^[^.]+")
     if base then
-        local str = base..'.'..item
+        local str = base .. '.' .. item
         if item and item ~= '' then
-            print('TRUESMOKING::add item: '..str)
+            print('TRUESMOKING::add item: ' .. str)
             player:getInventory():AddItem(str)
             trueSmoking.Smokable.replaceOnUse = ''
         end
@@ -100,7 +173,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
         return newStat
     end
 
-    local temp  --Store temp values for calculations
+    local temp --Store temp values for calculations
 
     --If smokable has boredom or unhappyness distribute them (these are applied in vanilla outside of OnEat, but we 0'd them earlier.)
     if smokable.boredom ~= 0 then
@@ -207,7 +280,7 @@ function TrueSmoking.OnEat_Tobacco(smokable)
         return newStat
     end
 
-    local temp  --Store temp values for calculations
+    local temp --Store temp values for calculations
 
     --Mimic vanilla logic for smoker which essentially 0's these stats
     if character:HasTrait("Smoker") then
@@ -215,7 +288,7 @@ function TrueSmoking.OnEat_Tobacco(smokable)
         body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp, 'unhappy'))
 
         temp = 1 * percent * effectMultiplier
-        stats:setStress(adjustStat(stats:getStress()-stats:getStressFromCigarettes(), temp, 'stress'))
+        stats:setStress(adjustStat(stats:getStress() - stats:getStressFromCigarettes(), temp, 'stress'))
 
         temp = 0.51 * percent * effectMultiplier
         stats:setStressFromCigarettes(adjustStat(stats:getStressFromCigarettes(), temp, 'cigs'))

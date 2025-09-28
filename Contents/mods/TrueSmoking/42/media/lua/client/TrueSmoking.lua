@@ -145,6 +145,7 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
         ['Base.Hat_ShemaghFull'] = 'Base.Hat_ShemaghFace',
         ['Base.Hat_ShemaghFull_Green'] = 'Base.Hat_ShemaghFace_Green',
         ['Base.Hat_ShemaghFull_Cotton'] = 'Base.Hat_ShemaghFace_Cotton',
+        ['Base.Hat_ShemaghFull_Burlap'] = 'Base.Hat_ShemaghFace_Burlap',
     }
     local scarfCovers = {
         ['Base.ShemaghScarfFace'] = 'Base.ShemaghScarf',

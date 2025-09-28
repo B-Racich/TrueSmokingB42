@@ -229,7 +229,34 @@ local function ItemFixer()
     if item then
         item:DoParam('UseDelta = 0.0875')
     end
-
 end
+
+local function EditRecipes()
+    -- This seems to fix double crafting inputs/outputs when redefining recipes
+    local recipeList = {
+        ["AddACigarette"] = {
+            ["inputs"] = "{ inputs { item 1 [Base.CigaretteSingle] flags[AllowFavorite;InheritFavorite], item 1 [Base.CigarettePack] mode:keep flags[AllowFavorite;InheritFavorite], } }"
+        },
+        ["TakeACigarette"] = {
+            ["inputs"] = "{ inputs { item 1 [Base.CigarettePack] flags[AllowFavorite;InheritFavorite], } }",
+            ["outputs"] = "{ outputs { item 1 Base.CigaretteSingle, } }"
+        }
+    }
+
+    for recipeName, script in pairs(recipeList) do
+        local recipe = getScriptManager():getCraftRecipe(recipeName)
+        for key, value in pairs(script) do
+            if key == 'inputs' then
+                recipe:getInputs():clear()
+                recipe:Load(recipeName, value)
+            elseif key == 'outputs' then
+                recipe:getOutputs():clear()
+                recipe:Load(recipeName, value)
+            end
+        end
+    end
+end
+
+Events.OnInitWorld.Add(EditRecipes)
 
 Events.OnGameBoot.Add(ItemFixer)
