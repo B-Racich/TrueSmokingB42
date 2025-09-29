@@ -365,8 +365,8 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
 end
 
-function TrueSmoking:start(playerNum, player)
-    local o = self:getPlayerReference(player)
+TrueSmoking.start = function(playerNum, player)
+    local o = TrueSmoking:getPlayerReference(player)
 
     o.eatSound = ''
     o.lightingEatSound = ''
@@ -374,13 +374,13 @@ function TrueSmoking:start(playerNum, player)
     o.Smokable = {}
     o.Smokable.smokeLit = false
 
-    local function NicotineUpdate()
-        NicotineSystem:update(player)
-    end
-    o.NicotineUpdate = NicotineUpdate
-
     if TrueSmoking.Options.UseNicotineSystem then
         NicotineSystem:initialize(player)
+
+        local function NicotineUpdate()
+            NicotineSystem:update(player)
+        end
+        o.NicotineUpdate = NicotineUpdate
         Events.EveryOneMinute.Add(o.NicotineUpdate)
     end
 
@@ -391,21 +391,23 @@ function TrueSmoking:start(playerNum, player)
     end
 
     -- 460 is vanilla
-    self.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 460 or 220
+    TrueSmoking.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 460 or 220
 
     local function keyWrapper(key)
-        self:onKeyStartPressed(key)
+        TrueSmoking:onKeyStartPressed(key)
     end
     o.keyWrapper = keyWrapper
 
     local function contextWrapper(player, context, items)
-        self:toggleSmokeMenuOption(player, context, items)
+        TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
     o.contextWrapper = contextWrapper
 
     if player:getModData().Smokable then
         local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
-        smokable:getModData().SmokeLength = player:getModData().Smokable[2]
+        if smokable then
+            smokable:getModData().SmokeLength = player:getModData().Smokable[2]
+        end
         player:getModData().Smokable = false
     end
 
@@ -413,8 +415,8 @@ function TrueSmoking:start(playerNum, player)
     Events.OnFillInventoryObjectContextMenu.Add(o.contextWrapper)
 end
 
-function TrueSmoking:stop(player)
-    local o = self:getPlayerReference(player)
+TrueSmoking.stop = function(player)
+    local o = TrueSmoking:getPlayerReference(player)
 
     if not TrueSmoking.Config.HideMoodles then
         o.SmokingMoodle:stop()
@@ -461,13 +463,9 @@ local group = BodyLocations.getGroup("Human")
 local bodyLocation = BodyLocation.new(group, "Mask_Smoke")
 group:getAllLocations():add(bodyLocation)
 
-Events.OnCreatePlayer.Add(function(playerNum, player)
-    TrueSmoking:start(playerNum, player)
-end)
+Events.OnCreatePlayer.Add(TrueSmoking.start)
 
-Events.OnPlayerDeath.Add(function(player)
-    TrueSmoking:stop(player)
-end)
+Events.OnPlayerDeath.Add(TrueSmoking.stop)
 
 Events.OnInitGlobalModData.Add(function()
     local sandbox = SandboxVars.TrueSmoking

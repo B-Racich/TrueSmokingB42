@@ -115,7 +115,6 @@ function NicotineSystem:initialize(player)
             end
         end
     end
-    modData.nicotineSystem.player = player
 end
 
 function NicotineSystem:calculateDynamicMetabolicFactor(player)
@@ -177,6 +176,7 @@ function NicotineSystem:calculateWithdrawalIntensity(addictionLevel)
 end
 
 function NicotineSystem:update(player)
+    if not player or not player:getModData() then return end
     local data = player:getModData().nicotineSystem
     if not data then return end
 
