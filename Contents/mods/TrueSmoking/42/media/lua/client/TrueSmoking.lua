@@ -223,7 +223,6 @@ function TrueSmoking:useRecipe(item, player, recipeString)
 end
 
 function TrueSmoking:findSmokable(player)
-    local items = player:getInventory():getItems()
     local itemData = {
         ['packed'] = {
             ['favorite'] = {},
@@ -235,45 +234,61 @@ function TrueSmoking:findSmokable(player)
         }
     }
 
-    for i = 0, items:size()-1 do
-        local item = items:get(i)
-        if item:getTags():contains('Smokable') and not item:getTags():contains('Packed') then
-            print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
-            if item:isFavorite() then
-                table.insert(itemData.smokable.favorite, item)
-            else
-                table.insert(itemData.smokable.nonfavorite, item)
+    local function processInventory(inv)
+        local items = inv:getItems()
+        for i = 0, items:size() - 1 do
+            local item = items:get(i)
+            if item:getTags():contains('Smokable') and not item:getTags():contains('Packed') then
+                print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
+                if item:isFavorite() then
+                    table.insert(itemData.smokable.favorite, item)
+                else
+                    table.insert(itemData.smokable.nonfavorite, item)
+                end
+            elseif item:getTags():contains('Packed') then
+                print('TRUESMOKING::Found Pack: ' .. item:getFullType())
+                if item:isFavorite() then
+                    table.insert(itemData.packed.favorite, item)
+                else
+                    table.insert(itemData.packed.nonfavorite, item)
+                end
             end
         end
     end
 
-    for i = 0, items:size()-1 do
-        local item = items:get(i)
-        if item:getTags():contains('Packed') then
-            print('TRUESMOKING::Found Pack: ' .. item:getFullType())
-            if item:isFavorite() then
-                table.insert(itemData.packed.favorite, item)
-            else
-                table.insert(itemData.packed.nonfavorite, item)
+    -- Process main inventory
+    processInventory(player:getInventory())
+
+    -- Process worn container inventories (e.g., bags, fanny packs)
+    local wornItems = player:getWornItems()
+    for i = 0, wornItems:size() - 1 do
+        local wornItem = wornItems:get(i).item
+        if wornItem and wornItem:IsInventoryContainer() then
+            local containerInv = wornItem:getInventory()
+            if containerInv then
+                processInventory(containerInv)
             end
         end
     end
 
-    -- for i, v in ipairs(itemData.packed.favorite) do
-    --     print("Packed Favorite:", v:getFullType())
-    -- end
-    -- for i, v in ipairs(itemData.packed.nonfavorite) do
-    --     print("Packed Nonfavorite:", v:getFullType())
-    -- end
-    -- for i, v in ipairs(itemData.smokable) do
-    --     print("Smokable:", v:getFullType())
-    -- end
+    --[[
+    for i, v in ipairs(itemData.packed.favorite) do
+        print("Packed Favorite:", v:getFullType())
+    end
+    for i, v in ipairs(itemData.packed.nonfavorite) do
+        print("Packed Nonfavorite:", v:getFullType())
+    end
+    for i, v in ipairs(itemData.smokable) do
+        print("Smokable:", v:getFullType())
+    end
+    --]]
+
     local cigarette = itemData.smokable.nonfavorite[1] or false
     local pack = itemData.packed.favorite[1] or itemData.packed.nonfavorite[1] or false
     local hasFavCig = itemData.smokable.favorite[1] or false
     local hasFavPack = itemData.packed.favorite[1] or false
 
-    if hasFavCig and self:hasRequiredItem(cigarette, player) then
+    if hasFavCig and self:hasRequiredItem(hasFavCig, player) then
         print('TRUESMOKING::Using Favorite Cigarette')
         ISInventoryPaneContextMenu.eatItem(hasFavCig, 1, player:getPlayerNum())
     end
