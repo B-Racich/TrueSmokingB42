@@ -85,7 +85,7 @@ function Smokable:getObject(item)
 
     local onEat = item:getOnEat()
     local defaults = {
-        ['OnEat_Cigarettes'] = {
+        ['RecipeCodeOnEat.cigarettes'] = {
             smokeLength = TrueSmoking.Options.CigaretteLength,
             foodSick = 14,
             nicotineContent = 40,
@@ -94,7 +94,7 @@ function Smokable:getObject(item)
             visualItem = 'Mask_Cigarette'
         },
 
-        ['OnEat_Cigarillo'] = {
+        ['RecipeCodeOnEat.cigarillo'] = {
             smokeLength = TrueSmoking.Options.CigarilloLength,
             foodSick = 21,
             nicotineContent = 60,
@@ -103,7 +103,7 @@ function Smokable:getObject(item)
             visualItem = 'Mask_Cigarillo'
         },
 
-        ['OnEat_Cigar'] = {
+        ['RecipeCodeOnEat.cigar'] = {
             smokeLength = TrueSmoking.Options.CigarLength,
             foodSick = 28,
             nicotineContent = 100,
