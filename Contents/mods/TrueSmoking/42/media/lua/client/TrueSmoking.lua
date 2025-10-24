@@ -234,11 +234,19 @@ function TrueSmoking:findSmokable(player)
         }
     }
 
+    -- for index, value in ipairs(self.HotkeyPacks) do
+    --     table.insert(itemData.packed.nonfavorite, value)
+    -- end
+
+    -- for index, value in ipairs(self.HotkeySmokes) do
+    --     table.insert(itemData.smokable.nonfavorite, value)
+    -- end
+
     local function processInventory(inv)
         local items = inv:getItems()
         for i = 0, items:size() - 1 do
             local item = items:get(i)
-            if item:getTags():contains('Smokable') and not item:getTags():contains('Packed') then
+            if (item:getTags():contains('Smokable') or item:getTags():contains('Smokeable')) and not item:getTags():contains('Packed') then
                 print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
                 if item:isFavorite() then
                     table.insert(itemData.smokable.favorite, item)
