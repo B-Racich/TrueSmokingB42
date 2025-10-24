@@ -5,7 +5,7 @@ function ISEatFoodAction:new(character, item, percentage)
     local o = {}
     local onEat = item:getOnEat() or ''
     local hook = 'OnEat_Hook'
-    local hasSmokableTag = item:getTags():contains('Smokable')
+    local hasSmokableTag = item:getTags():contains('Smokable') or item:getTags():contains('Smokeable')
     local funcsToHook = { 'RecipeCodeOnEat.cigarettes', 'RecipeCodeOnEat.cigarillo','RecipeCodeOnEat.cigar', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
         'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnSmoke_Blunt', 'OnSmoke_Cannabis',
         'OnSmoke_CannaCigar', 'OnSmoke_Spliff' }
