@@ -54,7 +54,6 @@ function Smokable:init(item, player)
     self.smokeLit = false
     self.puffPercent = 0.0
     self.burnRate = ZombRandFloat(self.burnMax * 0.75, self.burnMax * 1.15)
-    self.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
     self.hasRolledForDrop = false
 end
 
@@ -75,79 +74,106 @@ end
 function Smokable:getObject(item)
     local fullType = item:getFullType()
     print('TRUESMOKING::Looking for: ' .. fullType)
-    local ob = TrueSmoking.SmokableObjects[fullType]
-    local o = {}
 
-    if ob then
-        print('TRUESMOKING::Retrieved Smokable Object')
-        o = TrueSmoking.deepCopy(ob)
+    local ob = TrueSmoking.SmokableObjects[fullType]
+    local o = ob and TrueSmoking.deepCopy(ob) or {}
+
+    local g = TrueSmoking.Options.Global
+    local cat = TrueSmoking.Options.Category
+
+    -- Determine base smoke length (from SmokableObjects or global fallback)
+    local baseLength = o.smokeLength or TrueSmoking.Options.SmokeLength
+
+    -- Determine category burn multiplier
+    local categoryMult = cat.Cigarette -- default
+    if fullType:find("Cigar$") and not fullType:find("Cigarillo") then
+        categoryMult = cat.Cigar
+    elseif fullType:find("Cigarillo") then
+        categoryMult = cat.Cigarillo
+    elseif fullType:find("Pipe") or fullType:find("CanPipe") then
+        categoryMult = cat.Pipe
+    elseif fullType:find("Can") then
+        categoryMult = cat.Can
+    elseif fullType:find("Rolled") then
+        categoryMult = cat.Rolled
     end
 
-    local onEat = item:getOnEat()
-    local defaults = {
-        ['RecipeCodeOnEat.cigarettes'] = {
-            smokeLength = TrueSmoking.Options.CigaretteLength,
-            foodSick = 14,
-            nicotineContent = 40,
-            effectMultiplier = 1.0,
-            callback = TrueSmoking.OnEat_Tobacco,
-            visualItem = 'Mask_Cigarette'
-        },
-
-        ['RecipeCodeOnEat.cigarillo'] = {
-            smokeLength = TrueSmoking.Options.CigarilloLength,
-            foodSick = 21,
-            nicotineContent = 60,
-            effectMultiplier = 2.0,
-            callback = TrueSmoking.OnEat_Tobacco,
-            visualItem = 'Mask_Cigarillo'
-        },
-
-        ['RecipeCodeOnEat.cigar'] = {
-            smokeLength = TrueSmoking.Options.CigarLength,
-            foodSick = 28,
+    -- Recipe-based fallbacks (vanilla OnEat system)
+    local onEat = item:getOnEat() or ""
+    local recipeDefaults = {
+        ["RecipeCodeOnEat.cigarettes"] = {
+            smokeLength     = TrueSmoking.Options.CigaretteLength or baseLength,
             nicotineContent = 100,
-            effectMultiplier = 3.0,
-            callback = TrueSmoking.OnEat_Tobacco,
-            visualItem = 'Mask_Cigar'
+            visualItem      = "Mask_Cigarette",
+        },
+        ["RecipeCodeOnEat.cigarillo"] = {
+            smokeLength     = TrueSmoking.Options.CigarilloLength or baseLength,
+            nicotineContent = 150,
+            visualItem      = "Mask_Cigarillo",
+            categoryMult    = cat.Cigarillo,
+        },
+        ["RecipeCodeOnEat.cigar"] = {
+            smokeLength     = TrueSmoking.Options.CigarLength or baseLength,
+            nicotineContent = 300,
+            visualItem      = "Mask_Cigar",
+            categoryMult    = cat.Cigar,
         },
     }
-    local default = {
-        smokeLength = defaults[onEat] and defaults[onEat].smokeLength or TrueSmoking.Options.SmokeLength,
-        burnMin = 0.000125,
-        burnMax = 0.000300,
-        burnSpeed = 0.0025,
-        burnSpeedDecay = 0.20,
-        decayRate = 0.998,
-        callback = defaults[onEat] and defaults[onEat].callback or false,
-        conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
-        walkingFactor = 1.0,
-        runningFactor = 1.15,
-        sprintingFactor = 1.35,
-        puffFactor = 1.35,
-        effectMultiplier = defaults[onEat] and defaults[onEat].effectMultiplier or 0.0,
-        nicotineContent = defaults[onEat] and defaults[onEat].nicotineContent or 0.0,
-        visualItem = defaults[onEat] and defaults[onEat].visualItem or false,
+
+    local recipe = recipeDefaults[onEat]
+    if recipe then
+        for k, v in pairs(recipe) do
+            if o[k] == nil then o[k] = v end
+        end
+        if recipe.categoryMult then categoryMult = recipe.categoryMult end
+    end
+
+    -- Final defaults (only applied if not set by modder or recipe)
+    local defaults = {
+        smokeLength     = baseLength,
+        burnMin         = g.burnMin * categoryMult,
+        burnMax         = g.burnMax * categoryMult,
+        burnSpeed       = g.burnSpeed,
+        burnSpeedDecay  = g.burnSpeedDecay,
+        decayRate       = g.decayRate,
+        puffFactor      = g.puffFactor,
+        walkingFactor   = g.walkingFactor,
+        runningFactor   = g.runningFactor,
+        sprintingFactor = g.sprintingFactor,
+        effectMultiplier = 1.0,
+        nicotineContent = 40,
+        conditions      = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
+        visualItem      = "Mask_Cigarette",
+        callback        = TrueSmoking.OnEat_Tobacco,
     }
 
-    for key, value in pairs(default) do
-        if o[key] == nil then
-            o[key] = value
+    -- Apply defaults only where missing
+    for k, v in pairs(defaults) do
+        if o[k] == nil then
+            o[k] = v
         end
     end
 
+    -- Final setup
     o.fullType = fullType
-    o.smokeLength = TrueSmoking.Options.OverrideSmokeLength and TrueSmoking.Options.SmokeLength or o.smokeLength
-    o.originalSmokeLength = o.smokeLength
-    local savedSmoke = self:getSavedSmokeLength(item)
-    o.smokeLength = savedSmoke and savedSmoke or o.smokeLength
 
+    o.originalSmokeLength = o.smokeLength
+
+    -- Load saved progress from modData (partially smoked cigs)
+    local savedSmoke = self:getSavedSmokeLength(item)
+    if savedSmoke then
+        o.smokeLength = savedSmoke
+    end
+
+    -- Compatibility with SmokingSoundsOverhaul (halves puff burn to prevent double-puff bug)
     if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
         o.puffFactor = o.puffFactor / 2
     end
 
-    item:getModData().SmokeLength = o.smokeLength
-    item:getModData().OriginalSmokeLength = o.originalSmokeLength
+    -- Save to item modData for persistence
+    local modData = item:getModData()
+    modData.SmokeLength = o.smokeLength
+    modData.OriginalSmokeLength = o.originalSmokeLength
 
     return o
 end
@@ -378,7 +404,7 @@ function Smokable:update()
 
         if TrueSmoking.Options.UseNicotineSystem and self.puffPercent > 0 and self.nicotineContent then
             local nicotineAmount = self.nicotineContent * self.puffPercent
-            NicotineSystem:addNicotine(self.player, nicotineAmount)
+            NicotineSystem:smoke(self.player, nicotineAmount, self.nicotineContent)
         end
 
         if self.callback then

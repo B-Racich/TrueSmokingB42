@@ -109,7 +109,6 @@ function TakePuff:stop()
     self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
-    self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
 
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
@@ -131,7 +130,6 @@ function TakePuff:perform()
     self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
     self.trueSmoking.takingPuff = false
     self.trueSmoking.Smokable.puffTimeMark = os.time()
-    self.trueSmoking.Smokable.timeCheck = ZombRand(TrueSmoking.Config.PassiveMinTime, TrueSmoking.Config.PassiveMaxTime)
 
     ISBaseTimedAction.perform(self)
 end

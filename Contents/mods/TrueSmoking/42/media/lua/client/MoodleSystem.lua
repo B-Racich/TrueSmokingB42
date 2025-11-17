@@ -188,40 +188,74 @@ function NicotineMoodle:update()
     if not player or not player:getModData().nicotineSystem then return end
 
     local data = player:getModData().nicotineSystem
-    local addictionMoodle = MF.getMoodle(self.moodleId, self.playerNum)
+    local moodle = MF.getMoodle(self.moodleId, self.playerNum)
+    if not moodle then return end
 
-    if addictionMoodle then
-        addictionMoodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
+    local shouldShow = TrueSmoking.Config.DebugMoodles or (data.withdrawalLevel > 20 and data.nicotineLevel < 10)
+    local hideMoodles = TrueSmoking.Config.HideMoodles or TrueSmoking.Config.HideAddictionMoodle
 
-        local value = 0.5
-        if (TrueSmoking.Options.UseNicotineSystem and (self.table.isSmoking or (TrueSmoking.Config.AlwaysShowMoodle and self.player:HasTrait('Smoker')))) or TrueSmoking.Config.DebugMoodles then
-            if data.addictionLevel > 0 and data.addictionLevel < 100 then
-                value = 1 - (data.addictionLevel / 100)
-            elseif data.addictionLevel >= 100 then
-                value = 0
-            elseif data.addictionLevel <= 0 then
-                value = 1
-            end
+    local moodleValue = 0.5  -- default = hidden/neutral
+
+    if shouldShow and not hideMoodles then
+        local withdrawalNorm = math.min(data.withdrawalLevel / 100.0, 1.0)
+        moodleValue = 1.0 - withdrawalNorm  -- 1.0 = no withdrawal (green), 0.0 = max (red)
+    end
+
+    moodle:setThresholds(0.10, 0.20, 0.35, 0.4999, 0.5001, 0.65, 0.85, 0.90)
+    moodle:setValue(moodleValue)
+
+    if shouldShow and not hideMoodles then
+        local addiction = data.addictionLevel
+        local titleText = ""
+
+        if addiction >= 87.5 then
+            titleText = getText("Moodles_nicotine_Bad_lvl4")       -- Extremely
+        elseif addiction >= 75 then
+            titleText = getText("Moodles_nicotine_Bad_lvl3")       -- Severely
+        elseif addiction >= 62.5 then
+            titleText = getText("Moodles_nicotine_Bad_lvl2")       -- Heavily
+        elseif addiction >= 50 then
+            titleText = getText("Moodles_nicotine_Bad_lvl1")       -- Strongly
+        elseif addiction >= 37.5 then
+            titleText = getText("Moodles_nicotine_Good_lvl1")      -- Moderately
+        elseif addiction >= 25 then
+            titleText = getText("Moodles_nicotine_Good_lvl2")      -- Mild
+        elseif addiction >= 12.5 then
+            titleText = getText("Moodles_nicotine_Good_lvl3")      -- Slightly
+        else
+            titleText = getText("Moodles_nicotine_Good_lvl4")      -- No Addiction
         end
 
-        if TrueSmoking.Config.HideAddictionMoodle or TrueSmoking.Config.HideMoodles then
-            value = 0.5
+        local level = moodle:getLevel()
+        local gbn = moodle:getGoodBadNeutral()
+        if level > 0 and gbn ~= 0 then
+            moodle:setTitle(gbn, level, titleText)
         end
 
-        addictionMoodle:setValue(value)
-
-        local levelDesc = self:getAddictionRecoveryText()
+        local descText = ""
+        if data.withdrawalLevel >= 80 then
+            descText = getText("Moodles_nicotine_withdrawal_4")
+        elseif data.withdrawalLevel >= 60 then
+            descText = getText("Moodles_nicotine_withdrawal_3")
+        elseif data.withdrawalLevel >= 40 then
+            descText = getText("Moodles_nicotine_withdrawal_2")
+        elseif data.withdrawalLevel >= 20 then
+            descText = getText("Moodles_nicotine_withdrawal_1")
+        else
+            descText = getText("Moodles_nicotine_withdrawal_0")
+        end
 
         local debugInfo = ""
         if TrueSmoking.Config.DebugMoodles then
             debugInfo = self:generateDebugInfo(data)
         end
 
-        addictionMoodle:setDescription(
-            addictionMoodle:getGoodBadNeutral(),
-            addictionMoodle:getLevel(),
-            levelDesc .. debugInfo
-        )
+        moodle:setDescription(gbn, level, descText .. debugInfo)
+
+        if data.withdrawalLevel >= 60 and (not self.lastWiggle or os.time() - self.lastWiggle > 30) then
+            moodle:doWiggle()
+            self.lastWiggle = os.time()
+        end
     end
 end
 
@@ -229,24 +263,19 @@ function NicotineMoodle:generateDebugInfo(data)
     local debugText = "\n\n[DEBUG INFO]"
 
     debugText = debugText .. "\n[Nicotine]"
-    debugText = debugText .. string.format("\nLevel: %.3f%%", data.nicotineLevel)
+    debugText = debugText .. string.format("\nLevel: %.2f%%", data.nicotineLevel)
+    debugText = debugText .. string.format("\nNicotine Time: %.1f hours", data.nicotineTime)
+    debugText = debugText .. string.format("\nNicotine Overflow: %.2f%%", data.nicotineOverflow)
     debugText = debugText .. "\n\n[Addiction]"
     debugText = debugText .. string.format("\nLevel: %.3f", data.addictionLevel)
+    debugText = debugText .. string.format("\nAddiction Time: %.1f days", data.AddictionTime)
 
     debugText = debugText .. "\n\n[Withdrawal]"
-    if data.nicotineLevel < NicotineSystem.Options.ADDICTION_GAIN_THRESHOLD then
-        local symptomTime = data.messageCooldown - data.timeSinceLastMessage
-        local hoursS = math.floor(symptomTime)
-        local minutesS = math.floor((symptomTime * 60) % 60)
-        debugText = debugText .. string.format("\nNext Symptom: %d hours, %d minutes", hoursS, minutesS)
-    else
-        debugText = debugText .. string.format("\nNext Symptom: ~~")
-    end
     debugText = debugText .. string.format("\nWithdrawal Level: %.1f%%", data.withdrawalLevel)
 
     debugText = debugText .. "\n\n[Stats]"
-    debugText = debugText .. string.format("\nTolerance Factor: %.2fx", data.toleranceFactor)
-    debugText = debugText .. string.format("\nMetabolic Factor: %.2fx", data.metabolicFactor)
+    debugText = debugText .. string.format("\nUnhappiness Cap: %.2f", data.unhappinessCap)
+    debugText = debugText .. string.format("\nBoredom Cap: %.2f", data.boredomCap)
 
     return debugText
 end

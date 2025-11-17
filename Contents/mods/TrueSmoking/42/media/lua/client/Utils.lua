@@ -260,9 +260,9 @@ function TrueSmoking.OnEat_Tobacco(smokable)
     local percent = smokable.puffPercent
     local character = smokable.player
     local data = character:getModData().nicotineSystem
-    if data and TrueSmoking.Options.UseNicotineSystem then
-        percent = percent * data.toleranceFactor
-    end
+    -- if data and TrueSmoking.Options.UseNicotineSystem then
+    --     percent = percent * data.toleranceFactor
+    -- end
     local body = character:getBodyDamage()
     local stats = character:getStats()
 

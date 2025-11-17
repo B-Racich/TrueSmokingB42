@@ -217,7 +217,7 @@ function TrueSmoking:useRecipe(item, player, recipeString)
         local recipe = recipes:get(0)
         local name = recipe:getName()
         if string.match(name, 'Take') then
-             ISInventoryPaneContextMenu.OnNewCraft(item, recipe, player:getPlayerNum(), false)
+            ISInventoryPaneContextMenu.OnNewCraft(item, recipe, player:getPlayerNum(), false)
         end
     end
 end
@@ -397,16 +397,6 @@ TrueSmoking.start = function(playerNum, player)
     o.Smokable = {}
     o.Smokable.smokeLit = false
 
-    if TrueSmoking.Options.UseNicotineSystem then
-        NicotineSystem:initialize(player)
-
-        local function NicotineUpdate()
-            NicotineSystem:update(player)
-        end
-        o.NicotineUpdate = NicotineUpdate
-        Events.EveryOneMinute.Add(o.NicotineUpdate)
-    end
-
     if not TrueSmoking.Config.HideMoodles then
         o.SmokingMoodle = SmokingMoodle:new(o, playerNum)
         o.NicotineMoodle = NicotineMoodle:new(o, playerNum)
@@ -432,6 +422,17 @@ TrueSmoking.start = function(playerNum, player)
             smokable:getModData().SmokeLength = player:getModData().Smokable[2]
         end
         player:getModData().Smokable = false
+    end
+
+    if TrueSmoking.Options.UseNicotineSystem then
+        NicotineSystem:initialize(player)
+        NicotineSystem:UpdateDynamicConfig(player)
+
+        local function nicotineGameTimeWrapper()
+            NicotineSystem:GameTimeUpdate(player)
+        end
+        Events.EveryOneMinute.Add(nicotineGameTimeWrapper)
+        o.NicotineGameTimeWrapper = nicotineGameTimeWrapper
     end
 
     Events.OnKeyStartPressed.Add(o.keyWrapper)
@@ -463,9 +464,9 @@ TrueSmoking.stop = function(player)
         o.contextWrapper = nil
     end
 
-    if o.NicotineUpdate then
-        Events.EveryOneMinute.Remove(o.NicotineUpdate)
-        o.NicotineUpdate = nil
+    if o.NicotineGameTimeWrapper then
+        Events.EveryOneMinute.Remove(o.NicotineGameTimeWrapper)
+        o.NicotineGameTimeWrapper = nil
     end
 end
 
@@ -492,24 +493,7 @@ Events.OnPlayerDeath.Add(TrueSmoking.stop)
 
 Events.OnInitGlobalModData.Add(function()
     local sandbox = SandboxVars.TrueSmoking
-    local opt = TrueSmoking.Options
-
-    opt.OverrideSmokeLength = sandbox.OverrideSmokeLength
-    opt.SmokeLength = sandbox.SmokeLength
-
-    opt.ManageHeadGear = sandbox.ManageHeadGear
-
-    opt.UseNewMoodle = sandbox.UseNewMoodle
-
-    opt.SmokeRelighting = sandbox.SmokeRelighting
-
-    opt.Coughing = sandbox.Coughing
-    opt.CoughingChanceSmoker = sandbox.CoughingChanceSmoker
-    opt.CoughingChanceNonSmoker = sandbox.CoughingChanceNonSmoker
-
-    opt.Dropping = sandbox.Dropping
-    opt.DroppingChanceSmoker = sandbox.DroppingChanceSmoker
-    opt.DroppingChanceNonSmoker = sandbox.DroppingChanceNonSmoker
+    local opt     = TrueSmoking.Options
 
     -- Old Defaults for redundancy
     opt.PuffFactor = 1.35
@@ -517,127 +501,104 @@ Events.OnInitGlobalModData.Add(function()
     opt.SprintingFactor = 1.35
     opt.WalkingFactor = 1.0
     opt.IdleFactor = 1.0
+    opt.SmokeLength = 1.0
 
-    -- Smokable config options [Keep the length for redundancy]
-    opt.CigaretteLength = sandbox.CigaretteLength
-    opt.Cigarette = {
-        length = sandbox.CigaretteLength,
-        burnMin = sandbox.CigaretteBurnMin,
-        burnMax = sandbox.CigaretteBurnMax,
-        burnSpeed = sandbox.CigaretteBurnSpeed,
-        burnSpeedDecay = sandbox.CigaretteBurnSpeedDecay,
-        decayRate = sandbox.CigaretteDecayRate,
-        effectMultiplier = sandbox.CigaretteEffectMultiplier,
-        puffFactor = sandbox.CigarettePuffFactor,
-        walkingFactor = sandbox.CigaretteWalkingFactor,
-        runningFactor = sandbox.CigaretteRunningFactor,
-        sprintingFactor = sandbox.CigaretteSprintingFactor
+    -- 1. Core global options
+    opt.ManageHeadGear = sandbox.ManageHeadGear
+    opt.SmokeRelighting = sandbox.SmokeRelighting
+    opt.Dropping = sandbox.Dropping or true
+    opt.DroppingChanceSmoker = (sandbox.DropChanceSmoker or 6) / 100
+    opt.DroppingChanceNonSmoker = (sandbox.DropChanceNonSmoker or 35) / 100
+
+    opt.Coughing = sandbox.Coughing
+    opt.CoughingChanceSmoker = (sandbox.CoughingChanceSmoker or 4) / 100
+    opt.CoughingChanceNonSmoker = (sandbox.CoughingChanceNonSmoker or 15) / 100
+
+    opt.UseNewMoodle = sandbox.UseNewMoodle
+
+    local smokingSpeed = (sandbox.SmokingSpeed or 100) / 100
+    local puffStrength = (sandbox.PuffStrength or 100) / 100
+    local movementBurn = (sandbox.MovementBurn or 100) / 100
+    local idleBurnOut = (sandbox.IdleBurnOut or 75) / 100
+
+    opt.Global = {
+        burnMin = 0.000125 * smokingSpeed,
+        burnMax = 0.000300 * smokingSpeed,
+        burnSpeed = 0.0025,
+        burnSpeedDecay = 0.20,
+        puffFactor = 1.35 * puffStrength,
+        walkingFactor = 1.0 + (movementBurn - 1) * 0.5,
+        runningFactor = 1.15 + (movementBurn - 1) * 0.8,
+        sprintingFactor = 1.35 + (movementBurn - 1) * 1.2,
+        decayRate = 0.995 + (0.998 - 0.995) * (1 - idleBurnOut),
     }
 
-    opt.RolledCigaretteLength = sandbox.RolledCigaretteLength
-    opt.RolledCigarette = {
-        length = sandbox.RolledCigaretteLength,
-        burnMin = sandbox.RolledCigaretteBurnMin,
-        burnMax = sandbox.RolledCigaretteBurnMax,
-        burnSpeed = sandbox.RolledCigaretteBurnSpeed,
-        burnSpeedDecay = sandbox.RolledCigaretteBurnSpeedDecay,
-        decayRate = sandbox.RolledCigaretteDecayRate,
-        effectMultiplier = sandbox.RolledCigaretteEffectMultiplier,
-        puffFactor = sandbox.RolledCigarettePuffFactor,
-        walkingFactor = sandbox.RolledCigaretteWalkingFactor,
-        runningFactor = sandbox.RolledCigaretteRunningFactor,
-        sprintingFactor = sandbox.RolledCigaretteSprintingFactor
+    opt.Category = {
+        Cigarette = smokingSpeed,
+        RolledCigarette = smokingSpeed * 0.9,
+        Cigarillo = smokingSpeed * 0.75,
+        Cigar = smokingSpeed * 0.50,
+        Pipe = smokingSpeed * 0.40,
+        Can = smokingSpeed * 0.60,
     }
 
-    opt.CigarilloLength = sandbox.CigarilloLength
-    opt.Cigarillo = {
-        length = sandbox.CigarilloLength,
-        burnMin = sandbox.CigarilloBurnMin,
-        burnMax = sandbox.CigarilloBurnMax,
-        burnSpeed = sandbox.CigarilloBurnSpeed,
-        burnSpeedDecay = sandbox.CigarilloBurnSpeedDecay,
-        decayRate = sandbox.CigarilloDecayRate,
-        effectMultiplier = sandbox.CigarilloEffectMultiplier,
-        puffFactor = sandbox.CigarilloPuffFactor,
-        walkingFactor = sandbox.CigarilloWalkingFactor,
-        runningFactor = sandbox.CigarilloRunningFactor,
-        sprintingFactor = sandbox.CigarilloSprintingFactor
+    local lengthRatios = {
+        Cigarette = 1.0,
+        RolledCigarette = 1.0,
+        Cigarillo = 1.538,
+        Cigar = 2.307,
+        Pipe = 1.923,
+        Can = 0.769,
     }
 
-    opt.CigarLength = sandbox.CigarLength
-    opt.Cigar = {
-        length = sandbox.CigarLength,
-        burnMin = sandbox.CigarBurnMin,
-        burnMax = sandbox.CigarBurnMax,
-        burnSpeed = sandbox.CigarBurnSpeed,
-        burnSpeedDecay = sandbox.CigarBurnSpeedDecay,
-        decayRate = sandbox.CigarDecayRate,
-        effectMultiplier = sandbox.CigarEffectMultiplier,
-        puffFactor = sandbox.CigarPuffFactor,
-        walkingFactor = sandbox.CigarWalkingFactor,
-        runningFactor = sandbox.CigarRunningFactor,
-        sprintingFactor = sandbox.CigarSprintingFactor
-    }
+    local function spoofCategory(catName)
+        local mult = opt.Category[catName] or 1.0
+        local ratio = lengthRatios[catName] or 1.0
+        local len = opt.SmokeLength * ratio
 
-    opt.PipeLength = sandbox.PipeLength
-    opt.Pipe = {
-        length = sandbox.PipeLength,
-        burnMin = sandbox.PipeBurnMin,
-        burnMax = sandbox.PipeBurnMax,
-        burnSpeed = sandbox.PipeBurnSpeed,
-        burnSpeedDecay = sandbox.PipeBurnSpeedDecay,
-        decayRate = sandbox.PipeDecayRate,
-        effectMultiplier = sandbox.PipeEffectMultiplier,
-        puffFactor = sandbox.PipePuffFactor,
-        walkingFactor = sandbox.PipeWalkingFactor,
-        runningFactor = sandbox.PipeRunningFactor,
-        sprintingFactor = sandbox.PipeSprintingFactor
-    }
+        opt[catName] = {
+            length = len,
+            burnMin = opt.Global.burnMin * mult,
+            burnMax = opt.Global.burnMax * mult,
+            burnSpeed = opt.Global.burnSpeed,
+            burnSpeedDecay = opt.Global.burnSpeedDecay,
+            decayRate = opt.Global.decayRate,
+            effectMultiplier = puffStrength,
+            puffFactor = opt.Global.puffFactor,
+            walkingFactor = opt.Global.walkingFactor,
+            runningFactor = opt.Global.runningFactor,
+            sprintingFactor = opt.Global.sprintingFactor,
+        }
 
-    opt.CanLength = sandbox.CanLength
-    opt.Can = {
-        length = sandbox.CanLength,
-        burnMin = sandbox.CanBurnMin,
-        burnMax = sandbox.CanBurnMax,
-        burnSpeed = sandbox.CanBurnSpeed,
-        burnSpeedDecay = sandbox.CanBurnSpeedDecay,
-        decayRate = sandbox.CanDecayRate,
-        effectMultiplier = sandbox.CanEffectMultiplier,
-        puffFactor = sandbox.CanPuffFactor,
-        walkingFactor = sandbox.CanWalkingFactor,
-        runningFactor = sandbox.CanRunningFactor,
-        sprintingFactor = sandbox.CanSprintingFactor
-    }
+        opt[catName .. "Length"] = len
+    end
+
+    spoofCategory("Cigarette")
+    spoofCategory("RolledCigarette")
+    spoofCategory("Cigarillo")
+    spoofCategory("Cigar")
+    spoofCategory("Pipe")
+    spoofCategory("Can")
+
+    opt.ManageHeadGear          = sandbox.ManageHeadGear
+    opt.SmokeRelighting         = sandbox.SmokeRelighting
+
+    opt.Coughing                = sandbox.Coughing
+    opt.CoughingChanceSmoker    = sandbox.CoughingChanceSmoker or 5
+    opt.CoughingChanceNonSmoker = sandbox.CoughingChanceNonSmoker or 25
+
+    opt.Dropping                = sandbox.Dropping
+    opt.DroppingChanceSmoker    = (sandbox.DropChanceSmoker or 5) / 100
+    opt.DroppingChanceNonSmoker = (sandbox.DropChanceNonSmoker or 25) / 100
 
     -- Nicotine system options
-    opt.UseNicotineSystem = sandbox.UseNicotineSystem
-    opt.DynamicSmokerTrait = sandbox.DynamicSmokerTrait
+    opt.UseNicotineSystem          = sandbox.UseNicotineSystem
+    opt.DynamicSmokerTrait         = sandbox.DynamicSmokerTrait
 
-    local nic = NicotineSystem.Options
+    local nic                      = NicotineSystem.Options
 
-    nic.NICOTINE_DECAY_RATE = sandbox.MetabolismBaseDecayRate
-
-    nic.ADDICTION_GAIN_RATE = sandbox.AddictionGainRate
-    nic.ADDICTION_DECAY_RATE = sandbox.AddictionDecayRate
-    nic.ADDICTION_MIN_DECAY = sandbox.AddictionMinDecay
-    nic.ADDICTION_GAIN_THRESHOLD = sandbox.AddictionGrowthThreshold
-
-    nic.SMOKER_TRAIT_THRESHOLD = sandbox.AddictionTraitThreshold
-    nic.SMOKER_TRAIT_LOSE_THRESHOLD = sandbox.AddictionCureThreshold
-
-    nic.INTAKE_CONVERSION = sandbox.AddictionIntakeConversion
-    nic.ACTIVE_SMOKING_BONUS = sandbox.AddictionActiveSmoking
-
-    nic.HUNGER_BASE = sandbox.HungerReduction
-    nic.FATIGUE_BASE = sandbox.FatigueReduction
-
-    nic.STRESS_BASE = sandbox.StressGain
-    nic.UNHAPPINESS_BASE = sandbox.UnhappinessGain
-    nic.BOREDOM_BASE = sandbox.BoredomGain
-
-    nic.STRESS_MAX = sandbox.StressMax
-    nic.UNHAPPINESS_MAX = sandbox.UnhappinessMax
-    nic.BOREDOM_MAX = sandbox.BoredomMax
-
-    nic.ADDICTION_CAP = sandbox.AddictionCap
+    nic.DaysToAddiction            = sandbox.DaysToAddiction
+    nic.DaysToDetox                = sandbox.DaysToDetox
+    nic.DaysToPeakWithdrawal       = sandbox.DaysToPeakWithdrawal
+    nic.SmokerTraitDecayMultiplier = sandbox.SmokerTraitDecayMultiplier
 end)
