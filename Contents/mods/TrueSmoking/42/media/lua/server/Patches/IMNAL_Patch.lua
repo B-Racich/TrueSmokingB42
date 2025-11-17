@@ -1,86 +1,45 @@
 if getActivatedMods():contains('\\IMightNeedALighter') then
-    function OnStoveSmoking(_player, stove, _cigarette)
-        ISWorldObjectContextMenu.Test = true
+    function TrueSmoking_Logic(character, item)
+        local onEat = item:getOnEat() or ''
+        local hook = 'OnEat_Hook'
+        local hasSmokableTag = item:getTags():contains('Smokable') or item:getTags():contains('Smokeable')
+        local funcsToHook = { 'RecipeCodeOnEat.cigarettes', 'RecipeCodeOnEat.cigarillo','RecipeCodeOnEat.cigar', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
+            'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnSmoke_Blunt', 'OnSmoke_Cannabis',
+            'OnSmoke_CannaCigar', 'OnSmoke_Spliff', 'OnSmoke_Cigar','OnSmoke_Blunt' }
 
-        --We need to make sure the clicked player is still smoking
-        if instanceof(stove, 'IsoPlayer') then
-            if not string.match(stove:getAnimationDebug(), "foodtype : Cigarettes") then return end
-        end
+        local table = TrueSmoking:getPlayerReference(character)
 
-        --Do we need to transfer cigarette from a bag first ?
-        if luautils.walkAdj(_player, stove:getSquare(), true) then
-            if _cigarette:getContainer() ~= _player:getInventory() then
-                ISTimedActionQueue.add(ISInventoryTransferAction:new(_player, _cigarette, _cigarette:getContainer(),
-                    _player:getInventory(), 5))
-            end
-        end
+        if (TrueSmoking.isInList(onEat, funcsToHook) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
+            print('TRUESMOKING::Checking item onEat: ' .. onEat)
+            print('TRUESMOKING::Item ID: ' .. item:getID())
 
-        --This is where we calculate the length of the timed action and outcome
-        local outcome = DeterminateStoveSmokingOutcome(_player, stove, _cigarette)
+            if not table.isSmoking then
+                print('TRUESMOKING::Hooking: ' .. onEat)
+                local replace = item:getReplaceOnUseFullType()
 
-        --Let's light what we've found
-        if luautils.walkAdj(_player, stove:getSquare(), true) then
-            if instanceof(stove, 'IsoStove') and not stove:isMicrowave() then
-                ISTimedActionQueue.add(IsStoveLighting:new(_player, stove, _cigarette, outcome,
-                    SandboxVars.IMNAL.stoveBaseTimer / outcome))
-            elseif instanceof(stove, 'IsoStove') and stove:isMicrowave() then
-                ISTimedActionQueue.add(IsStoveLighting:new(_player, stove, _cigarette, outcome,
-                    SandboxVars.IMNAL.microwaveBaseTimer / outcome))
-            elseif instanceof(stove, 'IsoFireplace') and stove:isLit() then
-                ISTimedActionQueue.add(IsStoveLighting:new(_player, stove, _cigarette, outcome,
-                    SandboxVars.IMNAL.fireplaceBaseTimer / outcome))
-            elseif instanceof(stove, 'IsoBarbecue') and stove:isLit() then
-                ISTimedActionQueue.add(IsStoveLighting:new(_player, stove, _cigarette, outcome,
-                    SandboxVars.IMNAL.barbecueBaseTimer / outcome))
-            elseif instanceof(stove, "IsoObject") and stove:getSpriteName() == "camping_01_5" then
-                ISTimedActionQueue.add(IsStoveLighting:new(_player, stove, _cigarette, outcome,
-                    SandboxVars.IMNAL.campingBaseTimer / outcome))
-            elseif stove:getSquare():haveFire() then
-                ISTimedActionQueue.add(IsStoveLighting:new(_player, stove, _cigarette, outcome,
-                    SandboxVars.IMNAL.fireBaseTimer / outcome))
-            else
-                for i = 0, stove:getSquare():getMovingObjects():size() - 1 do
-                    local o = stove:getSquare():getMovingObjects():get(i)
-                    if instanceof(o, "IsoPlayer") and (o ~= playerObj) then
-                        if string.match(o:getAnimationDebug(), "foodtype : Cigarettes") then
-                            ISTimedActionQueue.add(IsStoveLighting:new(_player, stove, _cigarette, outcome,
-                                SandboxVars.IMNAL.playerBaseTimer / outcome))
-                        end
-                    end
+                if replace and (replace ~= nil and replace ~= '') then
+                    print('TRUESMOKING::Has replace on use: ' .. replace)
+                    item:getModData().replaceOnUse = replace
+                    item:setReplaceOnUse(nil)
                 end
+
+                print('TRUESMOKING::Setting up smokable')
+                table.Smokable = Smokable:new(item, character)
+                item:getModData().modOnEat = hook
+
+                return LightSmoke:new(character)
             end
         end
-
-        --Now it's lit, let's smoke it
-        if luautils.walkAdj(_player, stove:getSquare(), true) then
-            ISInventoryPaneContextMenu.eatItem(_cigarette, 1, _player:getPlayerNum())
-        end
+        return false
     end
 
-    --This is the function starting the car smoking sequence
-    function OnCarSmoking(_player, _cigarette)
-        if (_player:getVehicle() == nill) then return end
-        local carlighterBaseTimer = SandboxVars.IMNAL.carLighterBaseTimer
-        local batteryDurabilityMult = _player:getVehicle():getBattery():getCondition() / 100
+    local IMNAL_IsStoveSmoking = IsStoveSmoking.new
+    function IsStoveSmoking:new (character, worldobject, item, time)
+        return TrueSmoking_Logic(character, item) or IMNAL_IsStoveSmoking(self, character, worldobject, item, time)
+    end
 
-        --BROKEN BY B42 UPDATED - removing the battery drain for the time being
-        --local batteryChargeMult = _player:getVehicle():getBattery():getInventoryItem():getUsedDelta()
-
-        local carlighterFinalTimer = (carlighterBaseTimer / batteryDurabilityMult)
-
-        --Do we need to transfer cigarette from a bag first ?
-        if _cigarette:getContainer() ~= _player:getInventory() then
-            ISTimedActionQueue.add(ISInventoryTransferAction:new(_player, _cigarette, _cigarette:getContainer(),
-                _player:getInventory(), 5))
-        end
-
-        --TODO : We need to decide here if the attempt failed and broke the car lighter and/or the socket
-
-
-        --We need some time for the lighter to heat
-        ISTimedActionQueue.add(IsCarLighting:new(_player, _cigarette, carlighterFinalTimer))
-
-        --Let's smoke now
-        ISTimedActionQueue.add(ISEatFoodAction:new(_player, _cigarette, 1))
+    local IMNAL_IsCarSmoking = IsCarSmoking.new
+    function IsCarSmoking:new (character, item, time)
+        return TrueSmoking_Logic(character, item) or IMNAL_IsCarSmoking(self, character, item, time)
     end
 end

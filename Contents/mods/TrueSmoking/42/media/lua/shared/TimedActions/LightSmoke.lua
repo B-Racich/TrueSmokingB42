@@ -3,7 +3,9 @@ require "TimedActions/ISBaseTimedAction"
 LightSmoke = ISBaseTimedAction:derive("LightSmoke")
 
 function LightSmoke:isValid()
-    return self.hasLighter
+    local valid = self.hasLighter or self.carLighter or not not self.openFlame
+    -- print('TRUESMOKING::LightSmoke isValid: ' .. tostring(self.hasLighter) .. ' | CarLighter: ' .. tostring(self.carLighter) .. ' | OpenFlame: ' .. tostring(self.openFlame) .. ' | Result: ' .. tostring(valid))
+    return valid
 end
 
 function LightSmoke:update()
@@ -42,45 +44,46 @@ function LightSmoke:getRequiredItem()
 end
 
 function LightSmoke:start()
-    if self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
+    if self.item:getRequireInHandOrInventory() or self.carLighter or not not self.openFlame then
         local lighter = self:getRequiredItem()
         if not lighter then
             self.hasLighter = false
-        else
+        elseif (lighter and not self.carLighter and not self.openFlame) then
             lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
+        end
 
-            local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or
-                CharacterActionAnims.Eat
-            self:setActionAnim(anim)
-            self:setAnimVariable("FoodType", self.item:getEatType())
+        print('TRUESMOKING::LightSmoke started')
+        local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or
+            CharacterActionAnims.Eat
+        self:setActionAnim(anim)
+        self:setAnimVariable("FoodType", self.item:getEatType())
 
-            if TrueSmoking.Config.HideAllActionBars then
-                self.action:setUseProgressBar(false)
-            end
-            local hasPrimary = self.character:getPrimaryHandItem()
-            if hasPrimary then
-                self:setOverrideHandModels(hasPrimary, self.item)
-            else
-                self:setOverrideHandModels(nil, self.item)
-            end
+        if TrueSmoking.Config.HideAllActionBars then
+            self.action:setUseProgressBar(false)
+        end
+        local hasPrimary = self.character:getPrimaryHandItem()
+        if hasPrimary then
+            self:setOverrideHandModels(hasPrimary, self.item)
+        else
+            self:setOverrideHandModels(nil, self.item)
+        end
 
-            if self.eatSound ~= '' then
-                self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
-            end
+        if self.eatSound ~= '' then
+            self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+        end
 
-            -- Play custom sound when no sound is playing
-            if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
-                local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
-                if self.eatSound == '' or self.eatSound == nil then -- No sound running for first time
-                    self.eatSound = sound
-                    if not self.character:getEmitter():isPlaying(self.table.lightingEatSound) then
-                        self.table.lightingEatSound = self.eatSound
-                        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
-                    end
+        -- Play custom sound when no sound is playing
+        if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
+            local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
+            if self.eatSound == '' or self.eatSound == nil then -- No sound running for first time
+                self.eatSound = sound
+                if not self.character:getEmitter():isPlaying(self.table.lightingEatSound) then
+                    self.table.lightingEatSound = self.eatSound
+                    self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
                 end
             end
-            -- self.character:reportEvent("EventEating");
         end
+        -- self.character:reportEvent("EventEating");
     end
 end
 
