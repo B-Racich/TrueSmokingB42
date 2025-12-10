@@ -13,24 +13,26 @@ options:addTickBox("HideAllActionBars", getText("IGUI_TRUESMOKING_HIDE_ALL_ACTIO
 options:addTickBox('HideMoodles', getText("IGUI_TRUESMOKING_HIDE_MOODLES"), false, getText("IGUI_TRUESMOKING_HIDE_MOODLES_DESC"))
 options:addTickBox('ShowSmokePercent', getText("IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT"), false, getText("IGUI_TRUESMOKING_SHOW_SMOKE_PERCENT_DESC"))
 options:addTickBox("DebugMoodles", getText("IGUI_TRUESMOKING_DEBUG_MOODLES"), false, getText("IGUI_TRUESMOKING_DEBUG_MOODLES_DESC"))
-options:addButton('TestButton', '100 nicotine', '100 nicotine', function()
-    local data = getPlayer():getModData().nicotineSystem
-    data.nicotineLevel = 100
-end)
-options:addButton('TestButton2', '100 addiction', '100 addiction', function()
-    local data = getPlayer():getModData().nicotineSystem
-    data.addictionLevel = data.addictionLevel + 100
-end)
-options:addButton('TestButton1', '100 withdrawal', '100 withdrawal', function()
-    local data = getPlayer():getModData().nicotineSystem
-    data.withdrawalLevel = data.withdrawalLevel + 100
-end)
-options:addButton('TestButton3', '0 levels', '0 levels', function()
-    local data = getPlayer():getModData().nicotineSystem
-    data.nicotineLevel = 0
-    data.addictionLevel = 0
-    data.withdrawalLevel = 0
-end)
+
+-- options:addButton('TestButton', '100 nicotine', '100 nicotine', function()
+--     local data = getPlayer():getModData().nicotineSystem
+--     data.nicotineLevel = 100
+-- end)
+-- options:addButton('TestButton2', '100 addiction', '100 addiction', function()
+--     local data = getPlayer():getModData().nicotineSystem
+--     data.addictionLevel = data.addictionLevel + 100
+-- end)
+-- options:addButton('TestButton1', '100 withdrawal', '100 withdrawal', function()
+--     local data = getPlayer():getModData().nicotineSystem
+--     data.withdrawalLevel = data.withdrawalLevel + 100
+-- end)
+-- options:addButton('TestButton3', '0 levels', '0 levels', function()
+--     local data = getPlayer():getModData().nicotineSystem
+--     data.nicotineLevel = 0
+--     data.addictionLevel = 0
+--     data.withdrawalLevel = 0
+-- end)
+
 options:addSeparator()
 
 -- This is a helper function that will automatically populate the "config" table.

@@ -516,10 +516,11 @@ Events.OnInitGlobalModData.Add(function()
 
     opt.UseNewMoodle = sandbox.UseNewMoodle
 
-    local smokingSpeed = (sandbox.SmokingSpeed or 100) / 100
-    local puffStrength = (sandbox.PuffStrength or 100) / 100
-    local movementBurn = (sandbox.MovementBurn or 100) / 100
-    local idleBurnOut = (sandbox.IdleBurnOut or 75) / 100
+    local smokingSpeed = sandbox.SmokingSpeed or 1.0
+    local puffStrength = sandbox.PuffStrength or 1.0
+    local movementBurn = sandbox.MovementBurn or 1.0
+    local idleBurnOut = sandbox.IdleBurnOut or 1.0
+    local effectMultiplier = sandbox.EffectMultiplier or 1.0
 
     opt.Global = {
         burnMin = 0.000125 * smokingSpeed,
@@ -545,10 +546,10 @@ Events.OnInitGlobalModData.Add(function()
     local lengthRatios = {
         Cigarette = 1.0,
         RolledCigarette = 1.0,
-        Cigarillo = 1.538,
-        Cigar = 2.307,
-        Pipe = 1.923,
-        Can = 0.769,
+        Cigarillo = 1.5,
+        Cigar = 3,
+        Pipe = 2.5,
+        Can = 1.25,
     }
 
     local function spoofCategory(catName)
@@ -563,7 +564,7 @@ Events.OnInitGlobalModData.Add(function()
             burnSpeed = opt.Global.burnSpeed,
             burnSpeedDecay = opt.Global.burnSpeedDecay,
             decayRate = opt.Global.decayRate,
-            effectMultiplier = puffStrength,
+            effectMultiplier = lengthRatios[catName]* effectMultiplier,
             puffFactor = opt.Global.puffFactor,
             walkingFactor = opt.Global.walkingFactor,
             runningFactor = opt.Global.runningFactor,
