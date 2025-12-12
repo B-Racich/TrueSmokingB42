@@ -880,10 +880,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
         local baseConfig = itemConfigs[typ]
         if not baseConfig then return nil end
         local traits = {
-            Stoner = character:HasTrait("Stoner"),
-            Lucky = character:HasTrait("Lucky"),
-            Unlucky = character:HasTrait("Unlucky"),
-            Smoker = character:HasTrait("Smoker")
+            Stoner = character:hasTrait("Stoner"),
+            Lucky = character:hasTrait("Lucky"),
+            Unlucky = character:hasTrait("Unlucky"),
+            Smoker = character:hasTrait(CharacterTrait.SMOKER)
         }
         local computed = baseConfig.compute(traits)
         return {
@@ -945,32 +945,32 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
         local added_stoned = stoned_after - stoned_before
 
         local applyBonus = 0
-        if not character:HasTrait("Stoner") then
+        if not character:hasTrait("Stoner") then
             applyBonus = data.bonus * percent
         else
             applyBonus = data.stonerbonus * percent
         end
 
-        character:getBodyDamage():setBoredomLevel(math.max(character:getBodyDamage():getBoredomLevel() - applyBonus, 0))
+        character:getBodyDamage():set(CharacterStat.BOREDOM, math.max(character:getBodyDamage():get(CharacterStat.BOREDOM) - applyBonus, 0))
         character:getBodyDamage():setUnhappynessLevel(math.max(
-            character:getBodyDamage():getUnhappynessLevel() - applyBonus, 0))
-        character:getStats():setStress(math.max(character:getStats():getStress() - applyBonus, 0))
+            character:getBodyDamage():get(CharacterStat.UNHAPPINESS) - applyBonus, 0))
+        character:getStats():setStress(math.max(character:getStats():get(CharacterStat.STRESS) - applyBonus, 0))
 
-        local thirst = character:getStats():getThirst()
+        local thirst = character:getStats():get(CharacterStat.THIRST)
         if thirst < 0.4 then
             local add = data.thirstBase * percent
             thirst = thirst + add
             if thirst > 0.4 then thirst = 0.4 end
-            character:getStats():setThirst(thirst)
+            character:getStats():set(CharacterStat.THIRST, thirst)
         end
 
-        local sick = character:getBodyDamage():getFoodSicknessLevel()
+        local sick = character:getBodyDamage():get(CharacterStat.FOOD_SICKNESS)
         sick = sick - data.sicknessMultiplier * added_stoned / 2
         if sick < 0 then sick = 0 end
         character:getBodyDamage():setFoodSicknessLevel(sick)
 
-        if not character:HasTrait("Smoker") then
-            sick = character:getBodyDamage():getFoodSicknessLevel() + data.extraSickIfNotSmoker * percent
+        if not character:hasTrait(CharacterTrait.SMOKER) then
+            sick = character:getBodyDamage():get(CharacterStat.FOOD_SICKNESS) + data.extraSickIfNotSmoker * percent
             if sick > 100 then sick = 100 end
             character:getBodyDamage():setFoodSicknessLevel(sick)
         end
@@ -979,8 +979,8 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
             modData.cigsmoked = true
         end
 
-        if not character:HasTrait("Stoner") and data.hasFatigueHunger then
-            local fatigue = character:getStats():getFatigue()
+        if not character:hasTrait("Stoner") and data.hasFatigueHunger then
+            local fatigue = character:getStats():get(CharacterStat.FATIGUE)
             local fatigueDelta = 0
             if fatigue < 0.6 then
                 fatigueDelta = 0.6
@@ -991,15 +991,15 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
             end
             fatigue = fatigue + fatigueDelta * percent
             if fatigue > 1 then fatigue = 1 end
-            character:getStats():setFatigue(fatigue)
+            character:getStats():set(CharacterStat.FATIGUE, fatigue)
 
-            local hunger = character:getStats():getHunger()
+            local hunger = character:getStats():get(CharacterStat.HUNGER)
             local hungerDelta = 0
             if hunger < 0.4 then hungerDelta = 0.1 end
-            character:getStats():setHunger(hunger + hungerDelta * percent)
+            character:getStats():set(CharacterStat.HUNGER, hunger + hungerDelta * percent)
         end
 
-        if character:HasTrait("Smoker") then
+        if character:hasTrait(CharacterTrait.SMOKER) then
             SmokerRelief(character, percent) -- Assuming SmokerRelief now accepts optional percent param for partial effect
         end
 

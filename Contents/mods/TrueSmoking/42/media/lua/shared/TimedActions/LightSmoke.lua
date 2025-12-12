@@ -2,26 +2,27 @@ require "TimedActions/ISBaseTimedAction"
 
 LightSmoke = ISBaseTimedAction:derive("LightSmoke")
 
+function LightSmoke:isValidStart()
+    return true
+end
+
 function LightSmoke:isValid()
-    local valid = self.hasLighter or self.carLighter or not not self.openFlame
-    -- print('TRUESMOKING::LightSmoke isValid: ' .. tostring(self.hasLighter) .. ' | CarLighter: ' .. tostring(self.carLighter) .. ' | OpenFlame: ' .. tostring(self.openFlame) .. ' | Result: ' .. tostring(valid))
-    return valid
+    if isClient() and self.item then
+        return self.character:getInventory():containsID(self.item:getID());
+    else
+        return self.character:getInventory():contains(self.item);
+    end
 end
 
 function LightSmoke:update()
-     if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+        --        self.eatAudio = getSoundManager():PlayWorldSoundWav( self.eatSound, self.character:getCurrentSquare(), 0.5, 2, 0.5, true);
     end
 end
 
 function LightSmoke:waitToStart()
-    if not self.character:isStrafing() and not self.character:isRunning() and not self.character:isSprinting()
-        and not self.character:isAiming() and not self.character:isAsleep() and not self.character:isPerformingAnAction()
-    then
-        return false
-    else
-        return true
-    end
+    return false
 end
 
 local function predicateNotEmpty(item)
@@ -44,96 +45,91 @@ function LightSmoke:getRequiredItem()
 end
 
 function LightSmoke:start()
-    if self.item:getRequireInHandOrInventory() or self.carLighter or not not self.openFlame then
-        local lighter = self:getRequiredItem()
-        if not lighter then
-            self.hasLighter = false
-        elseif (lighter and not self.carLighter and not self.openFlame) then
-            lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
-        end
-
-        print('TRUESMOKING::LightSmoke started')
-        local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or
-            CharacterActionAnims.Eat
-        self:setActionAnim(anim)
-        self:setAnimVariable("FoodType", self.item:getEatType())
-
-        if TrueSmoking.Config.HideAllActionBars then
-            self.action:setUseProgressBar(false)
-        end
-        local hasPrimary = self.character:getPrimaryHandItem()
-        if hasPrimary then
-            self:setOverrideHandModels(hasPrimary, self.item)
-        else
-            self:setOverrideHandModels(nil, self.item)
-        end
-
-        if self.eatSound ~= '' then
-            self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
-        end
-
-        -- Play custom sound when no sound is playing
-        if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
-            local sound = SmokingSoundsOverhaul:getLightingSound(self.character)
-            if self.eatSound == '' or self.eatSound == nil then -- No sound running for first time
-                self.eatSound = sound
-                if not self.character:getEmitter():isPlaying(self.table.lightingEatSound) then
-                    self.table.lightingEatSound = self.eatSound
-                    self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
-                end
-            end
-        end
-        -- self.character:reportEvent("EventEating");
+    if isClient() and self.item then
+        self.item = self.character:getInventory():getItemById(self.item:getID())
     end
+
+    -- fromRelaunch is added in ISTimedAction to not consume stuff again when we relaunch the action
+    if not self.fromRelaunch and self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
+        local lighter = self:getRequiredItem()
+        lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
+    end
+
+    if self.eatSound ~= '' then
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+        --		self.eatAudio = getSoundManager():PlayWorldSoundWav( self.eatSound, self.character:getCurrentSquare(), 0.5, 2, 0.5, true);
+    end
+    if self.item:getCustomMenuOption() then
+        self.item:setJobType(self.item:getCustomMenuOption())
+    else
+        self.item:setJobType(getText("ContextMenu_Eat"));
+    end
+
+    self:setAnimVariable("FoodType", self.item:getEatType());
+    self:setActionAnim(CharacterActionAnims.Eat);
+    print('TRUESMOKING::LightSmoke started end')
 end
 
 function LightSmoke:stop()
+    print('TRUESMOKING::LightSmoke stopped')
     ISBaseTimedAction.stop(self)
+
+    if not isClient() and not isServer() then
+        self:serverStop();
+    end
+end
+
+function LightSmoke:serverStop()
+    print('TRUESMOKING::LightSmoke server stopped')
 end
 
 function LightSmoke:perform()
-    self.smokable.smokeLit = true
-    self.smokable.puffTimeMark = os.time()
-    if self.smokable.burnRate == 0 then
-        self.smokable.burnRate = ZombRandFloat(self.smokable.burnMin,
-        self.smokable.burnMax)
+    print('TRUESMOKING::LightSmoke perform')
+    if self.eatAudio ~= 0 and self.character:getEmitter():isPlaying(self.eatAudio) then
+        self.character:stopOrTriggerSound(self.eatAudio);
     end
+    self.container:setDrawDirty(true);
+
     ISBaseTimedAction.perform(self)
 end
 
 function LightSmoke:complete()
-    self.table.lightingEatSound = ''
-
+    print('TRUESMOKING::LightSmoke complete')
     self.smokable:start()
     return true
 end
 
-function LightSmoke:new(character)
-    local o = {
-        stopOnWalk = false,
-        stopOnRun = true,
-        stopOnAim = true,
-        forceProgressBar = false,
-        character = character,
-    }
+function LightSmoke:getDuration()
+     if self.character:isTimedActionInstant() then
+        return 1
+    end
+    return TrueSmoking.lightTime
+end
+
+function LightSmoke:new(character, item)
+    local o = ISBaseTimedAction.new(self, character)
+    o.stopOnWalk = false
+    o.stopOnRun = true
+    o.stopOnAim = true
+    o.forceProgressBar = false
 
     o.table = TrueSmoking:getPlayerReference(character)
     o.smokable = o.table.Smokable
-    o.item = o.smokable.item
+    o.item = item
+    o.character = character
+
     o.eatSound = o.item:getCustomEatSound() or ''
     o.eatAudio = 0
-    o.maxTime = TrueSmoking.lightTime
-    o.carLighter = o.item:hasTag("Smokable") and o.character:getVehicle() and
-        o.character:getVehicle():canLightSmoke(o.character)
-    o.openFlame = false
-    if o.item:hasTag("Smokable") then o.openFlame = ISInventoryPaneContextMenu.hasOpenFlame(o.character) end
+    o.maxTime = o:getDuration()
+
+    o.carLighter = item:hasTag(ItemTag.SMOKABLE) and character:getVehicle() and
+        character:getVehicle():canLightSmoke(character)
+    o.openFlame = false;
+    if not isServer() then
+        if item:hasTag(ItemTag.SMOKABLE) then o.openFlame = ISInventoryPaneContextMenu.hasOpenFlame(character) end
+    end
 
     o.ignoreHandsWounds = true
     o.isEating = true
-    o.hasLighter = true
-
-    setmetatable(o, self)
-    self.__index = self
-
     return o
 end

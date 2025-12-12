@@ -67,7 +67,7 @@ function Smokable:getItemStats(item)
         hunger = item:getHungChange() or 0,
         pain = item:getPainReduction() or 0,
         endurance = item:getEnduranceChange() or 0,
-        reduceFoodSick = item:getReduceFoodSickness() or 0,
+        reduceFoodSick = item:getFoodSicknessChange() or 0,
     }
 end
 
@@ -189,18 +189,18 @@ end
 
 function Smokable:equipVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
-    if not self.player:getWornItem('Mask_Smoke') and self.table.visualItem then
+    if not self.player:getWornItem(TrueSmoking.registries.mask) and self.table.visualItem then
         self.player:setWornItem(self.table.visualItem:getBodyLocation(), self.table.visualItem)
-    elseif self.player:getWornItem('Mask_Smoke') then
-        self.player:removeWornItem(self.player:getWornItem('Mask_Smoke'))
+    elseif self.player:getWornItem(TrueSmoking.registries.mask) then
+        self.player:removeWornItem(self.player:getWornItem(TrueSmoking.registries.mask))
         self:equipVisualItem()
     end
 end
 
 function Smokable:removeVisualItem()
     if not TrueSmoking.Options.ManageHeadGear then return end
-    if self.player:getWornItem('Mask_Smoke') then
-        self.player:removeWornItem(self.player:getWornItem('Mask_Smoke'))
+    if self.player:getWornItem(TrueSmoking.registries.mask) then
+        self.player:removeWornItem(self.player:getWornItem(TrueSmoking.registries.mask))
     end
 end
 
@@ -347,7 +347,7 @@ function Smokable:update()
         if not self.hasRolledForDrop and self:checkDropConditions() then
             self.hasRolledForDrop = true
             local roll = ZombRandFloat(0.0, 100.0)
-            local dropChance = self.player:HasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or
+            local dropChance = self.player:hasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or
                 TrueSmoking.Options.DroppingChanceNonSmoker
             if dropChance >= roll then
                 self.hasDropped = true

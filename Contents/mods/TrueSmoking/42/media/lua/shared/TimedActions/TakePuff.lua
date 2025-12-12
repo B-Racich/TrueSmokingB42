@@ -112,7 +112,7 @@ function TakePuff:stop()
 
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
-        if self.character:HasTrait("Smoker") then
+        if self.character:hasTrait(CharacterTrait.SMOKER) then
             if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
                 self.character:triggerCough()
             end
@@ -127,22 +127,18 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
-    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
-
-    ISBaseTimedAction.perform(self)
-end
-
-function TakePuff:complete()
-    if TrueSmoking.getGameSpeedMultiplier() > 1 then
+        if TrueSmoking.getGameSpeedMultiplier() > 1 then
         if self.character:getEmitter():isPlaying(self.eatSound) then
             self.character:getEmitter():stopSound(self.eatAudio)
         end
     end
+
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
+
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
-        if self.character:HasTrait("Smoker") then
+        if self.character:hasTrait(CharacterTrait.SMOKER) then
             if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
                 self.character:triggerCough()
             end
@@ -152,6 +148,13 @@ function TakePuff:complete()
             end
         end
     end
+
+    ISBaseTimedAction.perform(self)
+end
+
+function TakePuff:complete()
+    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
+
     return true
 end
 

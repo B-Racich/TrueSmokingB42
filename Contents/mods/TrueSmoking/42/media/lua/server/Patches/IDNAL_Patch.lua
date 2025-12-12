@@ -2,7 +2,7 @@ if getActivatedMods():contains('\\NoLighterNeeded') then
     function TrueSmoking_Logic(character, item)
         local onEat = item:getOnEat() or ''
         local hook = 'OnEat_Hook'
-        local hasSmokableTag = item:getTags():contains('Smokable') or item:getTags():contains('Smokeable')
+        local hasSmokableTag = item:hasTag(ItemTag.SMOKABLE)
         local funcsToHook = { 'RecipeCodeOnEat.cigarettes', 'RecipeCodeOnEat.cigarillo','RecipeCodeOnEat.cigar', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
             'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnSmoke_Blunt', 'OnSmoke_Cannabis',
             'OnSmoke_CannaCigar', 'OnSmoke_Spliff', 'OnSmoke_Cigar','OnSmoke_Blunt' }

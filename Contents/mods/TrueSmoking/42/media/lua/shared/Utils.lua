@@ -4,7 +4,7 @@ TrueSmoking = TrueSmoking or {}
 
 --Can probably remove this func and use vanilla logic here
 function TrueSmoking.canAddToPack(item)
-    if instanceof(item, 'Drainable') and item:getTags():contains('Packed') then
+    if instanceof(item, 'Drainable') and item:hasTag(ItemTag.PACKED) then
         local useDelta = item:getUseDelta()
         if useDelta and useDelta < 1 then
             -- print('TRUESMOKING::Checking if can add to pack: ' .. item:getFullType())
@@ -178,7 +178,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
     --If smokable has boredom or unhappyness distribute them (these are applied in vanilla outside of OnEat, but we 0'd them earlier.)
     if smokable.boredom ~= 0 then
         temp = smokable.originalBoredom * percent
-        body:setBoredomLevel(adjustStat(body:getBoredomLevel(), temp - ZomboidGlobals.BoredomIncrease, 'boredom'))
+        stats:set(CharacterStat.BOREDOM, adjustStat(stats:get(CharacterStat.BOREDOM), temp - ZomboidGlobals.BoredomIncrease, 'boredom'))
         smokable.boredom = smokable.boredom - temp
         -- print(string.format("Smokable boredom: %s | temp: %s", smokable.boredom, temp))
         if smokable.boredom > 0 then
@@ -189,7 +189,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
     --Handles hunger
     if smokable.hunger ~= 0 then
         temp = smokable.originalHunger * percent
-        stats:setHunger(adjustStat(stats:getHunger(), temp, 'hunger', true))
+        stats:set(CharacterStat.HUNGER, adjustStat(stats:get(CharacterStat.HUNGER), temp, 'hunger', true))
         smokable.hunger = smokable.hunger - temp
         if smokable.hunger < 0 then
             smokable.hunger = 0
@@ -199,7 +199,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
     --Handles thirst
     if smokable.thirst ~= 0 then
         temp = smokable.originalThirst * percent
-        stats:setThirst(adjustStat(stats:getThirst(), temp, 'thirst', true))
+        stats:set(CharacterStat.THIRST, adjustStat(stats:get(CharacterStat.THIRST), temp, 'thirst', true))
         smokable.thirst = smokable.thirst - temp
         if smokable.thirst < 0 then
             smokable.thirst = 0
@@ -209,7 +209,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
     --Handles pain
     if smokable.pain ~= 0 then
         temp = smokable.originalPain * percent
-        stats:setPain(adjustStat(stats:getPain(), temp, 'pain'))
+        stats:set(CharacterStat.PAIN, adjustStat(stats:getPain(), temp, 'pain'))
         smokable.pain = smokable.pain - temp
         if smokable.pain < 0 then
             smokable.pain = 0
@@ -221,7 +221,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
         local add = false;
         if smokable.endurance > 0 then add = true end
         temp = smokable.originalEndurance * percent
-        stats:setEndurance(adjustStat(stats:getEndurance(), temp, 'endurance'))
+        stats:set(CharacterStat.ENDURANCE, adjustStat(stats:get(CharacterStat.ENDURANCE), temp, 'endurance'))
         smokable.endurance = smokable.endurance - temp
         if add and smokable.endurance < 0 then
             smokable.endurance = 0
@@ -235,7 +235,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
         local add = false;
         if smokable.fatigue > 0 then add = true end
         temp = smokable.originalFatigue * percent
-        stats:setFatigue(adjustStat(stats:getFatigue(), temp, 'fatigue', add))
+        stats:set(CharacterStat.FATIGUE, adjustStat(stats:get(CharacterStat.FATIGUE), temp, 'fatigue', add))
         smokable.fatigue = smokable.fatigue - temp
         if add and smokable.fatigue < 0 then
             smokable.fatigue = 0
@@ -247,7 +247,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
     --Handles reduceFoodSickness
     if smokable.reduceFoodSick ~= 0 then
         temp = smokable.originalReduceFoodSick * percent
-        body:setFoodSicknessLevel(math.min(body:getFoodSicknessLevel() - temp, 100))
+        stats:set(CharacterStat.FOOD_SICKNESS, math.min(stats:get(CharacterStat.FOOD_SICKNESS) - temp, 100))
         smokable.reduceFoodSick = smokable.reduceFoodSick - temp
         if smokable.reduceFoodSick < 0 then
             smokable.reduceFoodSick = 0
@@ -283,25 +283,25 @@ function TrueSmoking.OnEat_Tobacco(smokable)
     local temp --Store temp values for calculations
 
     --Mimic vanilla logic for smoker which essentially 0's these stats
-    if character:HasTrait("Smoker") then
+    if character:hasTrait(CharacterTrait.SMOKER) then
         temp = 100 * percent * effectMultiplier
-        body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp, 'unhappy'))
+        stats:set(CharacterStat.UNHAPPINESS, adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp, 'unhappy'))
 
         temp = 1 * percent * effectMultiplier
-        stats:setStress(adjustStat(stats:getStress() - stats:getStressFromCigarettes(), temp, 'stress'))
+        stats:set(CharacterStat.STRESS, adjustStat(stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp, 'stress'))
 
         temp = 0.51 * percent * effectMultiplier
-        stats:setStressFromCigarettes(adjustStat(stats:getStressFromCigarettes(), temp, 'cigs'))
+        stats:set(CharacterStat.NICOTINE_WITHDRAWAL, adjustStat(stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp, 'cigs'))
 
         temp = 10 * percent * effectMultiplier
         character:setTimeSinceLastSmoke(character:getTimeSinceLastSmoke() - temp)
     else --distribute stats for non smoker (stress and sickness)
         temp = smokable.originalStress * percent
-        stats:setStress(adjustStat(stats:getStress(), temp * effectMultiplier))
+        stats:set(CharacterStat.STRESS, adjustStat(stats:get(CharacterStat.STRESS), temp * effectMultiplier))
         smokable.stress = smokable.stress - temp
 
         --Set these to 0 anyways for safety.
-        stats:setStressFromCigarettes(0)
+        stats:set(CharacterStat.NICOTINE_WITHDRAWAL, 0)
         character:setTimeSinceLastSmoke(0)
 
         if smokable.stress > 0 then
@@ -310,7 +310,7 @@ function TrueSmoking.OnEat_Tobacco(smokable)
 
         if smokable.foodSick ~= 0 then
             temp = smokable.originalFoodSick * percent
-            body:setFoodSicknessLevel(math.min(body:getFoodSicknessLevel() + temp * effectMultiplier, 100))
+            stats:set(CharacterStat.FOOD_SICKNESS, math.min(stats:get(CharacterStat.FOOD_SICKNESS) + temp * effectMultiplier, 100))
             smokable.foodSick = smokable.foodSick - temp
             if smokable.foodSick < 0 then
                 smokable.foodSick = 0
@@ -319,7 +319,7 @@ function TrueSmoking.OnEat_Tobacco(smokable)
 
         if smokable.unhappyness ~= 0 then
             temp = smokable.originalUnhappyness * percent
-            body:setUnhappynessLevel(adjustStat(body:getUnhappynessLevel(), temp * effectMultiplier, 'unhappy'))
+            stats:set(CharacterStat.UNHAPPINESS, adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp * effectMultiplier, 'unhappy'))
             smokable.unhappyness = smokable.unhappyness - temp
             if smokable.unhappyness > 0 then
                 smokable.unhappyness = 0

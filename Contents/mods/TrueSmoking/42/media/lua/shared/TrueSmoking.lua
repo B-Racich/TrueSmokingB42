@@ -25,8 +25,8 @@ TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
 TrueSmoking.Player_3 = TrueSmoking.Player_3 or {}
 TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
-local originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
-local originalEatItem = ISInventoryPaneContextMenu.eatItem
+-- local originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
+-- local originalEatItem = ISInventoryPaneContextMenu.eatItem
 
 --[[
     For modders use this to set smokes for the hotkey
@@ -126,7 +126,7 @@ function TrueSmoking:getShemagh(player, reCover)
     for _, item in pairs(items) do
         if item ~= '' then
             local type = item:getFullType()
-            if item:getTags():contains('CantSmoke') then
+            if item:hasTag('TrueSmoking:CantSmoke') then
                 if type:contains('Shemagh') then
                     o.shemagh = item
                     return item
@@ -186,11 +186,11 @@ function TrueSmoking:checkForMaskAndEquip(player)
 end
 
 function TrueSmoking:removeItem(player, item, time)
-    ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
+    ISTimedActionQueue.add(ISUnequipAction:new(player, item))
 end
 
 function TrueSmoking:equipItem(player, item, time)
-    ISTimedActionQueue.add(ISWearClothing:new(player, item, time))
+    ISTimedActionQueue.add(ISWearClothing:new(player, item))
 end
 
 function TrueSmoking:getPlayerReference(player)
@@ -246,15 +246,17 @@ function TrueSmoking:findSmokable(player)
         local items = inv:getItems()
         for i = 0, items:size() - 1 do
             local item = items:get(i)
-            if (item:getTags():contains('Smokable') or item:getTags():contains('Smokeable')) and not item:getTags():contains('Packed') then
-                print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
+            -- print('TRUESMOKING::Checking item: ' .. item:getFullType())
+            -- print('TRUESMOKING::Tags: ' .. item:getTags())
+            if (item:hasTag(ItemTag.SMOKABLE)) and not item:hasTag(ItemTag.PACKED) then
+                -- print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
                 if item:isFavorite() then
                     table.insert(itemData.smokable.favorite, item)
                 else
                     table.insert(itemData.smokable.nonfavorite, item)
                 end
-            elseif item:getTags():contains('Packed') then
-                print('TRUESMOKING::Found Pack: ' .. item:getFullType())
+            elseif item:hasTag(ItemTag.PACKED) then
+                -- print('TRUESMOKING::Found Pack: ' .. item:getFullType())
                 if item:isFavorite() then
                     table.insert(itemData.packed.favorite, item)
                 else
@@ -311,42 +313,45 @@ function TrueSmoking:findSmokable(player)
 
     if cigarette and self:hasRequiredItem(cigarette, player) then
         print('TRUESMOKING::Using Cigarette')
-        ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
+        -- ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
+        local table = TrueSmoking:getPlayerReference(player)
+        table.Smokable = Smokable:new(cigarette, player)
+        ISTimedActionQueue.add(TestSmoke:new(player, cigarette))
     end
 end
 
-ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
-    if item:getTags():contains('Smokable') then
-        TrueSmoking:getPlayerReference(player).CheckMaskSmoking = true
-    else
-        TrueSmoking:getPlayerReference(player).CheckMaskSmoking = false
-    end
-    originalEatItem(item, percentage, player)
-end
+-- ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
+--     if item:hasTag(ItemTag.SMOKABLE) then
+--         TrueSmoking:getPlayerReference(player).CheckMaskSmoking = true
+--     else
+--         TrueSmoking:getPlayerReference(player).CheckMaskSmoking = false
+--     end
+--     originalEatItem(item, percentage, player)
+-- end
 
-ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
-    local o = TrueSmoking:getPlayerReference(playerObj)
+-- ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
+--     local o = TrueSmoking:getPlayerReference(playerObj)
 
-    --use native function to get blocking mask
-    local mask = originalGetEatingMask(playerObj, false)
+--     --use native function to get blocking mask
+--     local mask = originalGetEatingMask(playerObj, false)
 
-    if mask and mask:getFullType():contains('Shemagh') and mask:getTags():contains('CantSmoke') and o.CheckMaskSmoking then
-        o.shemagh = mask
-        o.mask = false
-        TrueSmoking:adjustShemagh(playerObj, mask, true)
-    else --let the game handle it normally
-        mask = originalGetEatingMask(playerObj, removeMask)
-        o.mask = mask
-        o.shemagh = false
-    end
+--     if mask and mask:getFullType():contains('Shemagh') and mask:hasTag('TrueSmoking:CantSmoke') and o.CheckMaskSmoking then
+--         o.shemagh = mask
+--         o.mask = false
+--         TrueSmoking:adjustShemagh(playerObj, mask, true)
+--     else --let the game handle it normally
+--         mask = originalGetEatingMask(playerObj, removeMask)
+--         o.mask = mask
+--         o.shemagh = false
+--     end
 
-    --If we want to handle re-equipping tell the game we took nothing off
-    if o.CheckMaskSmoking then
-        return false
-    end
+--     --If we want to handle re-equipping tell the game we took nothing off
+--     if o.CheckMaskSmoking then
+--         return false
+--     end
 
-    return mask
-end
+--     return mask
+-- end
 
 function TrueSmoking:onKeyStartPressed(key)
     -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
@@ -484,8 +489,7 @@ end
 InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
 local group = BodyLocations.getGroup("Human")
-local bodyLocation = BodyLocation.new(group, "Mask_Smoke")
-group:getAllLocations():add(bodyLocation)
+group:getOrCreateLocation(TrueSmoking.registries.mask)
 
 Events.OnCreatePlayer.Add(TrueSmoking.start)
 

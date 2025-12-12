@@ -192,17 +192,21 @@ local function ItemFixer()
     if not ScriptManager.instance then return end -- Ensure ScriptManager exists
 
     for index, value in ipairs(HeadGearToTag) do
+        if index == 0 then return end
         local item = ScriptManager.instance:getItem("Base." .. value)
         if not item then return end
 
         local currentTags = item:getTags()
-        local newTagsList = { "CantSmoke" }
+        local newTagsList = { "TrueSmoking:CantSmoke" }
         local tagsSet = {} -- use  set to avoid dup tags
 
         -- here we add existing tags to the set
         if currentTags and not currentTags:isEmpty() then
             for i = 0, currentTags:size() - 1 do
-                tagsSet[currentTags:get(i)] = true
+                local tag = currentTags[i]
+                if tag then
+                    tagsSet[tag] = true
+                end
             end
         end
         -- add new tags
@@ -235,7 +239,8 @@ local function EditRecipes()
     -- This seems to fix double crafting inputs/outputs when redefining recipes
     local recipeList = {
         ["AddACigarette"] = {
-            ["inputs"] = "{ inputs { item 1 [Base.CigaretteSingle] flags[AllowFavorite;InheritFavorite], item 1 [Base.CigarettePack] mode:keep flags[AllowFavorite;InheritFavorite], } }"
+            ["inputs"] =
+            "{ inputs { item 1 [Base.CigaretteSingle] flags[AllowFavorite;InheritFavorite], item 1 [Base.CigarettePack] mode:keep flags[AllowFavorite;InheritFavorite], } }"
         },
         ["TakeACigarette"] = {
             ["inputs"] = "{ inputs { item 1 [Base.CigarettePack] flags[AllowFavorite;InheritFavorite], } }",

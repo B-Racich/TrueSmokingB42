@@ -1,12 +1,13 @@
 require 'TimedActions/ISTakePillAction'
+ISTakePillAction = ISBaseTimedAction:derive("ISTakePillAction")
 
 local originalActionNew = ISTakePillAction.new
 function ISTakePillAction:new(character, item)
  local o = {}
     local onEat = item:getOnEat() or ''
     local hook = 'OnEat_Hook'
-    local hasSmokableTag = item:getTags():contains('Smokable')
-    local funcsToHook = { 'cigarettes', 'RecipeCodeOnEat.cigarettes', 'RecipeCodeOnEat.cigarillo','RecipeCodeOnEat.cigar', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
+    local hasSmokableTag = item:hasTag(ItemTag.SMOKABLE)
+    local funcsToHook = { 'cigarettes', 'RecipeCodeOnEat.consumeNicotine', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
         'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnEat_Weed' }
 
     o = originalActionNew(self, character, item)
@@ -30,7 +31,7 @@ function ISTakePillAction:new(character, item)
             table.Smokable = Smokable:new(item, character)
             item:getModData().modOnEat = hook
 
-            return LightSmoke:new(character)
+            return LightSmoke:new(character, item)
         end
     end
 

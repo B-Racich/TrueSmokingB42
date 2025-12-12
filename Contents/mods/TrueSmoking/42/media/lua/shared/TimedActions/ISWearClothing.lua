@@ -1,3 +1,5 @@
+require "TimedActions/ISWearClothing"
+ISWearClothing = ISBaseTimedAction:derive("ISWearClothing")
 --[[
     Hook the complete method to mark when our mask actually equipped, this allows the keybind to try again
     if it was interrupted
@@ -16,9 +18,8 @@ end
    Added a time param and check for putting out smoke on equipping headgear
 ]]
 local originalNew = ISWearClothing.new
-function ISWearClothing:new(character, item, time)
+function ISWearClothing:new(character, item)
     local o = originalNew(self, character, item)
-    if time then o.maxTime = time end
 
     local smokableBlacklist = {
         Mask = true,
@@ -32,7 +33,7 @@ function ISWearClothing:new(character, item, time)
 
     local table = TrueSmoking:getPlayerReference(character)
 
-    if smokableBlacklist[item:getBodyLocation()] and not item:hasTag("CanEat") and table.isSmoking then
+    if smokableBlacklist[item:getBodyLocation()] and not item:hasTag(ItemTag.CAN_EAT) and table.isSmoking then
         table.Smokable:putOut()
     end
 

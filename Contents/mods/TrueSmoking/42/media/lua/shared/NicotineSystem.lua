@@ -74,8 +74,8 @@ function NicotineSystem:initialize(player)
     if not data.nicotineSystem then
         data.nicotineSystem = {
             nicotineLevel   = 0,
-            addictionLevel  = player:HasTrait("Smoker") and self.Config.SMOKER_TRAIT_GAIN_THRESHOLD * 1.2 or 0,
-            withdrawalLevel = player:HasTrait("Smoker") and 35 or 0,
+            addictionLevel  = player:hasTrait(CharacterTrait.SMOKER) and self.Config.SMOKER_TRAIT_GAIN_THRESHOLD * 1.2 or 0,
+            withdrawalLevel = player:hasTrait(CharacterTrait.SMOKER) and 35 or 0,
             AddictionTime   = 0,
             nicotineTime    = 0,
             unhappinessCap  = 0,
@@ -121,6 +121,7 @@ function NicotineSystem:GameTimeUpdate(player)
     local isSmoking = tableRef and tableRef.Smokable and tableRef.Smokable.smokeLit
     local lastSmoke = player:getTimeSinceLastSmoke()
 
+    -- Nicotine Decay and overflow
     if not isSmoking then
         data.nicotineLevel = data.nicotineLevel * (1 - self.Config.NICOTINE_DECAY_PER_MINUTE)
         data.nicotineLevel = math.max(0, data.nicotineLevel)
@@ -137,6 +138,7 @@ function NicotineSystem:GameTimeUpdate(player)
         end
     end
 
+    -- Timer
     if data.nicotineLevel > 0.01 then
         local minutesToZero = data.nicotineLevel / self.Config.NICOTINE_DECAY_PER_MINUTE
         local hoursToZero   = minutesToZero / 10 / 60
@@ -148,7 +150,22 @@ function NicotineSystem:GameTimeUpdate(player)
 
     local lowNicotine = data.nicotineLevel < self.Config.NICOTINE_THRESHOLD
 
+    -- Withdrawal effects
     if lowNicotine and data.addictionLevel > 8 then
+        local w = data.withdrawalLevel / 100
+        local unhappinessCap = 20 * w
+        local boredomCap = 25 * w
+
+        data.unhappinessCap = unhappinessCap
+        data.boredomCap = boredomCap
+
+        if stats:get(CharacterStat.UNHAPPINESS) < unhappinessCap then
+            stats:set(CharacterStat.UNHAPPINESS, math.min(unhappinessCap, stats:get(CharacterStat.UNHAPPINESS) + self.Config.UNHAPPYNESS_FROM_WITHDRAWAL))
+        end
+        if stats:get(CharacterStat.BOREDOM) < boredomCap then
+            stats:set(CharacterStat.BOREDOM, math.min(boredomCap, stats:get(CharacterStat.BOREDOM) + self.Config.BOREDOM_FROM_WITHDRAWAL))
+        end
+
         local intensityMultiplier = 1.0 + (data.addictionLevel / 100) * 0.5
 
         local hoursSinceLastSmoke = lastSmoke
@@ -168,33 +185,17 @@ function NicotineSystem:GameTimeUpdate(player)
         data.withdrawalLevel = math.max(0, data.withdrawalLevel - relief)
     end
 
-    if data.withdrawalLevel > 1 then
-        local w = data.withdrawalLevel / 100
-        local unhappinessCap = 20 + w
-        local boredomCap = 25 + w
-
-        data.unhappinessCap = unhappinessCap
-        data.boredomCap = boredomCap
-
-        if bd:getUnhappynessLevel() < unhappinessCap then
-            bd:setUnhappynessLevel(math.min(unhappinessCap, bd:getUnhappynessLevel() + self.Config.UNHAPPYNESS_FROM_WITHDRAWAL))
-        end
-        if bd:getBoredomLevel() < boredomCap then
-            bd:setBoredomLevel(math.min(boredomCap, bd:getBoredomLevel() + self.Config.BOREDOM_FROM_WITHDRAWAL))
-        end
-    end
-
     if data.nicotineLevel > 5 then
         local strength = math.min(data.nicotineLevel / 100, 1.0) -- 0–1 scale
 
         local fatigueReduction = self.Config.FATIGUE_FROM_NICOTINE * strength -- ~0.025 per minute at full nicotine
-        stats:setFatigue(math.max(0, stats:getFatigue() - fatigueReduction))
+        stats:set(CharacterStat.FATIGUE, math.max(0, stats:get(CharacterStat.FATIGUE) - fatigueReduction))
 
         local hungerReduction = self.Config.HUNGER_FROM_NICOTINE * strength -- ~0.00054 per minute → ~0.78 per day at max
-        stats:setHunger(math.max(0, stats:getHunger() - hungerReduction))
+        stats:set(CharacterStat.HUNGER, math.max(0, stats:get(CharacterStat.HUNGER) - hungerReduction))
 
-        if stats:getStress() > 0 then
-            stats:setStress(math.max(0, (stats:getStress() - stats:getStressFromCigarettes()) - (self.Config.STRESS_FROM_NICOTINE * strength)))
+        if stats:get(CharacterStat.STRESS) > 0 then
+            stats:set(CharacterStat.STRESS, math.max(0, (stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL)) - (self.Config.STRESS_FROM_NICOTINE * strength)))
         end
     end
 
@@ -206,11 +207,11 @@ function NicotineSystem:GameTimeUpdate(player)
     else
         if lowNicotine and data.withdrawalLevel >= 0 and not isSmoking then
             if not self.Config.ADDICTION_DECAY_PER_MINUTE then self:UpdateDynamicConfig(player) end
-            local baseDecay = player:HasTrait("Smoker")
+            local baseDecay = player:hasTrait(CharacterTrait.SMOKER)
                 and self.Config.ADDICTION_DECAY_PER_MINUTE_SMOKER
                 or self.Config.ADDICTION_DECAY_PER_MINUTE
 
-            local fatigue = player:getStats():getFatigue()
+            local fatigue = player:getStats():get(CharacterStat.FATIGUE)
             local exerciseBonus = 1.0
             if fatigue > 0.7 then
                 local bonusStrength = (fatigue - 0.7) / 0.3
@@ -228,15 +229,16 @@ function NicotineSystem:GameTimeUpdate(player)
     end
 
     if TrueSmoking and TrueSmoking.Options and TrueSmoking.Options.DynamicSmokerTrait then
-        if data.addictionLevel >= self.Config.SMOKER_TRAIT_GAIN_THRESHOLD and not player:HasTrait("Smoker") then
+        if data.addictionLevel >= self.Config.SMOKER_TRAIT_GAIN_THRESHOLD and not player:hasTrait(CharacterTrait.SMOKER) then
             player:getTraits():add("Smoker")
             if HaloTextHelper then
                 HaloTextHelper.addTextWithArrow(player, getText("UI_TRUESMOKING_BECAME_SMOKER"), true,
                     HaloTextHelper.getColorRed())
             end
-        elseif data.addictionLevel < self.Config.SMOKER_TRAIT_LOSE_THRESHOLD and player:HasTrait("Smoker") then
+        elseif data.addictionLevel < self.Config.SMOKER_TRAIT_LOSE_THRESHOLD and player:hasTrait(CharacterTrait.SMOKER) then
             player:getTraits():remove("Smoker")
             stats:setStressFromCigarettes(0)
+            stats:reset(CharacterStat.NICOTINE_WITHDRAWAL)
             data.boredomCap = 0
             data.unhappinessCap = 0
             if HaloTextHelper then

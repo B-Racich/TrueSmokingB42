@@ -1,3 +1,5 @@
+require "TimedActions/ISUnequipAction"
+ISUnequipAction = ISBaseTimedAction:derive("ISUnequipAction")
 --[[
     Add instant equip time for the visual smoke
 ]]
@@ -7,7 +9,7 @@ function ISUnequipAction:new(character, item, maxTime)
 
     local playerRef = TrueSmoking:getPlayerReference(character)
 
-    if item:getBodyLocation() == "Mask_Smoke" and playerRef.isSmoking then
+    if item:getBodyLocation() == TrueSmoking.registries.mask and playerRef.isSmoking then
         o.maxTime = 1
     end
 
@@ -23,7 +25,7 @@ function ISUnequipAction:complete()
 
     local playerRef = TrueSmoking:getPlayerReference(self.character)
 
-    if self.item:getBodyLocation() == "Mask_Smoke" and playerRef.isSmoking then
+    if self.item:getBodyLocation() == TrueSmoking.registries.mask and playerRef.isSmoking then
         playerRef.Smokable:putOut()
     end
 
