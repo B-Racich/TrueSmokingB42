@@ -102,9 +102,9 @@ function SmokingMoodle:update()
         self.lastWiggleTime = currentTime
     end
 
-    -- if TrueSmoking.Config.HideMoodles then
-    --     percentVal = 0.5
-    -- end
+    if TrueSmoking.Config.HideMoodles then
+        percentVal = 0.5
+    end
 
     moodle:setValue(percentVal)
 
@@ -191,7 +191,7 @@ function NicotineMoodle:update()
     local moodle = MF.getMoodle(self.moodleId, self.playerNum)
     if not moodle then return end
 
-    local shouldShow = TrueSmoking.Config.DebugMoodles or (data.withdrawalLevel > 15 and data.nicotineLevel < 8)
+    local shouldShow = TrueSmoking.Config.DebugMoodles or (data.withdrawalLevel > 20 and data.nicotineLevel < 10)
     local hideMoodles = TrueSmoking.Config.HideMoodles or TrueSmoking.Config.HideAddictionMoodle
 
     local moodleValue = 0.5  -- default = hidden/neutral

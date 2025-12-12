@@ -1,9 +1,5 @@
 require 'ISUI/ISInventoryPaneContextMenu'
 
-require 'Utils'
-require 'Smokable'
-
-local InventoryUI = require("Starlit/client/ui/InventoryUI")
 
 --[[
     This class serves as the entry point for the mod and stores references to the moodle and smokable object to retain the same instance.
@@ -18,15 +14,15 @@ TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
 TrueSmoking.SmokableObjects = TrueSmoking.SmokableObjects or {}
 TrueSmoking.Callbacks = TrueSmoking.Callbacks or {}
-TrueSmoking.Config = require 'Configuration/ModOptions'
+-- TrueSmoking.Config = require 'Configuration/ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
 TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
 TrueSmoking.Player_3 = TrueSmoking.Player_3 or {}
 TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
-local originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
-local originalEatItem = ISInventoryPaneContextMenu.eatItem
+-- local originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
+-- local originalEatItem = ISInventoryPaneContextMenu.eatItem
 
 --[[
     For modders use this to set smokes for the hotkey
@@ -126,7 +122,7 @@ function TrueSmoking:getShemagh(player, reCover)
     for _, item in pairs(items) do
         if item ~= '' then
             local type = item:getFullType()
-            if item:getTags():contains('CantSmoke') then
+            if item:hasTag('TrueSmoking:CantSmoke') then
                 if type:contains('Shemagh') then
                     o.shemagh = item
                     return item
@@ -161,7 +157,7 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
             if (fullType == covered and putDown) or (fullType == open and not putDown) then
                 print(string.format('TRUESMOKING::Adjusted Shegmah: %s - putDown: %s - setTo: %s', fullType,
                     putDown and 'true' or 'false', setTo))
-                ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo, 30))
+                ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo))
                 return true
             end
         end
@@ -186,15 +182,31 @@ function TrueSmoking:checkForMaskAndEquip(player)
 end
 
 function TrueSmoking:removeItem(player, item, time)
-    ISTimedActionQueue.add(ISUnequipAction:new(player, item, time))
+    ISTimedActionQueue.add(ISUnequipAction:new(player, item))
 end
 
 function TrueSmoking:equipItem(player, item, time)
-    ISTimedActionQueue.add(ISWearClothing:new(player, item, time))
+    ISTimedActionQueue.add(ISWearClothing:new(player, item))
 end
 
 function TrueSmoking:getPlayerReference(player)
     local num = player
+    if type(player) ~= 'number' then
+        num = player:getPlayerNum()
+    end
+
+    if not num or not getSpecificPlayer(num) then return end
+    print('TRUESMOKING::Getting player reference for player num: ' .. tostring(num))
+    local md = getSpecificPlayer(num):getModData()
+    if not md.TrueSmoking then
+        md.TrueSmoking = {}
+    end
+
+    return md.TrueSmoking
+end
+
+function TrueSmoking:getPlayerTable(player)
+local num = player
     if type(player) ~= 'number' then
         num = player:getPlayerNum()
     end
@@ -246,15 +258,17 @@ function TrueSmoking:findSmokable(player)
         local items = inv:getItems()
         for i = 0, items:size() - 1 do
             local item = items:get(i)
-            if (item:getTags():contains('Smokable') or item:getTags():contains('Smokeable')) and not item:getTags():contains('Packed') then
-                print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
+            -- print('TRUESMOKING::Checking item: ' .. item:getFullType())
+            -- print('TRUESMOKING::Tags: ' .. item:getTags())
+            if (item:hasTag(ItemTag.SMOKABLE)) and not item:hasTag(ItemTag.PACKED) then
+                -- print('TRUESMOKING::Found Smokable: ' .. item:getFullType())
                 if item:isFavorite() then
                     table.insert(itemData.smokable.favorite, item)
                 else
                     table.insert(itemData.smokable.nonfavorite, item)
                 end
-            elseif item:getTags():contains('Packed') then
-                print('TRUESMOKING::Found Pack: ' .. item:getFullType())
+            elseif item:hasTag(ItemTag.PACKED) then
+                -- print('TRUESMOKING::Found Pack: ' .. item:getFullType())
                 if item:isFavorite() then
                     table.insert(itemData.packed.favorite, item)
                 else
@@ -281,13 +295,13 @@ function TrueSmoking:findSmokable(player)
 
     --[[
     for i, v in ipairs(itemData.packed.favorite) do
-        print("Packed Favorite:", v:getFullType())
+        print('Packed Favorite:', v:getFullType())
     end
     for i, v in ipairs(itemData.packed.nonfavorite) do
-        print("Packed Nonfavorite:", v:getFullType())
+        print('Packed Nonfavorite:', v:getFullType())
     end
     for i, v in ipairs(itemData.smokable) do
-        print("Smokable:", v:getFullType())
+        print('Smokable:', v:getFullType())
     end
     --]]
 
@@ -312,56 +326,60 @@ function TrueSmoking:findSmokable(player)
     if cigarette and self:hasRequiredItem(cigarette, player) then
         print('TRUESMOKING::Using Cigarette')
         ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
+        -- local table = TrueSmoking:getPlayerReference(player)
+        -- table.Smokable = Smokable:new(cigarette, player)
+        -- ISTimedActionQueue.add(TestSmoke:new(player, cigarette))
     end
 end
 
-ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
-    if item:getTags():contains('Smokable') then
-        TrueSmoking:getPlayerReference(player).CheckMaskSmoking = true
-    else
-        TrueSmoking:getPlayerReference(player).CheckMaskSmoking = false
-    end
-    originalEatItem(item, percentage, player)
-end
+-- ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
+--     if item:hasTag(ItemTag.SMOKABLE) then
+--         TrueSmoking:getPlayerReference(player).CheckMaskSmoking = true
+--     else
+--         TrueSmoking:getPlayerReference(player).CheckMaskSmoking = false
+--     end
+--     originalEatItem(item, percentage, player)
+-- end
 
-ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
-    local o = TrueSmoking:getPlayerReference(playerObj)
+-- ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
+--     local o = TrueSmoking:getPlayerReference(playerObj)
 
-    --use native function to get blocking mask
-    local mask = originalGetEatingMask(playerObj, false)
+--     --use native function to get blocking mask
+--     local mask = originalGetEatingMask(playerObj, false)
 
-    if mask and mask:getFullType():contains('Shemagh') and mask:getTags():contains('CantSmoke') and o.CheckMaskSmoking then
-        o.shemagh = mask
-        o.mask = false
-        TrueSmoking:adjustShemagh(playerObj, mask, true)
-    else --let the game handle it normally
-        mask = originalGetEatingMask(playerObj, removeMask)
-        o.mask = mask
-        o.shemagh = false
-    end
+--     if mask and mask:getFullType():contains('Shemagh') and mask:hasTag('TrueSmoking:CantSmoke') and o.CheckMaskSmoking then
+--         o.shemagh = mask
+--         o.mask = false
+--         TrueSmoking:adjustShemagh(playerObj, mask, true)
+--     else --let the game handle it normally
+--         mask = originalGetEatingMask(playerObj, removeMask)
+--         o.mask = mask
+--         o.shemagh = false
+--     end
 
-    --If we want to handle re-equipping tell the game we took nothing off
-    if o.CheckMaskSmoking then
-        return false
-    end
+--     --If we want to handle re-equipping tell the game we took nothing off
+--     if o.CheckMaskSmoking then
+--         return false
+--     end
 
-    return mask
-end
+--     return mask
+-- end
 
 function TrueSmoking:onKeyStartPressed(key)
     -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
-    local o = self.Player_1
+    local table = self.Player_1
+    local o = TrueSmoking:getPlayerReference(0)
     local player = getSpecificPlayer(0) -- Player_0 is always keyboard
     if player then
-        if o.isSmoking and o.Smokable.smokeLit and key == self.Config.keySmoke then
-            o.Smokable:puff()
-        elseif o.isSmoking and not o.Smokable.smokeLit and key == self.Config.keySmoke then
-            o.Smokable:light()
+        if o.isSmoking and table.Smokable.smokeLit and key == self.Config.keySmoke then
+            table.Smokable:puff()
+        elseif o.isSmoking and not table.Smokable.smokeLit and key == self.Config.keySmoke then
+            table.Smokable:light()
         elseif self.Config.FindSmoke and not o.isSmoking and key == self.Config.keySmoke then
             print('TRUESMOKING::Find Smokable')
             self:findSmokable(player)
         elseif o.isSmoking and key == self.Config.keyStopSmoke then
-            o.Smokable:putOut()
+            table.Smokable:putOut()
         elseif not o.isSmoking and key == self.Config.keyStopSmoke and o.mask and self.Options.ManageHeadGear then
             self:equipItem(player, o.mask, false)
         end
@@ -390,18 +408,18 @@ end
 
 TrueSmoking.start = function(playerNum, player)
     local o = TrueSmoking:getPlayerReference(player)
+    local table = TrueSmoking:getPlayerReference(player)
 
     o.eatSound = ''
     o.lightingEatSound = ''
 
-    o.Smokable = {}
-    o.Smokable.smokeLit = false
+    table.Smokable = {}
+    table.Smokable.smokeLit = false
 
-    if not TrueSmoking.Config.HideMoodles then
-        o.SmokingMoodle = SmokingMoodle:new(o, playerNum)
-        o.NicotineMoodle = NicotineMoodle:new(o, playerNum)
-        o.NicotineMoodle:start()
-    end
+    table.SmokingMoodle = SmokingMoodle:new(playerNum)
+    table.NicotineMoodle = NicotineMoodle:new(playerNum)
+    table.SmokingMoodle:start()
+    table.NicotineMoodle:start()
 
     -- 460 is vanilla
     TrueSmoking.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 460 or 220
@@ -441,18 +459,17 @@ end
 
 TrueSmoking.stop = function(player)
     local o = TrueSmoking:getPlayerReference(player)
+    local table = TrueSmoking:getPlayerReference(player)
 
-    if not TrueSmoking.Config.HideMoodles then
-        o.SmokingMoodle:stop()
-        o.NicotineMoodle:stop()
+    table.SmokingMoodle:stop()
+    table.NicotineMoodle:stop()
+
+    if table.Smokable.smokeLit then
+        table.Smokable:stop()
     end
 
-    if o.Smokable.smokeLit then
-        o.Smokable:stop()
-    end
-
-    o.SmokingMoodle = nil
-    o.Smokable = nil
+    table.SmokingMoodle = nil
+    table.Smokable = nil
 
     if o.keyWrapper then
         Events.OnKeyStartPressed.Remove(o.keyWrapper)
@@ -470,22 +487,8 @@ TrueSmoking.stop = function(player)
     end
 end
 
-local remainingSmokeTooltip = function(tooltip, layout, item)
-    if item and item:getModData().SmokeLength and item:getModData().OriginalSmokeLength then
-        local current = item:getModData().SmokeLength
-        local original = item:getModData().OriginalSmokeLength
-        local amt = (current / original)
-        amt = amt >= 0 and amt or 0
-
-        InventoryUI.addTooltipBar(layout, "Remaining:", amt)
-    end
-end
-
-InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
-
-local group = BodyLocations.getGroup("Human")
-local bodyLocation = BodyLocation.new(group, "Mask_Smoke")
-group:getAllLocations():add(bodyLocation)
+local group = BodyLocations.getGroup('Human')
+group:getOrCreateLocation(TrueSmoking.registries.mask)
 
 Events.OnCreatePlayer.Add(TrueSmoking.start)
 
@@ -516,10 +519,11 @@ Events.OnInitGlobalModData.Add(function()
 
     opt.UseNewMoodle = sandbox.UseNewMoodle
 
-    local smokingSpeed = (sandbox.SmokingSpeed or 100) / 100
-    local puffStrength = (sandbox.PuffStrength or 100) / 100
-    local movementBurn = (sandbox.MovementBurn or 100) / 100
-    local idleBurnOut = (sandbox.IdleBurnOut or 75) / 100
+    local smokingSpeed = sandbox.SmokingSpeed or 1.0
+    local puffStrength = sandbox.PuffStrength or 1.0
+    local movementBurn = sandbox.MovementBurn or 1.0
+    local idleBurnOut = sandbox.IdleBurnOut or 1.0
+    local effectMultiplier = sandbox.EffectMultiplier or 1.0
 
     opt.Global = {
         burnMin = 0.000125 * smokingSpeed,
@@ -545,10 +549,10 @@ Events.OnInitGlobalModData.Add(function()
     local lengthRatios = {
         Cigarette = 1.0,
         RolledCigarette = 1.0,
-        Cigarillo = 1.538,
-        Cigar = 2.307,
-        Pipe = 1.923,
-        Can = 0.769,
+        Cigarillo = 1.5,
+        Cigar = 3,
+        Pipe = 2.5,
+        Can = 1.25,
     }
 
     local function spoofCategory(catName)
@@ -563,22 +567,22 @@ Events.OnInitGlobalModData.Add(function()
             burnSpeed = opt.Global.burnSpeed,
             burnSpeedDecay = opt.Global.burnSpeedDecay,
             decayRate = opt.Global.decayRate,
-            effectMultiplier = puffStrength,
+            effectMultiplier = lengthRatios[catName]* effectMultiplier,
             puffFactor = opt.Global.puffFactor,
             walkingFactor = opt.Global.walkingFactor,
             runningFactor = opt.Global.runningFactor,
             sprintingFactor = opt.Global.sprintingFactor,
         }
 
-        opt[catName .. "Length"] = len
+        opt[catName .. 'Length'] = len
     end
 
-    spoofCategory("Cigarette")
-    spoofCategory("RolledCigarette")
-    spoofCategory("Cigarillo")
-    spoofCategory("Cigar")
-    spoofCategory("Pipe")
-    spoofCategory("Can")
+    spoofCategory('Cigarette')
+    spoofCategory('RolledCigarette')
+    spoofCategory('Cigarillo')
+    spoofCategory('Cigar')
+    spoofCategory('Pipe')
+    spoofCategory('Can')
 
     opt.ManageHeadGear          = sandbox.ManageHeadGear
     opt.SmokeRelighting         = sandbox.SmokeRelighting
