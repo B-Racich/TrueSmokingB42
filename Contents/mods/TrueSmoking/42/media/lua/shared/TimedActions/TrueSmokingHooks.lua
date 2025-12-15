@@ -74,7 +74,6 @@ function ISEatFoodAction:new(character, item, percentage)
             end
 
             print('TRUESMOKING::Setting up smokable')
-            table.Smokable = Smokable:new(item, character)
             item:getModData().modOnEat = hook
 
             return LightSmoke:new(character, item, table.Smokable)

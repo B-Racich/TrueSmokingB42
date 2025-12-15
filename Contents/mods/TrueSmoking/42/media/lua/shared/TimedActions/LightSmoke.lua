@@ -95,7 +95,10 @@ end
 
 function LightSmoke:complete()
     print('TRUESMOKING::LightSmoke complete')
-    self.smokable:start()
+    local table = TrueSmoking:getPlayerReference(self.character)
+    local smokable = Smokable:new(self.item, self.character)
+    table.Smokable = smokable
+    smokable:start()
     return true
 end
 
@@ -103,7 +106,7 @@ function LightSmoke:getDuration()
      if self.character:isTimedActionInstant() then
         return 1
     end
-    return TrueSmoking.lightTime
+    return 460
 end
 
 function LightSmoke:new(character, item, smokable)

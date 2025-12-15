@@ -47,6 +47,7 @@ SmokingMoodle.__index = SmokingMoodle
 function SmokingMoodle:new(table, playerNum)
     local moodleImage = TrueSmoking.Options.UseNewMoodle and 'smoking_new' or 'smoking_old'
     local obj = MoodleSystem.new(self, table, playerNum, moodleImage)
+    table.SmokingMoodle = obj
     return obj
 end
 

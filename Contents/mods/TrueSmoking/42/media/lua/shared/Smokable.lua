@@ -1,4 +1,7 @@
 require 'TimedActions/ISBaseTimedAction'
+require 'TrueSmoking'
+
+TrueSmoking = TrueSmoking or {}
 
 Smokable = Smokable or {}
 Smokable.__index = Smokable
@@ -245,9 +248,7 @@ end
 function Smokable:start()
     if not self.table.isSmoking then
         self.table.isSmoking = true
-        if not TrueSmoking.Config.HideMoodles then
-            self.table.SmokingMoodle:start()
-        end
+        self.table.SmokingMoodle:start()
         local function updateWrapper()
             self:update()
         end
@@ -287,9 +288,7 @@ function Smokable:stop()
     self.hasDropped = false
     self.dropState = false
 
-    if not TrueSmoking.Config.HideMoodles then
-        self.table.SmokingMoodle:stop()
-    end
+    self.table.SmokingMoodle:stop()
 
     self:removeVisualItem()
 
