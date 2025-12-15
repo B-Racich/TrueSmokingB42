@@ -1,4 +1,5 @@
 local config = {}
+TrueSmoking = TrueSmoking or {}
 
 local options = PZAPI.ModOptions:create("TrueSmoking", "True Smoking")
 
@@ -54,6 +55,8 @@ end
 Events.OnMainMenuEnter.Add(function()
     options:apply()
 end)
+
+TrueSmoking.Config = config
 
 -- We now return the `config` object, so it can be used as a module!
 return config

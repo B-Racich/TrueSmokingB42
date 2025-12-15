@@ -1,5 +1,3 @@
-require 'TrueSmoking'
-
 TrueSmoking = TrueSmoking or {}
 
 --Can probably remove this func and use vanilla logic here

@@ -88,7 +88,7 @@ function LightSmoke:perform()
     if self.eatAudio ~= 0 and self.character:getEmitter():isPlaying(self.eatAudio) then
         self.character:stopOrTriggerSound(self.eatAudio);
     end
-    self.container:setDrawDirty(true);
+    -- self.container:setDrawDirty(true);
 
     ISBaseTimedAction.perform(self)
 end
@@ -106,15 +106,15 @@ function LightSmoke:getDuration()
     return TrueSmoking.lightTime
 end
 
-function LightSmoke:new(character, item)
+function LightSmoke:new(character, item, smokable)
     local o = ISBaseTimedAction.new(self, character)
     o.stopOnWalk = false
     o.stopOnRun = true
     o.stopOnAim = true
     o.forceProgressBar = false
 
-    o.table = TrueSmoking:getPlayerReference(character)
-    o.smokable = o.table.Smokable
+    -- o.table = TrueSmoking:getPlayerReference(character)
+    o.smokable = smokable
     o.item = item
     o.character = character
 

@@ -1,5 +1,4 @@
 require 'TimedActions/ISBaseTimedAction'
-require 'Utils'
 
 Smokable = Smokable or {}
 Smokable.__index = Smokable

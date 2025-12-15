@@ -1,9 +1,5 @@
 require 'ISUI/ISInventoryPaneContextMenu'
 
-require 'Utils'
-require 'Smokable'
-
-local InventoryUI = require("Starlit/client/ui/InventoryUI")
 
 --[[
     This class serves as the entry point for the mod and stores references to the moodle and smokable object to retain the same instance.
@@ -18,7 +14,7 @@ TrueSmoking.HotkeySmokes = TrueSmoking.HotkeySmokes or {}
 TrueSmoking.HotkeyPacks = TrueSmoking.HotkeyPacks or {}
 TrueSmoking.SmokableObjects = TrueSmoking.SmokableObjects or {}
 TrueSmoking.Callbacks = TrueSmoking.Callbacks or {}
-TrueSmoking.Config = require 'Configuration/ModOptions'
+-- TrueSmoking.Config = require 'Configuration/ModOptions'
 --To support splitscreen we need to store each player seperately
 TrueSmoking.Player_1 = TrueSmoking.Player_1 or {}
 TrueSmoking.Player_2 = TrueSmoking.Player_2 or {}
@@ -313,10 +309,10 @@ function TrueSmoking:findSmokable(player)
 
     if cigarette and self:hasRequiredItem(cigarette, player) then
         print('TRUESMOKING::Using Cigarette')
-        -- ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
-        local table = TrueSmoking:getPlayerReference(player)
-        table.Smokable = Smokable:new(cigarette, player)
-        ISTimedActionQueue.add(TestSmoke:new(player, cigarette))
+        ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
+        -- local table = TrueSmoking:getPlayerReference(player)
+        -- table.Smokable = Smokable:new(cigarette, player)
+        -- ISTimedActionQueue.add(TestSmoke:new(player, cigarette))
     end
 end
 
@@ -402,11 +398,9 @@ TrueSmoking.start = function(playerNum, player)
     o.Smokable = {}
     o.Smokable.smokeLit = false
 
-    if not TrueSmoking.Config.HideMoodles then
-        o.SmokingMoodle = SmokingMoodle:new(o, playerNum)
-        o.NicotineMoodle = NicotineMoodle:new(o, playerNum)
-        o.NicotineMoodle:start()
-    end
+    o.SmokingMoodle = SmokingMoodle:new(o, playerNum)
+    o.NicotineMoodle = NicotineMoodle:new(o, playerNum)
+    o.NicotineMoodle:start()
 
     -- 460 is vanilla
     TrueSmoking.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 460 or 220
@@ -447,10 +441,8 @@ end
 TrueSmoking.stop = function(player)
     local o = TrueSmoking:getPlayerReference(player)
 
-    if not TrueSmoking.Config.HideMoodles then
-        o.SmokingMoodle:stop()
-        o.NicotineMoodle:stop()
-    end
+    o.SmokingMoodle:stop()
+    o.NicotineMoodle:stop()
 
     if o.Smokable.smokeLit then
         o.Smokable:stop()
@@ -474,19 +466,6 @@ TrueSmoking.stop = function(player)
         o.NicotineGameTimeWrapper = nil
     end
 end
-
-local remainingSmokeTooltip = function(tooltip, layout, item)
-    if item and item:getModData().SmokeLength and item:getModData().OriginalSmokeLength then
-        local current = item:getModData().SmokeLength
-        local original = item:getModData().OriginalSmokeLength
-        local amt = (current / original)
-        amt = amt >= 0 and amt or 0
-
-        InventoryUI.addTooltipBar(layout, "Remaining:", amt)
-    end
-end
-
-InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
 local group = BodyLocations.getGroup("Human")
 group:getOrCreateLocation(TrueSmoking.registries.mask)

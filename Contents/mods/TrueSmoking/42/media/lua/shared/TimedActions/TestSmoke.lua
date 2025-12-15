@@ -35,10 +35,6 @@ end
 
 function TestSmoke:serverStart()
     print('TRUESMOKING::TestSmoke server started')
-    if not isServer() then
-        self.table = TrueSmoking:getPlayerReference(self.character)
-        self.smokable = self.table.Smokable
-    end
 end
 
 function TestSmoke:stop()
@@ -72,6 +68,9 @@ function TestSmoke:new(character, item)
     o.stopOnRun = true
     o.stopOnAim = true
     o.forceProgressBar = false
+
+    o.table = TrueSmoking:getPlayerReference(character)
+    o.smokable = o.table.Smokable
 
     o.character = character
     o.item = item
