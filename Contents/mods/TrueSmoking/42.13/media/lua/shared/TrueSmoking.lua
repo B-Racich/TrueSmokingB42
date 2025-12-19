@@ -1,4 +1,5 @@
 require 'ISUI/ISInventoryPaneContextMenu'
+require 'Utils'
 
 TrueSmoking = TrueSmoking or {}
 TrueSmoking.__index = TrueSmoking
@@ -174,32 +175,33 @@ function TrueSmoking:getModData(player)
     end
 
     if not num or not getSpecificPlayer(num) then
-        tsDebug('TRUESMOKING::getModData - Invalid player number: ' .. tostring(num))
+        tsDebug('getModData - Invalid player number: ' .. tostring(num))
         return
     end
     -- print('TRUESMOKING::Getting player reference for player num: ' .. tostring(num))
     local md = getSpecificPlayer(num):getModData()
-    if not md.TrueSmoking then
+    if md and not md.TrueSmoking then
+        tsDebug('getModData - Creating new TrueSmoking modData for player num: ' .. num)
         md.TrueSmoking = {}
     end
 
     return md.TrueSmoking
 end
 
-function TrueSmoking:getPlayerTable(player)
-    local num = player
+function TrueSmoking:getPlayerReference(player)
+local num = player
     if type(player) ~= 'number' then
         num = player:getPlayerNum()
     end
 
     if num == 0 then
-        return self.Player_1
+        return TrueSmoking.Player_1
     elseif num == 1 then
-        return self.Player_2
+        return TrueSmoking.Player_2
     elseif num == 2 then
-        return self.Player_3
+        return TrueSmoking.Player_3
     elseif num == 3 then
-        return self.Player_4
+        return TrueSmoking.Player_4
     end
 end
 
@@ -348,18 +350,21 @@ end
 
 function TrueSmoking:onKeyStartPressed(key)
     -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
-    local o = TrueSmoking:getModData(0)
+    local o = self:getModData(0)
     local player = getSpecificPlayer(0) -- Player_0 is always keyboard
+    local ts = TrueSmoking:getPlayerReference(0)
     if player then
-        if o.isSmoking and o.Smokable.smokeLit and key == self.Config.keySmoke then
-            o.Smokable:puff()
-        elseif o.isSmoking and not o.Smokable.smokeLit and key == self.Config.keySmoke then
-            o.Smokable:light()
+        if o.isSmoking and ts.Smokable.smokeLit and key == self.Config.keySmoke then
+            ts.Smokable:puff()
+        elseif o.isSmoking and not ts.Smokable.smokeLit and key == self.Config.keySmoke then
+            -- o.isSmoking = false
+            -- o.Smokable.smokeLit = false
+            ts.Smokable:light()
         elseif self.Config.FindSmoke and not o.isSmoking and key == self.Config.keySmoke then
             print('TRUESMOKING::Find Smokable')
             self:findSmokable(player)
         elseif o.isSmoking and key == self.Config.keyStopSmoke then
-            o.Smokable:putOut()
+            ts.Smokable:putOut()
         elseif not o.isSmoking and key == self.Config.keyStopSmoke and o.mask and self.Options.ManageHeadGear then
             self:equipItem(player, o.mask, false)
         end
@@ -388,12 +393,13 @@ end
 
 TrueSmoking.start = function(playerNum, player)
     local o = TrueSmoking:getModData(player)
+    local ts = TrueSmoking:getPlayerReference(player)
 
     o.eatSound = ''
     o.lightingEatSound = ''
 
-    o.Smokable = {}
-    o.Smokable.smokeLit = false
+    ts.Smokable = {}
+    ts.Smokable.smokeLit = false
 
     -- 460 is vanilla
     TrueSmoking.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 460 or 220
@@ -401,12 +407,12 @@ TrueSmoking.start = function(playerNum, player)
     local function keyWrapper(key)
         TrueSmoking:onKeyStartPressed(key)
     end
-    o.keyWrapper = keyWrapper
+    ts.keyWrapper = keyWrapper
 
     local function contextWrapper(player, context, items)
         TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
-    o.contextWrapper = contextWrapper
+    ts.contextWrapper = contextWrapper
 
     if player:getModData().Smokable then
         local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
@@ -427,33 +433,36 @@ TrueSmoking.start = function(playerNum, player)
         o.NicotineGameTimeWrapper = nicotineGameTimeWrapper
     end
 
-    Events.OnKeyStartPressed.Add(o.keyWrapper)
-    Events.OnFillInventoryObjectContextMenu.Add(o.contextWrapper)
+    o.isSmoking = false
+
+    player:transmitModData()
+    Events.OnKeyStartPressed.Add(ts.keyWrapper)
+    Events.OnFillInventoryObjectContextMenu.Add(ts.contextWrapper)
 end
 
 TrueSmoking.stop = function(player)
     local o = TrueSmoking:getModData(player)
+    local ts = TrueSmoking:getPlayerReference(player)
 
-    if o.Smokable.smokeLit then
-        o.Smokable:stop()
+    if ts.Smokable.smokeLit then
+        ts.Smokable:stop()
     end
 
-    o.SmokingMoodle = nil
     o.Smokable = nil
 
-    if o.keyWrapper then
-        Events.OnKeyStartPressed.Remove(o.keyWrapper)
-        o.keyWrapper = nil
+    if ts.keyWrapper then
+        Events.OnKeyStartPressed.Remove(ts.keyWrapper)
+        ts.keyWrapper = nil
     end
 
-    if o.contextWrapper then
-        Events.OnFillInventoryObjectContextMenu.Remove(o.contextWrapper)
-        o.contextWrapper = nil
+    if ts.contextWrapper then
+        Events.OnFillInventoryObjectContextMenu.Remove(ts.contextWrapper)
+        ts.contextWrapper = nil
     end
 
-    if o.NicotineGameTimeWrapper then
-        Events.EveryOneMinute.Remove(o.NicotineGameTimeWrapper)
-        o.NicotineGameTimeWrapper = nil
+    if ts.NicotineGameTimeWrapper then
+        Events.EveryOneMinute.Remove(ts.NicotineGameTimeWrapper)
+        ts.NicotineGameTimeWrapper = nil
     end
 end
 

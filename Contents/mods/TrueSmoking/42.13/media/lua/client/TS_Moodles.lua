@@ -2,7 +2,7 @@ require ' MF_ISMoodle'
 require 'TrueSmoking'
 
 local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
-MF.createMoodle(moodleID)
+MF.createMoodle('TS_Smoking_New')
 MF.createMoodle('TS_Nicotine')
 
 local tsDebug = TrueSmoking.tsDebug
@@ -10,21 +10,25 @@ local tsDebug = TrueSmoking.tsDebug
 function TrueSmoking.updateSmokingMoodle(player)
     local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
     local playerNum = player:getPlayerNum()
-    local moodle = MF.getMoodle(moodleID, playerNum)
-    if moodle == nil then return end
+    local moodle = MF.getMoodle('TS_Smoking_New', playerNum)
+    if moodle == nil then
+        -- tsDebug('TRUESMOKING::No smoking moodle found for player')
+        return
+    end
 
     local data = TrueSmoking:getModData(playerNum)
     if data == nil then
-        print('TRUESMOKING::No mod data found for player, cannot update smoking moodle')
+        -- print('TRUESMOKING::No mod data found for player, cannot update smoking moodle')
         return
     end
 
-    local item = data.Smokable
-    local smokeLit = item.smokeLit
-    if not item.smokeLength then
-        print('TRUESMOKING::No smokeLength found on smokable item, cannot update moodle')
+    local ts = TrueSmoking:getPlayerReference(playerNum)
+    local item = ts.Smokable
+    if not item or not item.smokeLength then
+        -- print('TRUESMOKING::No item found on smokable item, cannot update moodle')
         return
     end
+    local smokeLit = item.smokeLit
     local percent = item.smokeLength and (item.smokeLength / item.originalSmokeLength) or 0
     local percentVal = tonumber(percent) or 0
     local displayedPercentage = string.format('%.1f%%', percentVal * 100)
@@ -91,8 +95,8 @@ function TrueSmoking.updateSmokingMoodle(player)
         moodle:getLevel(),
         getText('Moodles_smoking_Custom', smokeLitText, estimate) .. debugInfo
     )
-    tsDebug('TRUESMOKING::Updated smoking moodle - smokeLit: ' .. tostring(smokeLit) ..
-        ', percent: ' .. tostring(displayedPercentage) .. ', estimate: ' .. tostring(estimate))
+    -- tsDebug('TRUESMOKING::Updated smoking moodle - smokeLit: ' .. tostring(smokeLit) ..
+    --     ', percent: ' .. tostring(displayedPercentage) .. ', estimate: ' .. tostring(estimate))
 end
 
 function TrueSmoking.smokingDebugInfo(item)

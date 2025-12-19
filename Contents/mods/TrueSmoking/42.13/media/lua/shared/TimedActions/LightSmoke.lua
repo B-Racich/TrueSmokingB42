@@ -1,4 +1,6 @@
 require 'TimedActions/ISBaseTimedAction'
+require 'TrueSmoking'
+require 'Smokable'
 
 LightSmoke = ISBaseTimedAction:derive('LightSmoke')
 
@@ -65,6 +67,13 @@ function LightSmoke:start()
         self.item:setJobType(getText('ContextMenu_Eat'));
     end
 
+    local hasPrimary = self.character:getPrimaryHandItem()
+    if hasPrimary then
+        self:setOverrideHandModels(hasPrimary, self.item)
+    else
+        self:setOverrideHandModels(nil, self.item)
+    end
+
     self:setAnimVariable('FoodType', self.item:getEatType());
     self:setActionAnim(CharacterActionAnims.Eat);
     print('TRUESMOKING::LightSmoke started end')
@@ -88,24 +97,45 @@ function LightSmoke:perform()
     if self.eatAudio ~= 0 and self.character:getEmitter():isPlaying(self.eatAudio) then
         self.character:stopOrTriggerSound(self.eatAudio);
     end
-    -- self.container:setDrawDirty(true);
 
+    -- self.container:setDrawDirty(true);
+    local data = TrueSmoking:getModData(self.character)
+    data.isSmoking = true
+    -- data.Smokable = Smokable:start(self.character, self.item)
+
+    local ts = TrueSmoking:getPlayerReference(self.character)
+    ts.Smokable = Smokable:start(self.character, self.item)
+    self.character:transmitModData()
+    -- Smokable:equipVisualItem(self.character, self.item)
+    -- triggerEvent('OnClothingUpdated', self.character)
+    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem', { self.item })
     ISBaseTimedAction.perform(self)
 end
 
 function LightSmoke:complete()
     print('TRUESMOKING::LightSmoke complete')
-    local smokable = Smokable:new(self.character, self.item, self.data)
-    self.data.Smokable = smokable
-    smokable:start()
+    -- local smokable = Smokable:new(self.character, self.item)
+    -- -- local data = TrueSmoking:getModData(self.character)
+    -- local data = self.data
+    -- if not data or not data.Smokable then
+    --     data.Smokable = {}
+    -- end
+    -- data.Smokable = smokable
+    -- self.character:transmitModData()
+    -- smokable:start()
+    -- Smokable:start(self.character, self.item)
+    -- Smokable:equipVisualItem(self.character, self.item)
+    -- triggerEvent('OnClothingUpdated', self.character)
+
+    print('TRUESMOKING::Set isSmoking to true in LightSmoke complete')
     return true
 end
 
 function LightSmoke:getDuration()
-     if self.character:isTimedActionInstant() then
+    if self.character:isTimedActionInstant() then
         return 1
     end
-    return 460
+    return 240
 end
 
 function LightSmoke:new(character, item)
@@ -117,7 +147,7 @@ function LightSmoke:new(character, item)
 
     o.character = character
     o.item = item
-    o.data = TrueSmoking:getModData(character)
+    -- o.data = data
 
     o.eatSound = o.item:getCustomEatSound() or ''
     o.eatAudio = 0

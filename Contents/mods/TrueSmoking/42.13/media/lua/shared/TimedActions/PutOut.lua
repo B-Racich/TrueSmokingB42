@@ -1,10 +1,12 @@
 require 'TimedActions/ISBaseTimedAction'
+require 'TrueSmoking'
+require 'Smokable'
 
 PutOut = ISBaseTimedAction:derive('PutOut')
 
 function PutOut:isValid()
     --Check if we have a smoke lit
-    return self.table.isSmoking
+    return self.data.isSmoking
 end
 
 function PutOut:update()
@@ -12,7 +14,8 @@ function PutOut:update()
     local curTime = os.time()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            self.smokable:removeVisualItem()
+            -- Smokable:removeVisualItem(self.character)
+            sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
             if hasPrimary then
@@ -33,7 +36,7 @@ function PutOut:waitToStart()
     --Wait for timed actions to finish
     if self.character:isStrafing() or self.character:isRunning() or self.character:isSprinting() or self.character:isAiming()
         or self.character:isAsleep() or self.character:isPerformingAnAction() then
-            return true
+        return true
     else
         return false
     end
@@ -47,7 +50,7 @@ function PutOut:start()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable('FoodType', self.item:getEatType())
-        self:setOverrideHandModels(nil, self.item)
+    self:setOverrideHandModels(nil, self.item)
 
     if self.eatSound ~= '' then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
@@ -56,34 +59,44 @@ end
 
 function PutOut:stop()
     ISBaseTimedAction.stop(self)
-    -- If we are cancelling the action and the smoke is finished just get rid of it
-    if self.item:getModData().SmokeLength <= 0 then
-        self.smokable:stop()
+    local data = TrueSmoking:getModData(self.character)
+    local ts = TrueSmoking:getPlayerReference(self.character)
+    -- if data and self.item:getModData().SmokeLength <= 0 then
+    if ts then
+        sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
+        ts.Smokable:stop()
     end
-    self:forceComplete()
+    -- end
+    -- If we are cancelling the action and the smoke is finished just get rid of it
+    -- self:forceComplete()
+end
+
+function PutOut:serverStop()
+
 end
 
 function PutOut:complete()
-    self.smokable:stop()
     return true
 end
 
 function PutOut:perform()
+    local data = TrueSmoking:getModData(self.character)
+    local ts = TrueSmoking:getPlayerReference(self.character)
+    data.isSmoking = false
+    if ts then
+        ts.Smokable:stop()
+    end
+    sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
+    self.character:transmitModData()
     ISBaseTimedAction.perform(self)
 end
 
-function PutOut:new(character)
-    local o = {
-        stopOnWalk = false,
-        stopOnRun = true,
-        stopOnAim = true,
-        forceProgressBar = false,
-        character = character,
-    }
+function PutOut:new(character, item)
+    local o = ISBaseTimedAction.new(self, character)
 
-    o.table = TrueSmoking:getPlayerReference(character)
-    o.smokable = o.table.Smokable
-    o.item = o.table.Smokable.item
+    o.character = character
+    o.data = TrueSmoking:getModData(character)
+    o.item = item
     o.maxTime = 120
 
     o.eatSound = o.item:getCustomEatSound() or ''
@@ -91,9 +104,6 @@ function PutOut:new(character)
 
     o.visualItemTimer = 0.7
     o.visualItemFlag = false
-
-    setmetatable(o, self)
-    self.__index = self
 
     return o
 end

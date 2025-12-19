@@ -1,3 +1,6 @@
+require 'TrueSmoking'
+require 'Smokable'
+
 NicotineSystem = NicotineSystem or {}
 NicotineSystem.__index = NicotineSystem
 
@@ -34,7 +37,7 @@ NicotineSystem.Config = {
     HUNGER_FROM_NICOTINE            = 0.00115,
     STRESS_FROM_NICOTINE            = 0.00012,
 
-    OVERFLOW_LEAK_RATE            = 0.05,
+    OVERFLOW_LEAK_RATE              = 0.05,
 }
 
 local tsDebug = TrueSmoking.tsDebug
@@ -65,10 +68,10 @@ function NicotineSystem:UpdateDynamicConfig(player)
     local passiveDaily                            = 3.0 / daysToAddict
     self.Config.ADDICTION_GAIN_PER_MINUTE         = math.max(0.00001, passiveDaily / 1440)
 
-    local minutesToPeak = daysToPeak * 24 * 60
-    local basePeakGain  = 100 / minutesToPeak
+    local minutesToPeak                           = daysToPeak * 24 * 60
+    local basePeakGain                            = 100 / minutesToPeak
 
-    self.Config.WITHDRAWAL_PEAK_GAIN_PER_MINUTE = basePeakGain / 1.5
+    self.Config.WITHDRAWAL_PEAK_GAIN_PER_MINUTE   = basePeakGain / 1.5
 end
 
 function NicotineSystem:initialize(player)
@@ -76,29 +79,31 @@ function NicotineSystem:initialize(player)
     if not data.nicotineSystem then
         tsDebug('Initializing Nicotine System for player ' .. tostring(player:getDisplayName()))
         data.nicotineSystem = {
-            nicotineLevel   = 0,
-            addictionLevel  = player:hasTrait(CharacterTrait.SMOKER) and self.Config.SMOKER_TRAIT_GAIN_THRESHOLD * 1.2 or 0,
-            withdrawalLevel = player:hasTrait(CharacterTrait.SMOKER) and 35 or 0,
-            AddictionTime   = 0,
-            nicotineTime    = 0,
-            unhappinessCap  = 0,
-            boredomCap      = 0,
+            nicotineLevel    = 0,
+            addictionLevel   = player:hasTrait(CharacterTrait.SMOKER) and self.Config.SMOKER_TRAIT_GAIN_THRESHOLD * 1.2 or
+            0,
+            withdrawalLevel  = player:hasTrait(CharacterTrait.SMOKER) and 35 or 0,
+            AddictionTime    = 0,
+            nicotineTime     = 0,
+            unhappinessCap   = 0,
+            boredomCap       = 0,
             nicotineOverflow = 0,
         }
     else
         local defaults = {
-            nicotineLevel   = 0,
-            addictionLevel  = 0,
-            withdrawalLevel = 0,
-            AddictionTime   = 0,
-            nicotineTime    = 0,
-            unhappinessCap  = 0,
-            boredomCap      = 0,
+            nicotineLevel    = 0,
+            addictionLevel   = 0,
+            withdrawalLevel  = 0,
+            AddictionTime    = 0,
+            nicotineTime     = 0,
+            unhappinessCap   = 0,
+            boredomCap       = 0,
             nicotineOverflow = 0,
         }
         for field, defaultValue in pairs(defaults) do
             if data.nicotineSystem[field] == nil then
-                tsDebug('Setting missing field "' .. field .. '" to default value for player ' .. tostring(player:getDisplayName()))
+                tsDebug('Setting missing field "' ..
+                field .. '" to default value for player ' .. tostring(player:getDisplayName()))
                 data.nicotineSystem[field] = defaultValue
             end
         end
@@ -131,14 +136,13 @@ function NicotineSystem:GameTimeUpdate(player)
         data.nicotineLevel = math.max(0, data.nicotineLevel)
         if data.nicotineOverflow > 0 then
             local leakAmount = data.nicotineOverflow * self.Config.OVERFLOW_LEAK_RATE
-            if data.nicotineLevel + leakAmount > 100 then
-                leakAmount = 100 - data.nicotineLevel
-                data.nicotineLevel = 100
+            local availableSpace = 100 - data.nicotineLevel
+
+            if availableSpace > 0 then
+                leakAmount = math.min(leakAmount, availableSpace) -- Don't exceed capacity
                 data.nicotineLevel = math.min(100, data.nicotineLevel + leakAmount)
-            else
-                data.nicotineLevel = data.nicotineLevel + leakAmount
+                data.nicotineOverflow = math.max(0, data.nicotineOverflow - leakAmount)
             end
-            data.nicotineOverflow = data.nicotineOverflow - leakAmount
         end
     end
 
@@ -164,10 +168,12 @@ function NicotineSystem:GameTimeUpdate(player)
         data.boredomCap = boredomCap
 
         if stats:get(CharacterStat.UNHAPPINESS) < unhappinessCap then
-            stats:set(CharacterStat.UNHAPPINESS, math.min(unhappinessCap, stats:get(CharacterStat.UNHAPPINESS) + self.Config.UNHAPPYNESS_FROM_WITHDRAWAL))
+            stats:set(CharacterStat.UNHAPPINESS,
+                math.min(unhappinessCap, stats:get(CharacterStat.UNHAPPINESS) + self.Config.UNHAPPYNESS_FROM_WITHDRAWAL))
         end
         if stats:get(CharacterStat.BOREDOM) < boredomCap then
-            stats:set(CharacterStat.BOREDOM, math.min(boredomCap, stats:get(CharacterStat.BOREDOM) + self.Config.BOREDOM_FROM_WITHDRAWAL))
+            stats:set(CharacterStat.BOREDOM,
+                math.min(boredomCap, stats:get(CharacterStat.BOREDOM) + self.Config.BOREDOM_FROM_WITHDRAWAL))
         end
 
         local intensityMultiplier = 1.0 + (data.addictionLevel / 100) * 0.5
@@ -190,7 +196,7 @@ function NicotineSystem:GameTimeUpdate(player)
     end
 
     if data.nicotineLevel > 5 then
-        local strength = math.min(data.nicotineLevel / 100, 1.0) -- 0–1 scale
+        local strength = math.min(data.nicotineLevel / 100, 1.0)              -- 0–1 scale
 
         local fatigueReduction = self.Config.FATIGUE_FROM_NICOTINE * strength -- ~0.025 per minute at full nicotine
         stats:set(CharacterStat.FATIGUE, math.max(0, stats:get(CharacterStat.FATIGUE) - fatigueReduction))
@@ -199,7 +205,10 @@ function NicotineSystem:GameTimeUpdate(player)
         stats:set(CharacterStat.HUNGER, math.max(0, stats:get(CharacterStat.HUNGER) - hungerReduction))
 
         if stats:get(CharacterStat.STRESS) > 0 then
-            stats:set(CharacterStat.STRESS, math.max(0, (stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL)) - (self.Config.STRESS_FROM_NICOTINE * strength)))
+            stats:set(CharacterStat.STRESS,
+                math.max(0,
+                    (stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL)) -
+                    (self.Config.STRESS_FROM_NICOTINE * strength)))
         end
     end
 

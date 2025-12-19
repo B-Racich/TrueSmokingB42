@@ -57,13 +57,13 @@ function ISEatFoodAction:new(character, item, percentage)
 
     o = originalActionNew(self, character, item, percentage)
 
-    local table = TrueSmoking:getModData(character)
+    local data = TrueSmoking:getModData(character)
 
     if (TrueSmoking.isInList(onEat, funcsToHook) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         print('TRUESMOKING::Checking item onEat: ' .. onEat)
         print('TRUESMOKING::Item ID: ' .. item:getID())
 
-        if not table.isSmoking then
+        if not data.isSmoking then
             print('TRUESMOKING::Hooking: ' .. onEat)
             local replace = item:getReplaceOnUseFullType()
 
