@@ -3,7 +3,7 @@ if getActivatedMods():contains('\\N&CsNarcotics') then
         --Use the smokable player ref to ensure we are affecting the right local player (splitscreen)
         local player = smokable.player
         local WeedEffect = 19 --Max weed effect we can accumulate
-        local PotHead = player:hasTrait("PotHead") and 216 or 100
+        local PotHead = player:hasTrait('PotHead') and 216 or 100
         --This is how much of the smoke (%) is consumed per tick, scale our changes by this
         local percent = smokable.puffPercent
         if player:getModData().NnCTenMinutesPotHead == nil then

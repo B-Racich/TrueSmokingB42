@@ -1,4 +1,4 @@
-if getActivatedMods():contains("\\B42Hemp&Tobacco") then
+if getActivatedMods():contains('\\B42Hemp&Tobacco') then
     Events.OnCreatePlayer.Add(function()
         local smokableObjects = {
             -- Hemp & Tobacco items

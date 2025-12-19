@@ -101,17 +101,17 @@ function TrueSmoking.getPlayerState(player)
 end
 
 function TrueSmoking.isInList(str, list)
-    if str == "" then
+    if str == '' then
         return false
     end
-    local listString = table.concat(list, ",")
+    local listString = table.concat(list, ',')
     return string.find(listString, str) ~= nil
 end
 
 function TrueSmoking.deepCopy(original)
     local copy = {}
     for key, value in pairs(original) do
-        if type(value) == "table" then
+        if type(value) == 'table' then
             copy[key] = TrueSmoking.deepCopy(value) -- Recursively copy nested tables
         else
             copy[key] = value                       -- Copy primitive values directly
@@ -122,15 +122,16 @@ end
 
 function TrueSmoking.addOnUseItem(player)
     local trueSmoking = TrueSmoking:getPlayerReference(player)
-    local type = trueSmoking.Smokable.fullType
-    local item = trueSmoking.Smokable.replaceOnUse
-    local base = type:match("^[^.]+")
+    local table = TrueSmoking:getPlayerReference(player)
+    local type = table.Smokable.fullType
+    local item = table.Smokable.replaceOnUse
+    local base = type:match('^[^.]+')
     if base then
         local str = base .. '.' .. item
         if item and item ~= '' then
             print('TRUESMOKING::add item: ' .. str)
             player:getInventory():AddItem(str)
-            trueSmoking.Smokable.replaceOnUse = ''
+            table.Smokable.replaceOnUse = ''
         end
     end
 end
@@ -161,7 +162,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
     local function adjustStat(stat, value, name, add)
         local name = name or 'nil'
         local newStat = stat - math.abs(value)
-        -- print(string.format("Name: %s | Stat: %s | Value: %s | New Value: %s", name, stat, value, newStat))
+        -- print(string.format('Name: %s | Stat: %s | Value: %s | New Value: %s', name, stat, value, newStat))
         if newStat < 0 then
             newStat = 0
         end
@@ -178,7 +179,7 @@ function TrueSmoking.OnEat_ItemStats(smokable)
         temp = smokable.originalBoredom * percent
         stats:set(CharacterStat.BOREDOM, adjustStat(stats:get(CharacterStat.BOREDOM), temp - ZomboidGlobals.BoredomIncrease, 'boredom'))
         smokable.boredom = smokable.boredom - temp
-        -- print(string.format("Smokable boredom: %s | temp: %s", smokable.boredom, temp))
+        -- print(string.format('Smokable boredom: %s | temp: %s', smokable.boredom, temp))
         if smokable.boredom > 0 then
             smokable.boredom = 0
         end

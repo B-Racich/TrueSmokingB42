@@ -1,8 +1,8 @@
-require "TimedActions/ISClothingExtraAction"
+require 'TimedActions/ISClothingExtraAction'
 
-require "TimedActions/ISWearClothing"
+require 'TimedActions/ISWearClothing'
 
-require "TimedActions/ISUnequipAction"
+require 'TimedActions/ISUnequipAction'
 
 require 'TimedActions/ISEatFoodAction'
 
@@ -38,7 +38,7 @@ function ISTakePillAction:new(character, item)
             table.Smokable = Smokable:new(item, character)
             item:getModData().modOnEat = hook
 
-            return LightSmoke:new(character, item, table.Smokable)
+            return LightSmoke:new(character, item)
         end
     end
 
@@ -76,7 +76,7 @@ function ISEatFoodAction:new(character, item, percentage)
             print('TRUESMOKING::Setting up smokable')
             item:getModData().modOnEat = hook
 
-            return LightSmoke:new(character, item, table.Smokable)
+            return LightSmoke:new(character, item)
         end
     end
 

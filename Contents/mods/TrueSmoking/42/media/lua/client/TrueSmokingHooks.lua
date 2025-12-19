@@ -1,4 +1,4 @@
-local InventoryUI = require("Starlit/client/ui/InventoryUI")
+local InventoryUI = require('Starlit/client/ui/InventoryUI')
 
 local remainingSmokeTooltip = function(tooltip, layout, item)
     if item and item:getModData().SmokeLength and item:getModData().OriginalSmokeLength then
@@ -7,7 +7,7 @@ local remainingSmokeTooltip = function(tooltip, layout, item)
         local amt = (current / original)
         amt = amt >= 0 and amt or 0
 
-        InventoryUI.addTooltipBar(layout, "Remaining:", amt)
+        InventoryUI.addTooltipBar(layout, 'Remaining:', amt)
     end
 end
 

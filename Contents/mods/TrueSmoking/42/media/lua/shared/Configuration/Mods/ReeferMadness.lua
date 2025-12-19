@@ -4,7 +4,7 @@
 --         if smokable.item:getOnEat() == 'OnEat_WeedPipe' then
 --             local WeedPipe = 0.2
 --             local player = smokable.player -- The stored player here should also be the correct splitscreen player if present
---             local moodle = MF.getMoodle("ReeferMadness_High", player:getPlayerNum())
+--             local moodle = MF.getMoodle('ReeferMadness_High', player:getPlayerNum())
 --             local currentMoodleValue = moodle:getValue()
 --             --[[
 --                 Here we want to scale the value we are adding by the puffPercent which is calculated every tick we smoke
@@ -18,7 +18,7 @@
 --             if myNewMoodleValue > 0.9 then
 --                 myNewMoodleValue = 0.9
 --             end
---             MF.getMoodle("ReeferMadness_High",playerNum):setValue(myNewMoodleValue)
+--             MF.getMoodle('ReeferMadness_High',playerNum):setValue(myNewMoodleValue)
 --         end
 --     end
 
@@ -26,14 +26,14 @@
 --         if smokable.item:getOnEat() == 'OnEat_WeedJoint' then
 --             local WeedJoint = 0.4
 --             local player = smokable.player
---             local moodle = MF.getMoodle("ReeferMadness_High", player:getPlayerNum())
+--             local moodle = MF.getMoodle('ReeferMadness_High', player:getPlayerNum())
 --             local currentMoodleValue = moodle:getValue()
 --             local additionMoodleValue = (WeedJoint) * smokable.puffPercent
 --             local myNewMoodleValue = math.max(currentMoodleValue + additionMoodleValue)
 --             if myNewMoodleValue > 0.9 then
 --                 myNewMoodleValue = 0.9
 --             end
---             MF.getMoodle("ReeferMadness_High",playerNum):setValue(myNewMoodleValue)
+--             MF.getMoodle('ReeferMadness_High',playerNum):setValue(myNewMoodleValue)
 --         end
 --     end
 

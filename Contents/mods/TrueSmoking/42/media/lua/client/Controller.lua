@@ -42,8 +42,8 @@ end
 function ISButtonPrompt:getBestBButtonAction(dir)
     originalGetBestBButtonAction(self, dir)
 
-    local grab = getText("UI_GrabAndDrop_GrabAction")
-    local drop = getText("UI_GrabAndDrop_DropAction")
+    local grab = getText('UI_GrabAndDrop_GrabAction')
+    local drop = getText('UI_GrabAndDrop_DropAction')
 
     local player = self.player and getSpecificPlayer(self.player)
 
@@ -56,14 +56,14 @@ function ISButtonPrompt:getBestBButtonAction(dir)
     local o = TrueSmoking:getPlayerReference(player)
 
     if o.isSmoking and o.Smokable.smokeLit and not o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_PUFF"), function() o.Smokable:puff() end)
+        self:setBPrompt(getText('UI_TRUESMOKING_PUFF'), function() o.Smokable:puff() end)
     elseif o.isSmoking and not o.Smokable.smokeLit and not o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_RELIGHT"), function() o.Smokable:light() end)
+        self:setBPrompt(getText('UI_TRUESMOKING_RELIGHT'), function() o.Smokable:light() end)
     elseif TrueSmoking.Config.FindSmoke and not o.isSmoking and o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_GET_SMOKE"), function() TrueSmoking:findSmokable(player) end)
+        self:setBPrompt(getText('UI_TRUESMOKING_GET_SMOKE'), function() TrueSmoking:findSmokable(player) end)
     elseif o.isSmoking and o.LB_HELD then
-        self:setBPrompt(getText("UI_TRUESMOKING_PUT_OUT"), function() o.Smokable:putOut() end)
+        self:setBPrompt(getText('UI_TRUESMOKING_PUT_OUT'), function() o.Smokable:putOut() end)
     elseif not o.isSmoking and o.LB_HELD and o.mask and TrueSmoking.Options.ManageHeadGear then
-        self:setBPrompt(getText("UI_TRUESMOKING_PUT_OUT"), function() TrueSmoking:equipItem(player, o.mask, false) end)
+        self:setBPrompt(getText('UI_TRUESMOKING_PUT_OUT'), function() TrueSmoking:equipItem(player, o.mask, false) end)
     end
 end

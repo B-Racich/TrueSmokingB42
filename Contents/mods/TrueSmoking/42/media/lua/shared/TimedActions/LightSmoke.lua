@@ -1,6 +1,6 @@
-require "TimedActions/ISBaseTimedAction"
+require 'TimedActions/ISBaseTimedAction'
 
-LightSmoke = ISBaseTimedAction:derive("LightSmoke")
+LightSmoke = ISBaseTimedAction:derive('LightSmoke')
 
 function LightSmoke:isValidStart()
     return true
@@ -15,7 +15,7 @@ function LightSmoke:isValid()
 end
 
 function LightSmoke:update()
-    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+    if self.eatSound ~= '' and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
         --        self.eatAudio = getSoundManager():PlayWorldSoundWav( self.eatSound, self.character:getCurrentSquare(), 0.5, 2, 0.5, true);
     end
@@ -62,10 +62,10 @@ function LightSmoke:start()
     if self.item:getCustomMenuOption() then
         self.item:setJobType(self.item:getCustomMenuOption())
     else
-        self.item:setJobType(getText("ContextMenu_Eat"));
+        self.item:setJobType(getText('ContextMenu_Eat'));
     end
 
-    self:setAnimVariable("FoodType", self.item:getEatType());
+    self:setAnimVariable('FoodType', self.item:getEatType());
     self:setActionAnim(CharacterActionAnims.Eat);
     print('TRUESMOKING::LightSmoke started end')
 end
@@ -95,10 +95,15 @@ end
 
 function LightSmoke:complete()
     print('TRUESMOKING::LightSmoke complete')
+    local smokable = Smokable:new(self.character, self.item, self.table)
     local table = TrueSmoking:getPlayerReference(self.character)
-    local smokable = Smokable:new(self.item, self.character)
     table.Smokable = smokable
     smokable:start()
+    local function updateWrapper()
+        print('TRUESMOKING::Smokable add update wrapper tick')
+        smokable:update()
+    end
+    Events.OnPlayerUpdate.Add(updateWrapper)
     return true
 end
 
@@ -109,7 +114,7 @@ function LightSmoke:getDuration()
     return 460
 end
 
-function LightSmoke:new(character, item, smokable)
+function LightSmoke:new(character, item)
     local o = ISBaseTimedAction.new(self, character)
     o.stopOnWalk = false
     o.stopOnRun = true
@@ -117,7 +122,7 @@ function LightSmoke:new(character, item, smokable)
     o.forceProgressBar = false
 
     -- o.table = TrueSmoking:getPlayerReference(character)
-    o.smokable = smokable
+    o.table = TrueSmoking:getPlayerReference(character)
     o.item = item
     o.character = character
 

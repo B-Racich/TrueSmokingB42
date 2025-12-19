@@ -157,7 +157,7 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
             if (fullType == covered and putDown) or (fullType == open and not putDown) then
                 print(string.format('TRUESMOKING::Adjusted Shegmah: %s - putDown: %s - setTo: %s', fullType,
                     putDown and 'true' or 'false', setTo))
-                ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo, 30))
+                ISTimedActionQueue.add(ISClothingExtraAction:new(player, item, setTo))
                 return true
             end
         end
@@ -191,6 +191,22 @@ end
 
 function TrueSmoking:getPlayerReference(player)
     local num = player
+    if type(player) ~= 'number' then
+        num = player:getPlayerNum()
+    end
+
+    if not num or not getSpecificPlayer(num) then return end
+    print('TRUESMOKING::Getting player reference for player num: ' .. tostring(num))
+    local md = getSpecificPlayer(num):getModData()
+    if not md.TrueSmoking then
+        md.TrueSmoking = {}
+    end
+
+    return md.TrueSmoking
+end
+
+function TrueSmoking:getPlayerTable(player)
+local num = player
     if type(player) ~= 'number' then
         num = player:getPlayerNum()
     end
@@ -279,13 +295,13 @@ function TrueSmoking:findSmokable(player)
 
     --[[
     for i, v in ipairs(itemData.packed.favorite) do
-        print("Packed Favorite:", v:getFullType())
+        print('Packed Favorite:', v:getFullType())
     end
     for i, v in ipairs(itemData.packed.nonfavorite) do
-        print("Packed Nonfavorite:", v:getFullType())
+        print('Packed Nonfavorite:', v:getFullType())
     end
     for i, v in ipairs(itemData.smokable) do
-        print("Smokable:", v:getFullType())
+        print('Smokable:', v:getFullType())
     end
     --]]
 
@@ -351,18 +367,19 @@ end
 
 function TrueSmoking:onKeyStartPressed(key)
     -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
-    local o = self.Player_1
+    local table = self.Player_1
+    local o = TrueSmoking:getPlayerReference(0)
     local player = getSpecificPlayer(0) -- Player_0 is always keyboard
     if player then
-        if o.isSmoking and o.Smokable.smokeLit and key == self.Config.keySmoke then
-            o.Smokable:puff()
-        elseif o.isSmoking and not o.Smokable.smokeLit and key == self.Config.keySmoke then
-            o.Smokable:light()
+        if o.isSmoking and table.Smokable.smokeLit and key == self.Config.keySmoke then
+            table.Smokable:puff()
+        elseif o.isSmoking and not table.Smokable.smokeLit and key == self.Config.keySmoke then
+            table.Smokable:light()
         elseif self.Config.FindSmoke and not o.isSmoking and key == self.Config.keySmoke then
             print('TRUESMOKING::Find Smokable')
             self:findSmokable(player)
         elseif o.isSmoking and key == self.Config.keyStopSmoke then
-            o.Smokable:putOut()
+            table.Smokable:putOut()
         elseif not o.isSmoking and key == self.Config.keyStopSmoke and o.mask and self.Options.ManageHeadGear then
             self:equipItem(player, o.mask, false)
         end
@@ -391,16 +408,18 @@ end
 
 TrueSmoking.start = function(playerNum, player)
     local o = TrueSmoking:getPlayerReference(player)
+    local table = TrueSmoking:getPlayerReference(player)
 
     o.eatSound = ''
     o.lightingEatSound = ''
 
-    o.Smokable = {}
-    o.Smokable.smokeLit = false
+    table.Smokable = {}
+    table.Smokable.smokeLit = false
 
-    o.SmokingMoodle = SmokingMoodle:new(o, playerNum)
-    o.NicotineMoodle = NicotineMoodle:new(o, playerNum)
-    o.NicotineMoodle:start()
+    table.SmokingMoodle = SmokingMoodle:new(playerNum)
+    table.NicotineMoodle = NicotineMoodle:new(playerNum)
+    table.SmokingMoodle:start()
+    table.NicotineMoodle:start()
 
     -- 460 is vanilla
     TrueSmoking.lightTime = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 460 or 220
@@ -440,16 +459,17 @@ end
 
 TrueSmoking.stop = function(player)
     local o = TrueSmoking:getPlayerReference(player)
+    local table = TrueSmoking:getPlayerReference(player)
 
-    o.SmokingMoodle:stop()
-    o.NicotineMoodle:stop()
+    table.SmokingMoodle:stop()
+    table.NicotineMoodle:stop()
 
-    if o.Smokable.smokeLit then
-        o.Smokable:stop()
+    if table.Smokable.smokeLit then
+        table.Smokable:stop()
     end
 
-    o.SmokingMoodle = nil
-    o.Smokable = nil
+    table.SmokingMoodle = nil
+    table.Smokable = nil
 
     if o.keyWrapper then
         Events.OnKeyStartPressed.Remove(o.keyWrapper)
@@ -467,7 +487,7 @@ TrueSmoking.stop = function(player)
     end
 end
 
-local group = BodyLocations.getGroup("Human")
+local group = BodyLocations.getGroup('Human')
 group:getOrCreateLocation(TrueSmoking.registries.mask)
 
 Events.OnCreatePlayer.Add(TrueSmoking.start)
@@ -554,15 +574,15 @@ Events.OnInitGlobalModData.Add(function()
             sprintingFactor = opt.Global.sprintingFactor,
         }
 
-        opt[catName .. "Length"] = len
+        opt[catName .. 'Length'] = len
     end
 
-    spoofCategory("Cigarette")
-    spoofCategory("RolledCigarette")
-    spoofCategory("Cigarillo")
-    spoofCategory("Cigar")
-    spoofCategory("Pipe")
-    spoofCategory("Can")
+    spoofCategory('Cigarette')
+    spoofCategory('RolledCigarette')
+    spoofCategory('Cigarillo')
+    spoofCategory('Cigar')
+    spoofCategory('Pipe')
+    spoofCategory('Can')
 
     opt.ManageHeadGear          = sandbox.ManageHeadGear
     opt.SmokeRelighting         = sandbox.SmokeRelighting

@@ -1,7 +1,7 @@
 if getActivatedMods():contains('\\jiggasGreenfireMod') then
     function SmokeHalfWeed(char)
         if char == nil then return end
-        if getActivatedMods():contains("jiggasAddictionMod") then
+        if getActivatedMods():contains('jiggasAddictionMod') then
             if char:getModData().potcount == nil then
                 char:getModData().potcount = 0;
             end
@@ -20,7 +20,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
     -- Partial versions for gradual effect application
     function SmokeKiefPartial(char, percent)
         if char == nil then return end
-        if getActivatedMods():contains("jiggasAddictionMod") then
+        if getActivatedMods():contains('jiggasAddictionMod') then
             if char:getModData().potcount == nil then
                 char:getModData().potcount = 0;
             end
@@ -38,7 +38,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
 
     function SmokeHashPartial(char, percent)
         if char == nil then return end
-        if getActivatedMods():contains("jiggasAddictionMod") then
+        if getActivatedMods():contains('jiggasAddictionMod') then
             if char:getModData().potcount == nil then
                 char:getModData().potcount = 0;
             end
@@ -56,7 +56,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
 
     function SmokeWeedPartial(char, percent)
         if char == nil then return end
-        if getActivatedMods():contains("jiggasAddictionMod") then
+        if getActivatedMods():contains('jiggasAddictionMod') then
             if char:getModData().potcount == nil then
                 char:getModData().potcount = 0;
             end
@@ -74,7 +74,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
 
     function SmokeHalfWeedPartial(char, percent)
         if char == nil then return end
-        if getActivatedMods():contains("jiggasAddictionMod") then
+        if getActivatedMods():contains('jiggasAddictionMod') then
             if char:getModData().potcount == nil then
                 char:getModData().potcount = 0;
             end
@@ -121,10 +121,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Weed" }
-                    halfItem = "Greenfire.HalfBlunt"
+                    smokeTypes = { 'Weed' }
+                    halfItem = 'Greenfire.HalfBlunt'
                 else
-                    smokeTypes = { "Kief" }
+                    smokeTypes = { 'Kief' }
                 end
                 return {
                     bonus = bonus,
@@ -147,7 +147,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 15 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Weed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Weed' }, halfItem = nil }
             end
         },
         ['Greenfire.MixedBlunt'] = {
@@ -180,10 +180,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "HalfWeed" }
-                    halfItem = "Greenfire.HalfMixedBlunt"
+                    smokeTypes = { 'HalfWeed' }
+                    halfItem = 'Greenfire.HalfMixedBlunt'
                 else
-                    smokeTypes = { "Weed" }
+                    smokeTypes = { 'Weed' }
                 end
                 return {
                     bonus = bonus,
@@ -206,7 +206,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 7.5 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "HalfWeed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'HalfWeed' }, halfItem = nil }
             end
         },
         ['Greenfire.KiefBlunt'] = {
@@ -238,10 +238,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Kief" }
-                    halfItem = "Greenfire.HalfKiefBlunt"
+                    smokeTypes = { 'Kief' }
+                    halfItem = 'Greenfire.HalfKiefBlunt'
                 else
-                    smokeTypes = { "Hash" }
+                    smokeTypes = { 'Hash' }
                 end
                 return {
                     bonus = bonus,
@@ -264,7 +264,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 30 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Kief" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Kief' }, halfItem = nil }
             end
         },
         ['Greenfire.HashBlunt'] = {
@@ -296,10 +296,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Kief", "Weed" }
-                    halfItem = "Greenfire.HalfHashBlunt"
+                    smokeTypes = { 'Kief', 'Weed' }
+                    halfItem = 'Greenfire.HalfHashBlunt'
                 else
-                    smokeTypes = { "Hash", "Kief" }
+                    smokeTypes = { 'Hash', 'Kief' }
                 end
                 return {
                     bonus = bonus,
@@ -322,7 +322,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 45 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Kief", "Weed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Kief', 'Weed' }, halfItem = nil }
             end
         },
         ['Greenfire.SpaceBlunt'] = {
@@ -353,10 +353,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Hash", "Hash" }
-                    halfItem = "Greenfire.HalfSpaceBlunt"
+                    smokeTypes = { 'Hash', 'Hash' }
+                    halfItem = 'Greenfire.HalfSpaceBlunt'
                 else
-                    smokeTypes = { "Hash" }
+                    smokeTypes = { 'Hash' }
                 end
                 return {
                     bonus = bonus,
@@ -377,7 +377,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 50
                 local stonerbonus = 100 / 3
                 if traits.Lucky then stonerbonus = 50 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Hash" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Hash' }, halfItem = nil }
             end
         },
         ['Greenfire.Joint'] = {
@@ -403,10 +403,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     if traits.Lucky then stonerbonus = 20 elseif traits.Unlucky then stonerbonus = 0 end
                 end
                 if smokedhalf then
-                    smokeTypes = { "HalfWeed" }
-                    halfItem = "Greenfire.HalfJoint"
+                    smokeTypes = { 'HalfWeed' }
+                    halfItem = 'Greenfire.HalfJoint'
                 else
-                    smokeTypes = { "Weed" }
+                    smokeTypes = { 'Weed' }
                 end
                 return {
                     bonus = bonus,
@@ -429,7 +429,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 7.5 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "HalfWeed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'HalfWeed' }, halfItem = nil }
             end
         },
         ['Greenfire.KiefJoint'] = {
@@ -461,10 +461,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Weed", "HalfWeed" }
-                    halfItem = "Greenfire.HalfKiefJoint"
+                    smokeTypes = { 'Weed', 'HalfWeed' }
+                    halfItem = 'Greenfire.HalfKiefJoint'
                 else
-                    smokeTypes = { "Kief", "Weed" }
+                    smokeTypes = { 'Kief', 'Weed' }
                 end
                 return {
                     bonus = bonus,
@@ -487,7 +487,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 22.5 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Weed", "HalfWeed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Weed', 'HalfWeed' }, halfItem = nil }
             end
         },
         ['Greenfire.HashJoint'] = {
@@ -519,10 +519,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Kief", "HalfWeed" }
-                    halfItem = "Greenfire.HalfHashJoint"
+                    smokeTypes = { 'Kief', 'HalfWeed' }
+                    halfItem = 'Greenfire.HalfHashJoint'
                 else
-                    smokeTypes = { "Weed", "Hash" }
+                    smokeTypes = { 'Weed', 'Hash' }
                 end
                 return {
                     bonus = bonus,
@@ -545,7 +545,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 37.5 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Kief", "HalfWeed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Kief', 'HalfWeed' }, halfItem = nil }
             end
         },
         ['Greenfire.WeedBong'] = {
@@ -557,7 +557,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 40
                 local stonerbonus = 20 / 3
                 if traits.Lucky then stonerbonus = 15 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Weed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Weed' }, halfItem = nil }
             end
         },
         ['Greenfire.ShakeBong'] = {
@@ -569,7 +569,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 40
                 local stonerbonus = 20 / 3
                 if traits.Lucky then stonerbonus = 15 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Weed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Weed' }, halfItem = nil }
             end
         },
         ['Greenfire.WeedPipe'] = {
@@ -581,7 +581,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 40
                 local stonerbonus = 20 / 3
                 if traits.Lucky then stonerbonus = 15 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Weed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Weed' }, halfItem = nil }
             end
         },
         ['Greenfire.ShakePipe'] = {
@@ -593,7 +593,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 40
                 local stonerbonus = 20 / 3
                 if traits.Lucky then stonerbonus = 15 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Weed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Weed' }, halfItem = nil }
             end
         },
         ['Greenfire.KiefBong'] = {
@@ -605,7 +605,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 80
                 local stonerbonus = 10 + 10 / 3
                 if traits.Lucky then stonerbonus = 30 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Kief" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Kief' }, halfItem = nil }
             end
         },
         ['Greenfire.KiefPipe'] = {
@@ -617,7 +617,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 80
                 local stonerbonus = 10 + 10 / 3
                 if traits.Lucky then stonerbonus = 30 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Kief" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Kief' }, halfItem = nil }
             end
         },
         ['Greenfire.HashBong'] = {
@@ -629,7 +629,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 60
                 local stonerbonus = 20 + 20 / 3
                 if traits.Lucky then stonerbonus = 60 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Hash" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Hash' }, halfItem = nil }
             end
         },
         ['Greenfire.HashPipe'] = {
@@ -641,7 +641,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 60
                 local stonerbonus = 20 + 20 / 3
                 if traits.Lucky then stonerbonus = 60 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Hash" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Hash' }, halfItem = nil }
             end
         },
         ['Greenfire.Spliff'] = {
@@ -653,7 +653,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 local bonus = 20
                 local stonerbonus = 10 / 3
                 if traits.Lucky then stonerbonus = 15 / 2 elseif traits.Unlucky then stonerbonus = 0 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "HalfWeed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'HalfWeed' }, halfItem = nil }
             end
         },
         ['Greenfire.CannaCigar'] = {
@@ -682,10 +682,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Kief", "Weed" }
-                    halfItem = "Greenfire.HalfCannaCigar"
+                    smokeTypes = { 'Kief', 'Weed' }
+                    halfItem = 'Greenfire.HalfCannaCigar'
                 else
-                    smokeTypes = { "Kief", "Hash" }
+                    smokeTypes = { 'Kief', 'Hash' }
                 end
                 return {
                     bonus = bonus,
@@ -708,7 +708,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 45 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Weed", "Kief" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Weed', 'Kief' }, halfItem = nil }
             end
         },
         ['Greenfire.PreCannaCigar'] = {
@@ -737,10 +737,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Hash" }
-                    halfItem = "Greenfire.HalfPreCannaCigar"
+                    smokeTypes = { 'Hash' }
+                    halfItem = 'Greenfire.HalfPreCannaCigar'
                 else
-                    smokeTypes = { "Hash", "Hash" }
+                    smokeTypes = { 'Hash', 'Hash' }
                 end
                 return {
                     bonus = bonus,
@@ -763,7 +763,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 60 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Hash" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Hash' }, halfItem = nil }
             end
         },
         ['Greenfire.DelCannaCigar'] = {
@@ -792,10 +792,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Hash", "Weed" }
-                    halfItem = "Greenfire.HalfDelCannaCigar"
+                    smokeTypes = { 'Hash', 'Weed' }
+                    halfItem = 'Greenfire.HalfDelCannaCigar'
                 else
-                    smokeTypes = { "Kief", "Hash", "Hash" }
+                    smokeTypes = { 'Kief', 'Hash', 'Hash' }
                 end
                 return {
                     bonus = bonus,
@@ -818,7 +818,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Lucky then stonerbonus = 50 elseif traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Hash", "Weed" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Hash', 'Weed' }, halfItem = nil }
             end
         },
         ['Greenfire.ResCannaCigar'] = {
@@ -845,10 +845,10 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                     end
                 end
                 if smokedhalf then
-                    smokeTypes = { "Kief", "Hash" }
-                    halfItem = "Greenfire.HalfResCannaCigar"
+                    smokeTypes = { 'Kief', 'Hash' }
+                    halfItem = 'Greenfire.HalfResCannaCigar'
                 else
-                    smokeTypes = { "Hash", "Hash", "Hash" }
+                    smokeTypes = { 'Hash', 'Hash', 'Hash' }
                 end
                 return {
                     bonus = bonus,
@@ -871,7 +871,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
                 if traits.Stoner then
                     if traits.Unlucky then stonerbonus = 0 end
                 end
-                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { "Hash", "Kief" }, halfItem = nil }
+                return { bonus = bonus, stonerbonus = stonerbonus, smokedhalf = false, smokeTypes = { 'Hash', 'Kief' }, halfItem = nil }
             end
         }
     }
@@ -880,9 +880,9 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
         local baseConfig = itemConfigs[typ]
         if not baseConfig then return nil end
         local traits = {
-            Stoner = character:hasTrait("Stoner"),
-            Lucky = character:hasTrait("Lucky"),
-            Unlucky = character:hasTrait("Unlucky"),
+            Stoner = character:hasTrait('Stoner'),
+            Lucky = character:hasTrait('Lucky'),
+            Unlucky = character:hasTrait('Unlucky'),
             Smoker = character:hasTrait(CharacterTrait.SMOKER)
         }
         local computed = baseConfig.compute(traits)
@@ -945,7 +945,7 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
         local added_stoned = stoned_after - stoned_before
 
         local applyBonus = 0
-        if not character:hasTrait("Stoner") then
+        if not character:hasTrait('Stoner') then
             applyBonus = data.bonus * percent
         else
             applyBonus = data.stonerbonus * percent
@@ -975,11 +975,11 @@ if getActivatedMods():contains('\\jiggasGreenfireMod') then
             character:getBodyDamage():setFoodSicknessLevel(sick)
         end
 
-        if getActivatedMods():contains("jiggasAddictionMod") then
+        if getActivatedMods():contains('jiggasAddictionMod') then
             modData.cigsmoked = true
         end
 
-        if not character:hasTrait("Stoner") and data.hasFatigueHunger then
+        if not character:hasTrait('Stoner') and data.hasFatigueHunger then
             local fatigue = character:getStats():get(CharacterStat.FATIGUE)
             local fatigueDelta = 0
             if fatigue < 0.6 then
