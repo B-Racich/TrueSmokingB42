@@ -1,6 +1,6 @@
-require 'TimedActions/ISBaseTimedAction'
+require "TimedActions/ISBaseTimedAction"
 
-TakePuff = ISBaseTimedAction:derive('TakePuff')
+TakePuff = ISBaseTimedAction:derive("TakePuff")
 
 function TakePuff:isValid()
     return self.trueSmoking.isSmoking and self.trueSmoking.Smokable.smokeLength > 0
@@ -9,7 +9,7 @@ end
 function TakePuff:update()
     -- Sync up the anim to remove the visualItem when the hand reaches the mouth
     local curTime = os.time()
-    if not self.visualItemFlag then
+    if self.trueSmoking.visualItem and not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
             self.trueSmoking.Smokable:removeVisualItem()
             self.visualItemFlag = true
@@ -23,7 +23,7 @@ function TakePuff:update()
     end
 
     -- Loop audio
-    if self.eatSound ~= '' and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
 
@@ -61,30 +61,30 @@ function TakePuff:start()
     end
     self.timer = os.time()
     -- set the anim for vanilla or modded
-    local anim = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 'Smoke_Quiet' or CharacterActionAnims.Eat
+    local anim = getActivatedMods():contains("\\SmokingSoundsOverhaul") and 'Smoke_Quiet' or CharacterActionAnims.Eat
     self:setActionAnim(anim)
-    self:setAnimVariable('FoodType', self.item:getEatType())
+    self:setAnimVariable("FoodType", self.item:getEatType())
     self.trueSmoking.Smokable.puffTimeMark = os.time()
 
     --Track puff
     self.trueSmoking.takingPuff = true
     self.puffTimeMark = os.time()
 
-    -- if not self.trueSmoking.visualItem then
-    --     local hasPrimary = self.character:getPrimaryHandItem()
-    --     if hasPrimary then
-    --         self:setOverrideHandModels(hasPrimary, self.item)
-    --     else
-    --         self:setOverrideHandModels(nil, self.item)
-    --     end
-    -- end
+    if not self.trueSmoking.visualItem then
+        local hasPrimary = self.character:getPrimaryHandItem()
+        if hasPrimary then
+            self:setOverrideHandModels(hasPrimary, self.item)
+        else
+            self:setOverrideHandModels(nil, self.item)
+        end
+    end
 
     if self.eatSound ~= '' then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
     end
 
     -- Play custom sound when no sound is playing
-    if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
+    if getActivatedMods():contains("\\SmokingSoundsOverhaul") then
         local gender = self.character:isFemale()
         local sound = SmokingSoundsOverhaul:getPuffSound(gender)
         if self.eatSound == '' then -- No sound running for first time
@@ -96,7 +96,7 @@ function TakePuff:start()
             end
         end
     end
-    -- self.character:reportEvent('EventEating');
+    -- self.character:reportEvent("EventEating");
 end
 
 function TakePuff:stop()
@@ -112,7 +112,7 @@ function TakePuff:stop()
 
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
-        if self.character:hasTrait(CharacterTrait.SMOKER) then
+        if self.character:HasTrait("Smoker") then
             if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
                 self.character:triggerCough()
             end
@@ -127,18 +127,22 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
-        if TrueSmoking.getGameSpeedMultiplier() > 1 then
+    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
+    self.trueSmoking.takingPuff = false
+    self.trueSmoking.Smokable.puffTimeMark = os.time()
+
+    ISBaseTimedAction.perform(self)
+end
+
+function TakePuff:complete()
+    if TrueSmoking.getGameSpeedMultiplier() > 1 then
         if self.character:getEmitter():isPlaying(self.eatSound) then
             self.character:getEmitter():stopSound(self.eatAudio)
         end
     end
-
-    self.trueSmoking.takingPuff = false
-    self.trueSmoking.Smokable.puffTimeMark = os.time()
-
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
-        if self.character:hasTrait(CharacterTrait.SMOKER) then
+        if self.character:HasTrait("Smoker") then
             if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
                 self.character:triggerCough()
             end
@@ -148,13 +152,6 @@ function TakePuff:perform()
             end
         end
     end
-
-    ISBaseTimedAction.perform(self)
-end
-
-function TakePuff:complete()
-    self.trueSmoking.Smokable:equipVisualItem() -- requip our visualItem
-
     return true
 end
 

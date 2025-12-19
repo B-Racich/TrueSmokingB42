@@ -1,6 +1,6 @@
-require 'TimedActions/ISBaseTimedAction'
+require "TimedActions/ISBaseTimedAction"
 
-PutOut = ISBaseTimedAction:derive('PutOut')
+PutOut = ISBaseTimedAction:derive("PutOut")
 
 function PutOut:isValid()
     --Check if we have a smoke lit
@@ -24,7 +24,7 @@ function PutOut:update()
         end
     end
 
-    if self.eatSound ~= '' and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
+    if self.eatSound ~= "" and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
     end
 end
@@ -46,8 +46,10 @@ function PutOut:start()
     self.timer = os.time()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
-    self:setAnimVariable('FoodType', self.item:getEatType())
+    self:setAnimVariable("FoodType", self.item:getEatType())
+    if not self.table.visualItem then
         self:setOverrideHandModels(nil, self.item)
+    end
 
     if self.eatSound ~= '' then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);

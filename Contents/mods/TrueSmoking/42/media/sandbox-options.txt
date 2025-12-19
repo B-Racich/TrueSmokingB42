@@ -2,10 +2,10 @@ VERSION = 1,
 
 option TrueSmoking.SmokingSpeed
 {
-    type = double,
-    min = 0.1,
-    max = 3.0,
-    default = 1.0,
+    type = integer,
+    min = 25,
+    max = 200,
+    default = 100,
     page = TrueSmoking,
     translation = TrueSmoking_SmokingSpeed,
     tooltip = TrueSmoking_SmokingSpeed_Tooltip,
@@ -13,10 +13,10 @@ option TrueSmoking.SmokingSpeed
 
 option TrueSmoking.PuffStrength
 {
-    type = double,
-    min = 0.0,
-    max = 3.0,
-    default = 1.0,
+    type = integer,
+    min = 25,
+    max = 200,
+    default = 100,
     page = TrueSmoking,
     translation = TrueSmoking_PuffStrength,
     tooltip = TrueSmoking_PuffStrength_Tooltip,
@@ -24,10 +24,10 @@ option TrueSmoking.PuffStrength
 
 option TrueSmoking.MovementBurn
 {
-    type = double,
-    min = 0.0,
-    max = 3.0,
-    default = 1.0,
+    type = integer,
+    min = 25,
+    max = 200,
+    default = 100,
     page = TrueSmoking,
     translation = TrueSmoking_MovementBurn,
     tooltip = TrueSmoking_MovementBurn_Tooltip,
@@ -35,24 +35,13 @@ option TrueSmoking.MovementBurn
 
 option TrueSmoking.IdleBurnOut
 {
-    type = double,
-    min = 0.0,
-    max = 3.0,
-    default = 1.0,
+    type = integer,
+    min = 0,
+    max = 100,
+    default = 100,
     page = TrueSmoking,
     translation = TrueSmoking_IdleBurnOut,
     tooltip = TrueSmoking_IdleBurnOut_Tooltip,
-}
-
-option TrueSmoking.EffectMultiplier
-{
-    type = double,
-    min = 0.1,
-    max = 3.0,
-    default = 1.0,
-    page = TrueSmoking,
-    translation = TrueSmoking_EffectMultiplier,
-    tooltip = TrueSmoking_EffectMultiplier_Tooltip,
 }
 
 option TrueSmoking.ManageHeadGear
@@ -178,7 +167,7 @@ option TrueSmoking.DaysToPeakWithdrawal
     type = integer,
     min = 1,
     max = 7,
-    default = 2,
+    default = 3,
     page = TrueSmokingNicotine,
     translation = TrueSmoking_DaysToPeakWithdrawal,
 }
@@ -188,7 +177,7 @@ option TrueSmoking.SmokerTraitDecayMultiplier
     type = double,
     min = 0.1,
     max = 1.0,
-    default = 0.8,
+    default = 0.75,
     page = TrueSmokingNicotine,
     translation = TrueSmoking_SmokerTraitDecayMultiplier,
 }

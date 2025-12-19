@@ -3,7 +3,7 @@ if getActivatedMods():contains('\\P4TidyUpMeister') then
     function ISInventoryPaneContextMenu.onEatItems(items, percentage, player)
         items = ISInventoryPane.getActualItems(items)
         for i,item in ipairs(items) do
-            if item:hasTag(ItemTag.SMOKABLE) then
+            if item:hasTag('Smokable') then
                 ISInventoryPaneContextMenu.eatItem(item, percentage, player)
                 break
             else
