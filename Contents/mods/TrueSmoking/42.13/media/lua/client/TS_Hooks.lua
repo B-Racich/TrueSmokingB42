@@ -47,3 +47,4 @@ ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
     end
 
     return mask
+end
