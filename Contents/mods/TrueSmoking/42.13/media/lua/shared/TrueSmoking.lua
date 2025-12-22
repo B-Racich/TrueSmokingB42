@@ -315,39 +315,6 @@ function TrueSmoking:findSmokable(player)
     end
 end
 
--- ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
---     if item:hasTag(ItemTag.SMOKABLE) then
---         TrueSmoking:getModData(player).CheckMaskSmoking = true
---     else
---         TrueSmoking:getModData(player).CheckMaskSmoking = false
---     end
---     originalEatItem(item, percentage, player)
--- end
-
--- ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
---     local o = TrueSmoking:getModData(playerObj)
-
---     --use native function to get blocking mask
---     local mask = originalGetEatingMask(playerObj, false)
-
---     if mask and mask:getFullType():contains('Shemagh') and mask:hasTag('TrueSmoking:CantSmoke') and o.CheckMaskSmoking then
---         o.shemagh = mask
---         o.mask = false
---         TrueSmoking:adjustShemagh(playerObj, mask, true)
---     else --let the game handle it normally
---         mask = originalGetEatingMask(playerObj, removeMask)
---         o.mask = mask
---         o.shemagh = false
---     end
-
---     --If we want to handle re-equipping tell the game we took nothing off
---     if o.CheckMaskSmoking then
---         return false
---     end
-
---     return mask
--- end
-
 function TrueSmoking:onKeyStartPressed(key)
     -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
     local o = self:getModData(0)
@@ -415,10 +382,13 @@ TrueSmoking.start = function(playerNum, player)
     ts.contextWrapper = contextWrapper
 
     if player:getModData().Smokable then
-        local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
-        if smokable then
-            smokable:getModData().SmokeLength = player:getModData().Smokable[2]
-        end
+        local itemName = player:getModData().Smokable[1]
+        -- local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
+        local data = { SmokeLength = player:getModData().Smokable[2] }
+        sendClientCommand(player, 'TrueSmoking', 'addSmokable', { itemName, data })
+        -- if smokable then
+        --     smokable:getModData().SmokeLength = player:getModData().Smokable[2]
+        -- end
         player:getModData().Smokable = false
     end
 

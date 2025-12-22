@@ -54,6 +54,68 @@ function TrueSmoking.onClientCommand(module, command, player, args)
             -- triggerEvent('OnClothingUpdated',player)
         end
     end
+
+    if command == 'OnEat_ItemStats' then
+        local stats = args[1]
+        local puffPercent = args[2]
+        TrueSmoking.OnEat_ItemStats(player, stats)
+    end
+
+    if command == 'OnEat_Tobacco' then
+        local stats = args[1]
+        local puffPercent = args[2]
+        TrueSmoking.OnEat_Tobacco(player, stats)
+    end
+
+    if command == 'updateStats' then
+        local stats = args[1]
+
+        for statName, value in pairs(stats) do
+            if player:getStats():get(CharacterStat[statName]) then
+                player:getStats():set(CharacterStat[statName], value)
+            end
+        end
+    end
+
+    if command == 'addTrait' then
+        local traitName = args[1]
+        if not player:HasTrait(traitName) then
+            player:getCharacterTraits():add(traitName)
+        end
+    end
+
+    if command == 'removeTrait' then
+        local traitName = args[1]
+        if player:HasTrait(traitName) then
+            player:getCharacterTraits():remove(traitName)
+        end
+    end
+
+    if command == 'addSmokable' then
+        local itemName = args[1]
+        local data = args[2] or false
+        local smokable = player:getInventory():AddItem(itemName)
+        if smokable and data then
+            smokable:getModData().SmokeLength = data.SmokeLength
+        end
+        -- syncItemModData(smokable)
+        sendAddItemToContainer(player:getInventory(),smokable)
+
+    end
+
+    -- if command == 'removeSmokable' then
+    --     local itemName = args[1]
+    --     local item = player:getInventory():Remove(itemName)
+    --     sendRemoveItemFromContainer(player:getInventory(),item)
+    -- end
+
+    if command == 'smokableCallback' then
+        local callback = args[1]
+        local smokable = args[2]
+        if callback and type(callback) == 'function' then
+            callback(player, smokable)
+        end
+    end
 end
 
 Events.OnClientCommand.Add(TrueSmoking.onClientCommand)

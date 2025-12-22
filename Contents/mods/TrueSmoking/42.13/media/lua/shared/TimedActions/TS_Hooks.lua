@@ -8,7 +8,7 @@ require 'TimedActions/ISEatFoodAction'
 
 require 'TimedActions/ISTakePillAction'
 
-local originalActionNew = ISTakePillAction.new
+local originalPillActionNew = ISTakePillAction.new
 function ISTakePillAction:new(character, item)
  local o = {}
     local onEat = item:getOnEat() or ''
@@ -17,7 +17,7 @@ function ISTakePillAction:new(character, item)
     local funcsToHook = { 'cigarettes', 'RecipeCodeOnEat.consumeNicotine', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
         'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnEat_Weed' }
 
-    o = originalActionNew(self, character, item)
+    o = originalPillActionNew(self, character, item)
 
     local table = TrueSmoking:getPlayerReference(character)
 
@@ -45,7 +45,7 @@ function ISTakePillAction:new(character, item)
     return o
 end
 
-local originalActionNew = ISEatFoodAction.new
+local originalFoodActionNew  = ISEatFoodAction.new
 function ISEatFoodAction:new(character, item, percentage)
     local o = {}
     local onEat = item:getOnEat() or ''
@@ -55,7 +55,7 @@ function ISEatFoodAction:new(character, item, percentage)
         'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnSmoke_Blunt', 'OnSmoke_Cannabis',
         'OnSmoke_CannaCigar', 'OnSmoke_Spliff', 'OnSmoke_Cigar','OnSmoke_Blunt' }
 
-    o = originalActionNew(self, character, item, percentage)
+    o = originalFoodActionNew(self, character, item, percentage)
 
     local data = TrueSmoking:getModData(character)
 
@@ -86,9 +86,9 @@ end
 --[[
     Add instant equip time for the visual smoke
 ]]
-local originalNew = ISUnequipAction.new
+local originalUnequipNew = ISUnequipAction.new
 function ISUnequipAction:new(character, item, maxTime)
-    local o = originalNew(self, character, item, maxTime)
+    local o = originalUnequipNew(self, character, item, maxTime)
 
     local playerRef = TrueSmoking:getPlayerReference(character)
 
@@ -102,9 +102,9 @@ end
 --[[
     If the player somehow unequips the visual smoke we need to put the smoke out
 ]]
-local originalComplete = ISUnequipAction.complete
+local originalUnequipComplete = ISUnequipAction.complete
 function ISUnequipAction:complete()
-    originalComplete(self)
+    originalUnequipComplete(self)
 
     local playerRef = TrueSmoking:getPlayerReference(self.character)
 
@@ -120,9 +120,9 @@ end
     Hook the complete method to mark when our mask actually equipped, this allows the keybind to try again
     if it was interrupted
 ]]
-local originalComplete = ISWearClothing.complete
+local originalClothingComplete = ISWearClothing.complete
 function ISWearClothing:complete()
-    local rtn = originalComplete(self)
+    local rtn = originalClothingComplete(self)
     local table = TrueSmoking:getPlayerReference(self.character)
     if self.item == table.mask then
         table.mask = false
@@ -133,9 +133,9 @@ end
 --[[
    Added a time param and check for putting out smoke on equipping headgear
 ]]
-local originalNew = ISWearClothing.new
+local originalClothingNew = ISWearClothing.new
 function ISWearClothing:new(character, item)
-    local o = originalNew(self, character, item)
+    local o = originalClothingNew(self, character, item)
 
     local smokableBlacklist = {
         Mask = true,
@@ -156,8 +156,8 @@ function ISWearClothing:new(character, item)
     return o
 end
 
-local originalNew = ISClothingExtraAction.new
+local originalExtraActionNew = ISClothingExtraAction.new
 function ISClothingExtraAction:new(character, item, extra)
-    local o = originalNew(self, character, item, extra)
+    local o = originalExtraActionNew(self, character, item, extra)
     return o
 end

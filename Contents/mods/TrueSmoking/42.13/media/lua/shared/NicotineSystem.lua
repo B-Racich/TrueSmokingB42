@@ -81,7 +81,7 @@ function NicotineSystem:initialize(player)
         data.nicotineSystem = {
             nicotineLevel    = 0,
             addictionLevel   = player:hasTrait(CharacterTrait.SMOKER) and self.Config.SMOKER_TRAIT_GAIN_THRESHOLD * 1.2 or
-            0,
+                0,
             withdrawalLevel  = player:hasTrait(CharacterTrait.SMOKER) and 35 or 0,
             AddictionTime    = 0,
             nicotineTime     = 0,
@@ -103,11 +103,12 @@ function NicotineSystem:initialize(player)
         for field, defaultValue in pairs(defaults) do
             if data.nicotineSystem[field] == nil then
                 tsDebug('Setting missing field "' ..
-                field .. '" to default value for player ' .. tostring(player:getDisplayName()))
+                    field .. '" to default value for player ' .. tostring(player:getDisplayName()))
                 data.nicotineSystem[field] = defaultValue
             end
         end
     end
+    player:transmitModData()
 end
 
 Events.OnCreatePlayer.Add(function(_, player)
@@ -124,11 +125,12 @@ function NicotineSystem:GameTimeUpdate(player)
         data = player:getModData().nicotineSystem
     end
 
-    local stats     = player:getStats()
-    local bd        = player:getBodyDamage()
-    local tableRef  = TrueSmoking and TrueSmoking:getModData(player)
-    local isSmoking = tableRef and tableRef.Smokable and tableRef.Smokable.smokeLit
-    local lastSmoke = player:getTimeSinceLastSmoke()
+    local stats       = player:getStats()
+    local bd          = player:getBodyDamage()
+    local tableRef    = TrueSmoking and TrueSmoking:getModData(player)
+    local isSmoking   = tableRef and tableRef.Smokable and tableRef.Smokable.smokeLit
+    local lastSmoke   = player:getTimeSinceLastSmoke()
+    local updateStats = {}
 
     -- Nicotine Decay and overflow
     if not isSmoking then
@@ -167,14 +169,21 @@ function NicotineSystem:GameTimeUpdate(player)
         data.unhappinessCap = unhappinessCap
         data.boredomCap = boredomCap
 
+
         if stats:get(CharacterStat.UNHAPPINESS) < unhappinessCap then
-            stats:set(CharacterStat.UNHAPPINESS,
-                math.min(unhappinessCap, stats:get(CharacterStat.UNHAPPINESS) + self.Config.UNHAPPYNESS_FROM_WITHDRAWAL))
+            -- stats:set(CharacterStat.UNHAPPINESS,
+            --     math.min(unhappinessCap, stats:get(CharacterStat.UNHAPPINESS) + self.Config.UNHAPPYNESS_FROM_WITHDRAWAL))
+            updateStats['UNHAPPINESS'] = math.min(unhappinessCap,
+                stats:get(CharacterStat.UNHAPPINESS) + self.Config.UNHAPPYNESS_FROM_WITHDRAWAL)
         end
         if stats:get(CharacterStat.BOREDOM) < boredomCap then
-            stats:set(CharacterStat.BOREDOM,
-                math.min(boredomCap, stats:get(CharacterStat.BOREDOM) + self.Config.BOREDOM_FROM_WITHDRAWAL))
+            -- stats:set(CharacterStat.BOREDOM,
+            --     math.min(boredomCap, stats:get(CharacterStat.BOREDOM) + self.Config.BOREDOM_FROM_WITHDRAWAL))
+            updateStats['BOREDOM'] = math.min(boredomCap,
+                stats:get(CharacterStat.BOREDOM) + self.Config.BOREDOM_FROM_WITHDRAWAL)
         end
+
+        -- sendClientCommand(player, 'TrueSmoking', 'updateStats', { updateStats })
 
         local intensityMultiplier = 1.0 + (data.addictionLevel / 100) * 0.5
 
@@ -199,10 +208,12 @@ function NicotineSystem:GameTimeUpdate(player)
         local strength = math.min(data.nicotineLevel / 100, 1.0)              -- 0–1 scale
 
         local fatigueReduction = self.Config.FATIGUE_FROM_NICOTINE * strength -- ~0.025 per minute at full nicotine
-        stats:set(CharacterStat.FATIGUE, math.max(0, stats:get(CharacterStat.FATIGUE) - fatigueReduction))
+        -- stats:set(CharacterStat.FATIGUE, math.max(0, stats:get(CharacterStat.FATIGUE) - fatigueReduction))
+        updateStats['FATIGUE'] = math.max(0, stats:get(CharacterStat.FATIGUE) - fatigueReduction)
 
         local hungerReduction = self.Config.HUNGER_FROM_NICOTINE * strength -- ~0.00054 per minute → ~0.78 per day at max
-        stats:set(CharacterStat.HUNGER, math.max(0, stats:get(CharacterStat.HUNGER) - hungerReduction))
+        -- stats:set(CharacterStat.HUNGER, math.max(0, stats:get(CharacterStat.HUNGER) - hungerReduction))
+        updateStats['HUNGER'] = math.max(0, stats:get(CharacterStat.HUNGER) - hungerReduction)
 
         if stats:get(CharacterStat.STRESS) > 0 then
             stats:set(CharacterStat.STRESS,
@@ -243,15 +254,18 @@ function NicotineSystem:GameTimeUpdate(player)
 
     if TrueSmoking and TrueSmoking.Options and TrueSmoking.Options.DynamicSmokerTrait then
         if data.addictionLevel >= self.Config.SMOKER_TRAIT_GAIN_THRESHOLD and not player:hasTrait(CharacterTrait.SMOKER) then
-            player:getTraits():add('Smoker')
+            -- player:getTraits():add('Smoker')
+            sendClientCommand(player, 'TrueSmoking', 'addTrait', {'SMOKER'})
             if HaloTextHelper then
                 HaloTextHelper.addTextWithArrow(player, getText('UI_TRUESMOKING_BECAME_SMOKER'), true,
                     HaloTextHelper.getColorRed())
             end
         elseif data.addictionLevel < self.Config.SMOKER_TRAIT_LOSE_THRESHOLD and player:hasTrait(CharacterTrait.SMOKER) then
-            player:getTraits():remove('Smoker')
-            stats:setStressFromCigarettes(0)
-            stats:reset(CharacterStat.NICOTINE_WITHDRAWAL)
+            -- player:getTraits():remove('Smoker')
+            sendClientCommand(player, 'TrueSmoking', 'removeTrait', {'SMOKER'})
+            -- stats:setStressFromCigarettes(0)
+            updateStats['NICOTINE_WITHDRAWAL'] = 0
+            -- stats:reset(CharacterStat.NICOTINE_WITHDRAWAL)
             data.boredomCap = 0
             data.unhappinessCap = 0
             if HaloTextHelper then
@@ -260,6 +274,8 @@ function NicotineSystem:GameTimeUpdate(player)
             end
         end
     end
+    player:transmitModData()
+    sendClientCommand(player, 'TrueSmoking', 'updateStats', { updateStats })
 end
 
 function NicotineSystem:smoke(player, rawAmountPerPuff, nicotineContent)
@@ -292,4 +308,5 @@ function NicotineSystem:smoke(player, rawAmountPerPuff, nicotineContent)
         (1.0 - math.min(addictionTolerance * 0.85, 0.85))
 
     data.addictionLevel = math.min(maxAddiction, data.addictionLevel + effectiveGain)
+    player:transmitModData()
 end

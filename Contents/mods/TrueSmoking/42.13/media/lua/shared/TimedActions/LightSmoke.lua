@@ -9,11 +9,12 @@ function LightSmoke:isValidStart()
 end
 
 function LightSmoke:isValid()
-    if isClient() and self.item then
-        return self.character:getInventory():containsID(self.item:getID());
-    else
-        return self.character:getInventory():contains(self.item);
-    end
+    -- if isClient() and self.item then
+    --     return self.character:getInventory():containsID(self.item:getID());
+    -- else
+    --     return self.character:getInventory():contains(self.item);
+    -- end
+    return true
 end
 
 function LightSmoke:update()
@@ -128,6 +129,9 @@ function LightSmoke:complete()
     -- triggerEvent('OnClothingUpdated', self.character)
 
     print('TRUESMOKING::Set isSmoking to true in LightSmoke complete')
+    self.character:getInventory():Remove(self.item)
+    sendRemoveItemFromContainer(self.character:getInventory(),self.item)
+    -- sendClientCommand(self.character, 'TrueSmoking', 'removeSmokable', { self.item }    )
     return true
 end
 

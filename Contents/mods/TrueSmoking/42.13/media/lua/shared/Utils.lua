@@ -2,6 +2,12 @@ TrueSmoking = TrueSmoking or {}
 
 TrueSmoking.DEBUG = true
 
+
+--TODO:: CLIENT COMMAND STAT CHANGES FOR SMOKABLE/NICOTINE
+-- REWORK SMOKE EFFECTS TO EVERY MINUTE
+-- TEST SP/MP
+
+
 function TrueSmoking.tsDebug(str)
     if TrueSmoking.DEBUG then
         print('TRUESMOKING::' .. tostring(str))
@@ -161,11 +167,12 @@ function TrueSmoking.getGameSpeedMultiplier()
 end
 
 -- OnEat for applying item stats
-function TrueSmoking.OnEat_ItemStats(smokable)
-    local percent = smokable.puffPercent
-    local character = smokable.player
+function TrueSmoking.OnEat_ItemStats(player, smokableStats)
+    local percent = smokableStats.puffPercent
+    local character = player
     local body = character:getBodyDamage()
     local stats = character:getStats()
+    local smokable = smokableStats
 
     local function adjustStat(stat, value, name, add)
         local name = name or 'nil'
@@ -264,9 +271,9 @@ function TrueSmoking.OnEat_ItemStats(smokable)
 end
 
 --OnEat method for distributing Tobacco effects from Vanilla
-function TrueSmoking.OnEat_Tobacco(smokable)
-    local percent = smokable.puffPercent
-    local character = smokable.player
+function TrueSmoking.OnEat_Tobacco(player, smokableStats)
+    local percent = smokableStats.puffPercent
+    local character = player
     local data = character:getModData().nicotineSystem
     -- if data and TrueSmoking.Options.UseNicotineSystem then
     --     percent = percent * data.toleranceFactor
@@ -274,7 +281,10 @@ function TrueSmoking.OnEat_Tobacco(smokable)
     local body = character:getBodyDamage()
     local stats = character:getStats()
 
-    local effectMultiplier = smokable.effectMultiplier
+    local smokable = smokableStats
+
+    local effectMultiplier = smokableStats.effectMultiplier
+    -- local effectMultiplier = 1.0 -- Placeholder for future use
 
     local function adjustStat(stat, value, name, add)
         local name = name or 'nil'

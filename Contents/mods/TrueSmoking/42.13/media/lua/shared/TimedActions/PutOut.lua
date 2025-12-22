@@ -62,10 +62,12 @@ function PutOut:stop()
     local data = TrueSmoking:getModData(self.character)
     local ts = TrueSmoking:getPlayerReference(self.character)
     -- if data and self.item:getModData().SmokeLength <= 0 then
-    if ts then
-        sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
-        ts.Smokable:stop()
+     if self.smokeLength > 0 then
+        -- self.character:getInventory():Remove(self.item)
+        -- local item = self.character:getInventory():AddItem(self.item)
+        sendClientCommand(self.character, 'TrueSmoking', 'addSmokable', { self.fullType,self.smokeLength })
     end
+    return true
     -- end
     -- If we are cancelling the action and the smoke is finished just get rid of it
     -- self:forceComplete()
@@ -76,30 +78,44 @@ function PutOut:serverStop()
 end
 
 function PutOut:complete()
+    if self.smokeLength > 0 then
+        local item = self.character:getInventory():AddItem(self.fullType)
+        item:getModData().SmokeLength = self.smokeLength
+        -- item:syncItemModData()
+        -- syncItemModData(item)
+        -- item:transmitModData()
+        sendAddItemToContainer(self.character:getInventory(),item)
+    end
     return true
 end
 
 function PutOut:perform()
     local data = TrueSmoking:getModData(self.character)
     local ts = TrueSmoking:getPlayerReference(self.character)
-    data.isSmoking = false
-    if ts then
+    -- data.isSmoking = false
+    -- if ts then
         ts.Smokable:stop()
-    end
+    -- end
     sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
     self.character:transmitModData()
     ISBaseTimedAction.perform(self)
 end
 
-function PutOut:new(character, item)
+function PutOut:new(character, item, smokeLength, eatSound, fullType)
     local o = ISBaseTimedAction.new(self, character)
+
+    o.stopOnWalk = false
+    o.stopOnRun = true
+    o.stopOnAim = true
 
     o.character = character
     o.data = TrueSmoking:getModData(character)
     o.item = item
     o.maxTime = 120
+    o.smokeLength = smokeLength
+    o.fullType = fullType
 
-    o.eatSound = o.item:getCustomEatSound() or ''
+    o.eatSound = eatSound
     o.eatAudio = 0
 
     o.visualItemTimer = 0.7

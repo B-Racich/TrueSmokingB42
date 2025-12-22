@@ -33,7 +33,7 @@ Events.OnCreatePlayer.Add(function()
     local smokableObjects = {
         ['Base.CigaretteSingle'] = {
             visualItem = 'Mask_Cigarette',
-            callback = TrueSmoking.OnEat_Tobacco,
+            -- callback = TrueSmoking.OnEat_Tobacco,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.Cigarette.length,
             burnMin = TrueSmoking.Options.Cigarette.burnMin,
@@ -50,7 +50,7 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.CigaretteRolled'] = {
             visualItem = 'Mask_Cigarette',
-            callback = TrueSmoking.OnEat_Tobacco,
+            -- callback = TrueSmoking.OnEat_Tobacco,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.RolledCigarette.length,
             burnMin = TrueSmoking.Options.RolledCigarette.burnMin,
@@ -67,7 +67,7 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.Cigarillo'] = {
             visualItem = 'Mask_Cigarillo',
-            callback = TrueSmoking.OnEat_Tobacco,
+            -- callback = TrueSmoking.OnEat_Tobacco,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.Cigarillo.length,
             burnMin = TrueSmoking.Options.Cigarillo.burnMin,
@@ -84,7 +84,7 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.Cigar'] = {
             visualItem = 'Mask_Cigar',
-            callback = TrueSmoking.OnEat_Tobacco,
+            -- callback = TrueSmoking.OnEat_Tobacco,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.Cigar.length,
             burnMin = TrueSmoking.Options.Cigar.burnMin,
@@ -101,7 +101,7 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.SmokingPipe_Tobacco'] = {
             visualItem = 'Mask_Pipe',
-            callback = TrueSmoking.OnEat_Tobacco,
+            -- callback = TrueSmoking.OnEat_Tobacco,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.Pipe.length,
             burnMin = TrueSmoking.Options.Pipe.burnMin,
@@ -118,7 +118,7 @@ Events.OnCreatePlayer.Add(function()
         },
         ['Base.CanPipe_Tobacco'] = {
             visualItem = false,
-            callback = TrueSmoking.OnEat_Tobacco,
+            -- callback = TrueSmoking.OnEat_Tobacco,
             conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
             smokeLength = TrueSmoking.Options.Can.length,
             burnMin = TrueSmoking.Options.Can.burnMin,

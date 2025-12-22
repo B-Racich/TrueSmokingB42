@@ -42,6 +42,10 @@ options:addTickBox('DebugMoodles', getText('IGUI_TRUESMOKING_DEBUG_MOODLES'), fa
 --     data.withdrawalLevel = 0
 -- end)
 
+options:addButton('TestButton3', '0 levels', '0 levels', function()
+    sendClientCommand(getPlayer(), 'TrueSmoking', 'addSmokable', { 'Base.CigaretteSingle' })
+end)
+
 options:addSeparator()
 
 -- This is a helper function that will automatically populate the 'config' table.

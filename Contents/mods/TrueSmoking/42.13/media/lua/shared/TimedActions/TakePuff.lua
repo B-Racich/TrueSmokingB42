@@ -14,7 +14,7 @@ function TakePuff:update()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
             -- Smokable:removeVisualItem(self.character)
-            sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
+            sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', {})
             -- self.data.Smokable:removeVisualItem()
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
@@ -32,12 +32,12 @@ function TakePuff:update()
     end
 
     -- Reset job if keybind is held
-    if self:getJobDelta() >= .98 then
-        if self.ts.Smokable.smokeLength > 0 and ((isKeyDown(TrueSmoking.Config.keySmoke) or self.data.B_HELD) and not self.endAction) then -- We reset job delta for continous smoking
-            self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
-            self:resetJobDelta()
+        if self:getJobDelta() >= .98 then
+            if self.ts.Smokable.smokeLength > 0 and (self.data.holdingPuffKey or self.data.B_HELD) and not self.endAction then -- We reset job delta for continous smoking
+                self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
+                self:resetJobDelta()
+            end
         end
-    end
 end
 
 function TakePuff:waitToStart()
@@ -121,13 +121,13 @@ function TakePuff:stop()
             end
         end
     end
-    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.item})
+    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.fullType})
     self:forceComplete()
 end
 
 function TakePuff:serverStop()
     -- Smokable:equipVisualItem(self.character, self.item) -- requip our visualItem
-    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.item})
+    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.fullType})
 end
 
 function TakePuff:perform()
@@ -152,7 +152,7 @@ function TakePuff:perform()
         end
     end
     self.character:transmitModData()
-    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.item})
+    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.fullType})
     ISBaseTimedAction.perform(self)
 end
 
@@ -163,14 +163,20 @@ function TakePuff:complete()
     return true
 end
 
-function TakePuff:new(character, item)
+function TakePuff:new(character, item, eatSound, fullType)
     local o = ISBaseTimedAction.new(self, character)
+
+    o.stopOnWalk = false
+    o.stopOnRun = true
+    o.stopOnAim = true
 
     o.character = character
     o.data = TrueSmoking:getModData(character)
     o.ts = TrueSmoking:getPlayerReference(character)
     o.item = item
-    o.eatSound = o.item:getCustomEatSound() or ''
+    o.eatSound = eatSound
+    o.fullType = fullType
+    -- o.eatSound = ''
     o.eatAudio = 0
     o.maxTime = 220
     o.visualItemAnimLength = 3.7
