@@ -127,7 +127,7 @@ function NicotineSystem:GameTimeUpdate(player)
 
     local stats       = player:getStats()
     local bd          = player:getBodyDamage()
-    local tableRef    = TrueSmoking and TrueSmoking:getModData(player)
+    local tableRef    = TrueSmoking and player:getModData().TrueSmoking
     local isSmoking   = tableRef and tableRef.Smokable and tableRef.Smokable.smokeLit
     local lastSmoke   = player:getTimeSinceLastSmoke()
     local updateStats = {}

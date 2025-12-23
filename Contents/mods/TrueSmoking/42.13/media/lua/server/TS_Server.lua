@@ -1,6 +1,8 @@
 require 'TrueSmoking'
-function TrueSmoking.onClientCommand(module, command, player, args)
+function TrueSmoking.onClientCommand(module, command, playerRaw, args)
     if module ~= 'TrueSmoking' then return end
+
+    local player = getPlayerByOnlineID(playerRaw:getOnlineID())
 
     if command == 'equipVisualItem' then
         local function getVisual(item)
@@ -103,31 +105,12 @@ function TrueSmoking.onClientCommand(module, command, player, args)
 
     end
 
-    -- if command == 'removeSmokable' then
-    --     local itemName = args[1]
-    --     local item = player:getInventory():Remove(itemName)
-    --     sendRemoveItemFromContainer(player:getInventory(),item)
-    -- end
-
-    if command == 'smokableCallback' then
-        local callback = args[1]
-        local smokable = args[2]
-        if callback and type(callback) == 'function' then
-            callback(player, smokable)
-        end
-    end
-
-    if command == 'SyncItemModData' then
-        local item = args[1]
-        local data = args[2]
-        for k, v in pairs(data) do
-            item:getModData()[k] = v
-        end
-    end
-
     if command == 'updatePlayerData' then
         local data = args[1]
-        player:getModData().TrueSmoking = data
+        for key, value in pairs(data) do
+            player:getModData().TrueSmoking[key] = value
+        end
+        player:transmitModData()
     end
 
     if command == 'updateItemData' then
@@ -136,6 +119,7 @@ function TrueSmoking.onClientCommand(module, command, player, args)
         for k, v in pairs(data) do
             item:getModData()[k] = v
         end
+        -- syncItemModData(player, item)
     end
 end
 

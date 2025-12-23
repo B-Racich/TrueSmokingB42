@@ -57,7 +57,7 @@ function ISEatFoodAction:new(character, item, percentage)
 
     o = originalFoodActionNew(self, character, item, percentage)
 
-    local data = TrueSmoking:getModData(character)
+    local data = character:getModData().TrueSmoking
 
     if (TrueSmoking.isInList(onEat, funcsToHook) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         print('TRUESMOKING::Checking item onEat: ' .. onEat)
@@ -75,7 +75,7 @@ function ISEatFoodAction:new(character, item, percentage)
 
             print('TRUESMOKING::Setting up smokable')
             item:getModData().modOnEat = hook
-            syncItemModData(character, item)
+            -- syncItemModData(character, item)
 
             return LightSmoke:new(character, item)
         end

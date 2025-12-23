@@ -5,6 +5,8 @@ require 'Utils'
 
 PutOut = ISBaseTimedAction:derive('PutOut')
 
+local tsDebug = TrueSmoking.tsDebug
+
 function PutOut:isValid()
     --Check if we have a smoke lit
     return self.data.isSmoking
@@ -51,7 +53,7 @@ function PutOut:start()
     --Set the animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable('FoodType', self.item:getEatType())
-    self:setOverrideHandModels(nil, self.item)
+    self:setOverrideHandModels(nil, nil)
 
     if self.eatSound ~= '' then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
@@ -59,47 +61,51 @@ function PutOut:start()
 end
 
 function PutOut:stop()
-    ISBaseTimedAction.stop(self)
-    return true
-end
-
-function PutOut:serverStop()
+    local ts = TrueSmoking:getPlayerReference(self.character)
+    ts.Smokable:stop()
     self:forceComplete()
-    return true
+    ISBaseTimedAction.stop(self)
 end
 
 function PutOut:complete()
-    local data = TrueSmoking:getModData(self.character)
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    ts.Smokable:stop()
+    -- local data = self.character:getModData().TrueSmoking
     if self.smokeLength > 0 then
-        self.item:getModData().SmokeLength = self.smokeLength
+        sendClientCommand(self.character, 'TrueSmoking', 'updateItemData', { self.item, { SmokeLength = self.smokeLength } })
     end
 
     if self.item then
         local onUse = self.item:getReplaceOnUseFullType()
-        if onUse and onUse ~= '' and self.smokeLength <= 0 then
+        if onUse and onUse ~= '' then
             local item = self.character:getInventory():AddItem(onUse)
-            sendItemAddedToInventory(self.character, item)
+            sendRemoveItemFromContainer(self.character:getInventory(), item)
+        end
+        if self.smokeLength <= 0 then
             self.character:getInventory():Remove(self.item)
-            sendItemRemovedFromInventory(self.character, self.item)
+            sendRemoveItemFromContainer(self.character:getInventory(), self.item)
         end
     end
 
     sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', {})
     -- TrueSmoking.RemoveVisualItem(self.character)
-    TrueSmoking:checkForMaskAndEquip(self.character)
 
+    local data = {}
     data.isSmoking = false
     data.takingPuff = false
 
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { data })
     -- self.character:transmitModData()
-    syncItemModData(self.character, self.item)
+    tsDebug('PutOut::complete - Transmitted mod data after putting out smoke')
     return true
 end
 
 function PutOut:perform()
+    local ts = TrueSmoking:getPlayerReference(self.character)
+    ts.Smokable:stop()
+    local data = self.character:getModData().TrueSmoking
+    data.isSmoking = false
+    data.takingPuff = false
+    TrueSmoking:checkForMaskAndEquip(self.character)
+    tsDebug('PutOut::perform - Performed put out action and checked for mask equip')
     ISBaseTimedAction.perform(self)
 end
 
@@ -111,7 +117,7 @@ function PutOut:new(character, item, smokeLength, eatSound, fullType)
     o.stopOnAim = true
 
     o.character = character
-    o.data = TrueSmoking:getModData(character)
+    o.data = character:getModData().TrueSmoking
     o.item = item
     o.maxTime = 120
     o.smokeLength = smokeLength

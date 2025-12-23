@@ -5,6 +5,8 @@ require 'Utils'
 
 LightSmoke = ISBaseTimedAction:derive('LightSmoke')
 
+local tsDebug = TrueSmoking.tsDebug
+
 function LightSmoke:isValidStart()
     return true
 end
@@ -54,8 +56,9 @@ function LightSmoke:start()
     end
 
     -- fromRelaunch is added in ISTimedAction to not consume stuff again when we relaunch the action
-    if not self.fromRelaunch and self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
+    if self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
         local lighter = self:getRequiredItem()
+        self.lighter = lighter
         lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
         sendItemStats(lighter)
     end
@@ -97,25 +100,31 @@ end
 
 function LightSmoke:perform()
     print('TRUESMOKING::LightSmoke perform')
+    local ts = TrueSmoking:getPlayerReference(self.character)
+
     if self.eatAudio ~= 0 and self.character:getEmitter():isPlaying(self.eatAudio) then
         self.character:stopOrTriggerSound(self.eatAudio);
     end
+    ts.Smokable = Smokable:start(self.character, self.item)
+    tsDebug('LightSmoke::perform - Started smoking action')
 
     ISBaseTimedAction.perform(self)
 end
 
 function LightSmoke:complete()
     print('TRUESMOKING::LightSmoke complete')
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    local data = TrueSmoking:getModData(self.character)
-
-    ts.Smokable = Smokable:start(self.character, self.item)
+    -- self.lighter:UseAndSync()
+    -- local data = self.character:getModData().TrueSmoking
+    local data = {}
     data.isSmoking = true
     -- TrueSmoking.EquipVisualItem(self.character, self.item)
     sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
 
-    self.character:transmitModData()
+    -- self.character:transmitModData()
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { data })
+    -- self.character:transmitModData()
     -- syncItemModData(self.character, self.item)
+    tsDebug('LightSmoke::complete - Transmitted mod data after lighting smoke')
     return true
 end
 
@@ -123,7 +132,7 @@ function LightSmoke:getDuration()
     if self.character:isTimedActionInstant() then
         return 1
     end
-    return 240
+    return 220
 end
 
 function LightSmoke:new(character, item)

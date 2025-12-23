@@ -168,7 +168,8 @@ function Smokable:getObject(item)
     local modData = item:getModData()
     modData.SmokeLength = o.smokeLength
     modData.OriginalSmokeLength = o.originalSmokeLength
-    syncItemModData(self.player, item)
+    sendClientCommand(self.player, 'TrueSmoking', 'updateItemData', { item, modData })
+    -- syncItemModData(self.player, item)
 
     return o
 end
@@ -214,7 +215,7 @@ function Smokable:start(player, item)
 end
 
 function Smokable:putOut()
-    local data = TrueSmoking:getModData(self.player)
+    local data = self.player:getModData().TrueSmoking
     if data.isSmoking and not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
         ISTimedActionQueue.add(PutOut:new(self.player, self.item, self.smokeLength,
             self.customEatSound, self.itemFullType))
@@ -253,25 +254,26 @@ Events.OnPlayerUpdate.Add(function(player)
 end)
 
 function Smokable:update(player)
-    local data = TrueSmoking:getModData(player)
-    if not data or not data.isSmoking then return end
-    if isClient() then
-        if not player:getInventory():containsID(self.item:getID()) then
-            self.smokeLit = false
-            data.isSmoking = false
-            sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { data })
-            -- self.player:transmitModData()
-            return
-        end
-    else
+    local data = player:getModData().TrueSmoking
+    local newData = {}
+    if not data or not data.isSmoking or not self.item then return end
+    -- if isClient() and self.item then
+    --     if not player:getInventory():containsID(self.item:getID()) then
+    --         self.smokeLit = false
+    --         data.isSmoking = false
+    --         sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { data })
+    --         -- self.player:transmitModData()
+    --         return
+    --     end
+    -- else
         if not player:getInventory():contains(self.item) then
             self.smokeLit = false
-            data.isSmoking = false
+            newData.isSmoking = false
             sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { data })
             -- self.player:transmitModData()
             return
         end
-    end
+    -- end
     -- tsDebug('TRUESMOKING::Smokable update tick')
     -- if TrueSmoking.Options.Dropping and self.canDrop then
     --     if not self.hasRolledForDrop and self:checkDropConditions() then
@@ -300,9 +302,9 @@ function Smokable:update(player)
         local isReading = ISTimedActionQueue.hasActionType(self.player, 'ISReadABook')
 
         if isKeyDown(TrueSmoking.Config.keySmoke) and data.holdingPuffKey == false then
-            data.holdingPuffKey = true
+            newData.holdingPuffKey = true
         elseif data.holdingPuffKey == true and not isKeyDown(TrueSmoking.Config.keySmoke) then
-            data.holdingPuffKey = false
+            newData.holdingPuffKey = false
         end
 
         local targetBurnRate
@@ -356,7 +358,7 @@ function Smokable:update(player)
             -- func(self)
         end
 
-        sendClientCommand(self.player, 'TrueSmoking', 'updatePlayerData', { data })
+        sendClientCommand(self.player, 'TrueSmoking', 'updatePlayerData', { newData })
         sendClientCommand(self.player, 'TrueSmoking', 'updateItemData', { self.item, { SmokeLength = self.smokeLength } })
         self:idlePuff()
     end

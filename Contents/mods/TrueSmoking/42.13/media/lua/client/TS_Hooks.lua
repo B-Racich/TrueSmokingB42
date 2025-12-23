@@ -15,18 +15,19 @@ end
 InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 
 local originalEatItem = ISInventoryPaneContextMenu.eatItem
-ISInventoryPaneContextMenu.eatItem = function(item, percentage, player)
+ISInventoryPaneContextMenu.eatItem = function(item, percentage, player, openingRecipe, eatPercentage)
+    local playerObj = getSpecificPlayer(player);
     if item:hasTag(ItemTag.SMOKABLE) then
-        TrueSmoking:getModData(player).CheckMaskSmoking = true
+        playerObj:getModData().TrueSmoking.CheckMaskSmoking = true
     else
-        TrueSmoking:getModData(player).CheckMaskSmoking = false
+        playerObj:getModData().TrueSmoking.CheckMaskSmoking = false
     end
-    originalEatItem(item, percentage, player)
+    originalEatItem(item, percentage, player, openingRecipe, eatPercentage)
 end
 
 local originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
 ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
-    local o = TrueSmoking:getModData(playerObj)
+    local o = playerObj:getModData().TrueSmoking
 
     --use native function to get blocking mask
     local mask = originalGetEatingMask(playerObj, false)

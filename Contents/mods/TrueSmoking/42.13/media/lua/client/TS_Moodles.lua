@@ -1,14 +1,14 @@
 require ' MF_ISMoodle'
 require 'TrueSmoking'
 
-local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
+-- local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
 MF.createMoodle('TS_Smoking_New')
 MF.createMoodle('TS_Nicotine')
 
 local tsDebug = TrueSmoking.tsDebug
 
 function TrueSmoking.updateSmokingMoodle(player)
-    local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
+    -- local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
     local playerNum = player:getPlayerNum()
     local moodle = MF.getMoodle('TS_Smoking_New', playerNum)
     if moodle == nil then
@@ -16,9 +16,10 @@ function TrueSmoking.updateSmokingMoodle(player)
         return
     end
 
-    local data = TrueSmoking:getModData(playerNum)
+    local data = player:getModData().TrueSmoking
     if data == nil then
         -- print('TRUESMOKING::No mod data found for player, cannot update smoking moodle')
+        moodle:setValue(0.5)
         return
     end
 

@@ -116,6 +116,7 @@ function TakePuff:stop()
             end
         end
     end
+    self.data.takingPuff = false
     self:forceComplete()
 end
 
@@ -146,12 +147,13 @@ function TakePuff:perform()
             end
         end
     end
+    self.data.takingPuff = false
     ISBaseTimedAction.perform(self)
 end
 
 function TakePuff:complete()
     self.data.takingPuff = false
-    self.character:transmitModData()
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { {takingPuff = false} })
     sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
     -- TrueSmoking.EquipVisualItem(self.character, self.item)
     return true
@@ -165,7 +167,7 @@ function TakePuff:new(character, item, eatSound, fullType)
     o.stopOnAim = true
 
     o.character = character
-    o.data = TrueSmoking:getModData(character)
+    o.data = character:getModData().TrueSmoking
     o.ts = TrueSmoking:getPlayerReference(character)
     o.item = item
     o.eatSound = eatSound

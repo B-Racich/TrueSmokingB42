@@ -87,7 +87,7 @@ function TrueSmoking:hasRequiredItem(smokable, player)
 end
 
 function TrueSmoking:getShemagh(player, reCover)
-    local o = self:getModData(player)
+    local o = player:getModData().TrueSmoking
     local items = {}
     items['FullHat'] = player:getWornItem('FullHat') or ''
     items['Hat'] = player:getWornItem('Hat') or ''
@@ -145,14 +145,14 @@ function TrueSmoking:adjustShemagh(player, item, putDown)
 end
 
 function TrueSmoking:checkForMaskAndEquip(player)
-    local o = self:getModData(player)
+    local o = player:getModData().TrueSmoking
     if o.mask then
-        self:equipItem(player, o.mask, 50)
+        TrueSmoking:equipItem(player, o.mask, 50)
     end
     if o.shemagh then
-        o.shemagh = self:getShemagh(player, true)
+        o.shemagh = TrueSmoking:getShemagh(player, true)
         if o.shemagh then
-            self:adjustShemagh(player, o.shemagh, false)
+            TrueSmoking:adjustShemagh(player, o.shemagh, false)
         end
     end
 end
@@ -290,7 +290,7 @@ function TrueSmoking:findSmokable(player)
 end
 
 function TrueSmoking:onKeyStartPressed(key)
-    local o = self:getModData(0)
+    local o = getPlayer():getModData().TrueSmoking
     local player = getSpecificPlayer(0) -- Player_0 is always keyboard
     local ts = TrueSmoking:getPlayerReference(0)
     if player then
@@ -314,7 +314,7 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         local item = v
         local smokable = nil
 
-        local o = self:getModData(player)
+        local o = getSpecificPlayer(player):getModData().TrueSmoking
 
         if not instanceof(v, 'InventoryItem') then item = v.items[1] end
 
@@ -330,7 +330,7 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
 end
 
 TrueSmoking.start = function(playerNum, player)
-    local o = TrueSmoking:getModData(player)
+    local o = player:getModData().TrueSmoking
     local ts = TrueSmoking:getPlayerReference(player)
 
     o.eatSound = ''
@@ -371,7 +371,7 @@ TrueSmoking.start = function(playerNum, player)
 end
 
 TrueSmoking.stop = function(player)
-    local o = TrueSmoking:getModData(player)
+    local o = player:getModData().TrueSmoking
     local ts = TrueSmoking:getPlayerReference(player)
 
     if ts.Smokable.smokeLit then
