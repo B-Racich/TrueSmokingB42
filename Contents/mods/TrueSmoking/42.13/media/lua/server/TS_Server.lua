@@ -110,6 +110,9 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
     if command == 'updatePlayerData' then
         local data = args[1]
         for key, value in pairs(data) do
+            if not player:getModData().TrueSmoking then
+                player:getModData().TrueSmoking = {}
+            end
             player:getModData().TrueSmoking[key] = value
         end
         player:transmitModData()

@@ -17,11 +17,15 @@ InventoryUI.onFillItemTooltip:addListener(remainingSmokeTooltip)
 local originalEatItem = ISInventoryPaneContextMenu.eatItem
 ISInventoryPaneContextMenu.eatItem = function(item, percentage, player, openingRecipe, eatPercentage)
     local playerObj = getSpecificPlayer(player);
+    if not playerObj:getModData().TrueSmoking then
+        playerObj:getModData().TrueSmoking = {}
+    end
     if item:hasTag(ItemTag.SMOKABLE) then
         playerObj:getModData().TrueSmoking.CheckMaskSmoking = true
     else
         playerObj:getModData().TrueSmoking.CheckMaskSmoking = false
     end
+    playerObj:transmitModData()
     originalEatItem(item, percentage, player, openingRecipe, eatPercentage)
 end
 
@@ -41,6 +45,8 @@ ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
         o.mask = mask
         o.shemagh = false
     end
+
+    playerObj:transmitModData()
 
     --If we want to handle re-equipping tell the game we took nothing off
     if o.CheckMaskSmoking then

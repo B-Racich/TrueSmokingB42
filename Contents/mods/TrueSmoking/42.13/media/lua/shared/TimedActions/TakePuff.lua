@@ -39,20 +39,20 @@ function TakePuff:update()
 end
 
 function TakePuff:waitToStart()
-    if TrueSmoking.getGameSpeedMultiplier() == 1 then
-        if self.character:getEmitter():isPlaying(self.data.eatSound)
-            or (self.data.lightingEatSound and self.character:getEmitter():isPlaying(self.data.lightingEatSound)) then
-            return true
-        end
-    end
+    -- if TrueSmoking.getGameSpeedMultiplier() == 1 then
+    --     if self.character:getEmitter():isPlaying(self.data.eatSound)
+    --         or (self.data.lightingEatSound and self.character:getEmitter():isPlaying(self.data.lightingEatSound)) then
+    --         return true
+    --     end
+    -- end
     --Wait for timed actions to finish
-    if self.character:isStrafing() or self.character:isRunning() or self.character:isSprinting()
-        or self.character:isAiming() or self.character:isAsleep() or self.character:isPerformingAnAction()
-    then
-        return true
-    else
+    -- if self.character:isStrafing() or self.character:isRunning() or self.character:isSprinting()
+    --     or self.character:isAiming() or self.character:isAsleep() or self.character:isPerformingAnAction()
+    -- then
+    --     return true
+    -- else
         return false
-    end
+    -- end
 end
 
 function TakePuff:start()

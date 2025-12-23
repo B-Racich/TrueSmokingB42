@@ -329,12 +329,22 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
 end
 
-TrueSmoking.start = function(playerNum, player)
+TrueSmoking.start = function(playerNum)
+    local player = getSpecificPlayer(playerNum)
     local o = player:getModData().TrueSmoking
+    if not o then
+        o = {}
+    end
     local ts = TrueSmoking:getPlayerReference(player)
 
+    local newData = {
+        eatSound = '',
+        lightingEatSound = '',
+        isSmoking = false,
+    }
     o.eatSound = ''
     o.lightingEatSound = ''
+    o.isSmoking = false
 
     ts.Smokable = {}
     ts.Smokable.smokeLit = false
@@ -365,7 +375,7 @@ TrueSmoking.start = function(playerNum, player)
 
     o.isSmoking = false
 
-    player:transmitModData()
+    sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { newData })
     Events.OnKeyStartPressed.Add(ts.keyWrapper)
     Events.OnFillInventoryObjectContextMenu.Add(ts.contextWrapper)
 end
