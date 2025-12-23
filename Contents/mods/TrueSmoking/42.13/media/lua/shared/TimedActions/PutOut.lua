@@ -1,6 +1,7 @@
 require 'TimedActions/ISBaseTimedAction'
 require 'TrueSmoking'
 require 'Smokable'
+require 'Utils'
 
 PutOut = ISBaseTimedAction:derive('PutOut')
 
@@ -15,7 +16,7 @@ function PutOut:update()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
             -- Smokable:removeVisualItem(self.character)
-            sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
+            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { self.item })
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
             if hasPrimary then
@@ -59,45 +60,46 @@ end
 
 function PutOut:stop()
     ISBaseTimedAction.stop(self)
-    local data = TrueSmoking:getModData(self.character)
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    -- if data and self.item:getModData().SmokeLength <= 0 then
-     if self.smokeLength > 0 then
-        -- self.character:getInventory():Remove(self.item)
-        -- local item = self.character:getInventory():AddItem(self.item)
-        sendClientCommand(self.character, 'TrueSmoking', 'addSmokable', { self.fullType,self.smokeLength })
-    end
     return true
-    -- end
-    -- If we are cancelling the action and the smoke is finished just get rid of it
-    -- self:forceComplete()
 end
 
 function PutOut:serverStop()
-
+    self:forceComplete()
+    return true
 end
 
 function PutOut:complete()
+    local data = TrueSmoking:getModData(self.character)
+    local ts = TrueSmoking:getPlayerReference(self.character)
+    ts.Smokable:stop()
     if self.smokeLength > 0 then
-        local item = self.character:getInventory():AddItem(self.fullType)
-        item:getModData().SmokeLength = self.smokeLength
-        -- item:syncItemModData()
-        -- syncItemModData(item)
-        -- item:transmitModData()
-        sendAddItemToContainer(self.character:getInventory(),item)
+        self.item:getModData().SmokeLength = self.smokeLength
     end
+
+    if self.item then
+        local onUse = self.item:getReplaceOnUseFullType()
+        if onUse and onUse ~= '' and self.smokeLength <= 0 then
+            local item = self.character:getInventory():AddItem(onUse)
+            sendItemAddedToInventory(self.character, item)
+            self.character:getInventory():Remove(self.item)
+            sendItemRemovedFromInventory(self.character, self.item)
+        end
+    end
+
+    sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', {})
+    -- TrueSmoking.RemoveVisualItem(self.character)
+    TrueSmoking:checkForMaskAndEquip(self.character)
+
+    data.isSmoking = false
+    data.takingPuff = false
+
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { data })
+    -- self.character:transmitModData()
+    syncItemModData(self.character, self.item)
     return true
 end
 
 function PutOut:perform()
-    local data = TrueSmoking:getModData(self.character)
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    -- data.isSmoking = false
-    -- if ts then
-        ts.Smokable:stop()
-    -- end
-    sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', { self.item })
-    self.character:transmitModData()
     ISBaseTimedAction.perform(self)
 end
 

@@ -13,9 +13,7 @@ function TakePuff:update()
     local curTime = os.time()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            -- Smokable:removeVisualItem(self.character)
-            sendClientCommand(self.character, 'TrueSmoking', 'removeSmokableItem', {})
-            -- self.data.Smokable:removeVisualItem()
+            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', {})
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
             if hasPrimary then
@@ -32,12 +30,12 @@ function TakePuff:update()
     end
 
     -- Reset job if keybind is held
-        if self:getJobDelta() >= .98 then
-            if self.ts.Smokable.smokeLength > 0 and (self.data.holdingPuffKey or self.data.B_HELD) and not self.endAction then -- We reset job delta for continous smoking
-                self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
-                self:resetJobDelta()
-            end
+    if self:getJobDelta() >= .98 then
+        if self.ts.Smokable.smokeLength > 0 and (self.data.holdingPuffKey or self.data.B_HELD) and not self.endAction then     -- We reset job delta for continous smoking
+            self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
+            self:resetJobDelta()
         end
+    end
 end
 
 function TakePuff:waitToStart()
@@ -96,7 +94,7 @@ function TakePuff:start()
             end
         end
     end
-    -- self.character:reportEvent('EventEating');
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { self.data })   
 end
 
 function TakePuff:stop()
@@ -106,9 +104,6 @@ function TakePuff:stop()
         self.character:getEmitter():stopSound(self.eatAudio)
     end
 
-    -- Smokable:equipVisualItem(self.character, self.item) -- requip our visualItem
-    self.data.takingPuff = false
-
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
         if self.character:hasTrait(CharacterTrait.SMOKER) then
@@ -121,13 +116,14 @@ function TakePuff:stop()
             end
         end
     end
-    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.fullType})
     self:forceComplete()
 end
 
 function TakePuff:serverStop()
-    -- Smokable:equipVisualItem(self.character, self.item) -- requip our visualItem
-    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.fullType})
+    self.data.takingPuff = false
+    self.player:transmitModData()
+    -- TrueSmoking.EquipVisualItem(self.character, self.item)
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
 end
 
 function TakePuff:perform()
@@ -137,7 +133,6 @@ function TakePuff:perform()
         end
     end
 
-    self.data.takingPuff = false
 
     if TrueSmoking.Options.Coughing then
         local coughChance = 100
@@ -151,15 +146,14 @@ function TakePuff:perform()
             end
         end
     end
-    self.character:transmitModData()
-    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem',{self.fullType})
     ISBaseTimedAction.perform(self)
 end
 
 function TakePuff:complete()
-    -- Smokable:equipVisualItem(self.character, self.item) -- requip our visualItem
-    -- self.data.Smokable:equipVisualItem() -- requip our visualItem
-
+    self.data.takingPuff = false
+    self.character:transmitModData()
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
+    -- TrueSmoking.EquipVisualItem(self.character, self.item)
     return true
 end
 

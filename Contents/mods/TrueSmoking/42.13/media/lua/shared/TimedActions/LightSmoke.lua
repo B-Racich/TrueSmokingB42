@@ -1,6 +1,7 @@
 require 'TimedActions/ISBaseTimedAction'
 require 'TrueSmoking'
 require 'Smokable'
+require 'Utils'
 
 LightSmoke = ISBaseTimedAction:derive('LightSmoke')
 
@@ -56,6 +57,7 @@ function LightSmoke:start()
     if not self.fromRelaunch and self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
         local lighter = self:getRequiredItem()
         lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
+        sendItemStats(lighter)
     end
 
     if self.eatSound ~= '' then
@@ -99,39 +101,21 @@ function LightSmoke:perform()
         self.character:stopOrTriggerSound(self.eatAudio);
     end
 
-    -- self.container:setDrawDirty(true);
-    local data = TrueSmoking:getModData(self.character)
-    data.isSmoking = true
-    -- data.Smokable = Smokable:start(self.character, self.item)
-
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    ts.Smokable = Smokable:start(self.character, self.item)
-    self.character:transmitModData()
-    -- Smokable:equipVisualItem(self.character, self.item)
-    -- triggerEvent('OnClothingUpdated', self.character)
-    sendClientCommand(self.character, 'TrueSmoking', 'equipSmokableItem', { self.item })
     ISBaseTimedAction.perform(self)
 end
 
 function LightSmoke:complete()
     print('TRUESMOKING::LightSmoke complete')
-    -- local smokable = Smokable:new(self.character, self.item)
-    -- -- local data = TrueSmoking:getModData(self.character)
-    -- local data = self.data
-    -- if not data or not data.Smokable then
-    --     data.Smokable = {}
-    -- end
-    -- data.Smokable = smokable
-    -- self.character:transmitModData()
-    -- smokable:start()
-    -- Smokable:start(self.character, self.item)
-    -- Smokable:equipVisualItem(self.character, self.item)
-    -- triggerEvent('OnClothingUpdated', self.character)
+    local ts = TrueSmoking:getPlayerReference(self.character)
+    local data = TrueSmoking:getModData(self.character)
 
-    print('TRUESMOKING::Set isSmoking to true in LightSmoke complete')
-    self.character:getInventory():Remove(self.item)
-    sendRemoveItemFromContainer(self.character:getInventory(),self.item)
-    -- sendClientCommand(self.character, 'TrueSmoking', 'removeSmokable', { self.item }    )
+    ts.Smokable = Smokable:start(self.character, self.item)
+    data.isSmoking = true
+    -- TrueSmoking.EquipVisualItem(self.character, self.item)
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
+
+    self.character:transmitModData()
+    -- syncItemModData(self.character, self.item)
     return true
 end
 

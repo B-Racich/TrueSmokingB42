@@ -75,6 +75,7 @@ function ISEatFoodAction:new(character, item, percentage)
 
             print('TRUESMOKING::Setting up smokable')
             item:getModData().modOnEat = hook
+            syncItemModData(character, item)
 
             return LightSmoke:new(character, item)
         end

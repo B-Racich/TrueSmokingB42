@@ -17,9 +17,6 @@ TrueSmoking.Player_4 = TrueSmoking.Player_4 or {}
 
 local tsDebug = TrueSmoking.tsDebug
 
--- local originalGetEatingMask = ISInventoryPaneContextMenu.getEatingMask
--- local originalEatItem = ISInventoryPaneContextMenu.eatItem
-
 function TrueSmoking:setHotkeySmokes(list)
     for _, item in ipairs(list) do
         table.insert(self.HotkeySmokes, item)
@@ -160,11 +157,11 @@ function TrueSmoking:checkForMaskAndEquip(player)
     end
 end
 
-function TrueSmoking:removeItem(player, item, time)
+function TrueSmoking:removeItem(player, item)
     ISTimedActionQueue.add(ISUnequipAction:new(player, item))
 end
 
-function TrueSmoking:equipItem(player, item, time)
+function TrueSmoking:equipItem(player, item)
     ISTimedActionQueue.add(ISWearClothing:new(player, item))
 end
 
@@ -229,14 +226,6 @@ function TrueSmoking:findSmokable(player)
         }
     }
 
-    -- for index, value in ipairs(self.HotkeyPacks) do
-    --     table.insert(itemData.packed.nonfavorite, value)
-    -- end
-
-    -- for index, value in ipairs(self.HotkeySmokes) do
-    --     table.insert(itemData.smokable.nonfavorite, value)
-    -- end
-
     local function processInventory(inv)
         local items = inv:getItems()
         for i = 0, items:size() - 1 do
@@ -276,18 +265,6 @@ function TrueSmoking:findSmokable(player)
         end
     end
 
-    --[[
-    for i, v in ipairs(itemData.packed.favorite) do
-        print('Packed Favorite:', v:getFullType())
-    end
-    for i, v in ipairs(itemData.packed.nonfavorite) do
-        print('Packed Nonfavorite:', v:getFullType())
-    end
-    for i, v in ipairs(itemData.smokable) do
-        print('Smokable:', v:getFullType())
-    end
-    --]]
-
     local cigarette = itemData.smokable.nonfavorite[1] or false
     local pack = itemData.packed.favorite[1] or itemData.packed.nonfavorite[1] or false
     local hasFavCig = itemData.smokable.favorite[1] or false
@@ -309,14 +286,10 @@ function TrueSmoking:findSmokable(player)
     if cigarette and self:hasRequiredItem(cigarette, player) then
         print('TRUESMOKING::Using Cigarette')
         ISInventoryPaneContextMenu.eatItem(cigarette, 1, player:getPlayerNum())
-        -- local table = TrueSmoking:getModData(player)
-        -- table.Smokable = Smokable:new(cigarette, player)
-        -- ISTimedActionQueue.add(TestSmoke:new(player, cigarette))
     end
 end
 
 function TrueSmoking:onKeyStartPressed(key)
-    -- print(string.format('TRUESMOKING::KEY PRESSED - %s',key))
     local o = self:getModData(0)
     local player = getSpecificPlayer(0) -- Player_0 is always keyboard
     local ts = TrueSmoking:getPlayerReference(0)
@@ -324,8 +297,6 @@ function TrueSmoking:onKeyStartPressed(key)
         if o.isSmoking and ts.Smokable.smokeLit and key == self.Config.keySmoke then
             ts.Smokable:puff()
         elseif o.isSmoking and not ts.Smokable.smokeLit and key == self.Config.keySmoke then
-            -- o.isSmoking = false
-            -- o.Smokable.smokeLit = false
             ts.Smokable:light()
         elseif self.Config.FindSmoke and not o.isSmoking and key == self.Config.keySmoke then
             print('TRUESMOKING::Find Smokable')
@@ -380,17 +351,6 @@ TrueSmoking.start = function(playerNum, player)
         TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
     ts.contextWrapper = contextWrapper
-
-    if player:getModData().Smokable then
-        local itemName = player:getModData().Smokable[1]
-        -- local smokable = player:getInventory():AddItem(player:getModData().Smokable[1])
-        local data = { SmokeLength = player:getModData().Smokable[2] }
-        sendClientCommand(player, 'TrueSmoking', 'addSmokable', { itemName, data })
-        -- if smokable then
-        --     smokable:getModData().SmokeLength = player:getModData().Smokable[2]
-        -- end
-        player:getModData().Smokable = false
-    end
 
     if TrueSmoking.Options.UseNicotineSystem then
         NicotineSystem:initialize(player)

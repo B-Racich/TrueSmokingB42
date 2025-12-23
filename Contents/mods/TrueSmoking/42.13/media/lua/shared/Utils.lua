@@ -97,8 +97,9 @@ function TrueSmoking.takeACigarette(items, result, player)
                     item:getModData().OriginalSmokeLength = value.OriginalSmokeLength
                     item:getModData().SmokeLength = value.SmokeLength
                     print('TRUESMOKING::Restored cig data from pack for ID: ' ..
-                    key ..
-                    ' | OriginalSmokeLength: ' .. value.OriginalSmokeLength .. ' | SmokeLength: ' .. value.SmokeLength)
+                        key ..
+                        ' | OriginalSmokeLength: ' ..
+                        value.OriginalSmokeLength .. ' | SmokeLength: ' .. value.SmokeLength)
                     pack:getModData().Cigs[key] = nil
                     break
                 end
@@ -192,7 +193,8 @@ function TrueSmoking.OnEat_ItemStats(player, smokableStats)
     --If smokable has boredom or unhappyness distribute them (these are applied in vanilla outside of OnEat, but we 0'd them earlier.)
     if smokable.boredom ~= 0 then
         temp = smokable.originalBoredom * percent
-        stats:set(CharacterStat.BOREDOM, adjustStat(stats:get(CharacterStat.BOREDOM), temp - ZomboidGlobals.BoredomIncrease, 'boredom'))
+        stats:set(CharacterStat.BOREDOM,
+            adjustStat(stats:get(CharacterStat.BOREDOM), temp - ZomboidGlobals.BoredomIncrease, 'boredom'))
         smokable.boredom = smokable.boredom - temp
         -- print(string.format('Smokable boredom: %s | temp: %s', smokable.boredom, temp))
         if smokable.boredom > 0 then
@@ -306,10 +308,12 @@ function TrueSmoking.OnEat_Tobacco(player, smokableStats)
         stats:set(CharacterStat.UNHAPPINESS, adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp, 'unhappy'))
 
         temp = 1 * percent * effectMultiplier
-        stats:set(CharacterStat.STRESS, adjustStat(stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp, 'stress'))
+        stats:set(CharacterStat.STRESS,
+            adjustStat(stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp, 'stress'))
 
         temp = 0.51 * percent * effectMultiplier
-        stats:set(CharacterStat.NICOTINE_WITHDRAWAL, adjustStat(stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp, 'cigs'))
+        stats:set(CharacterStat.NICOTINE_WITHDRAWAL,
+            adjustStat(stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp, 'cigs'))
 
         temp = 10 * percent * effectMultiplier
         character:setTimeSinceLastSmoke(character:getTimeSinceLastSmoke() - temp)
@@ -328,7 +332,8 @@ function TrueSmoking.OnEat_Tobacco(player, smokableStats)
 
         if smokable.foodSick ~= 0 then
             temp = smokable.originalFoodSick * percent
-            stats:set(CharacterStat.FOOD_SICKNESS, math.min(stats:get(CharacterStat.FOOD_SICKNESS) + temp * effectMultiplier, 100))
+            stats:set(CharacterStat.FOOD_SICKNESS,
+                math.min(stats:get(CharacterStat.FOOD_SICKNESS) + temp * effectMultiplier, 100))
             smokable.foodSick = smokable.foodSick - temp
             if smokable.foodSick < 0 then
                 smokable.foodSick = 0
@@ -337,7 +342,8 @@ function TrueSmoking.OnEat_Tobacco(player, smokableStats)
 
         if smokable.unhappyness ~= 0 then
             temp = smokable.originalUnhappyness * percent
-            stats:set(CharacterStat.UNHAPPINESS, adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp * effectMultiplier, 'unhappy'))
+            stats:set(CharacterStat.UNHAPPINESS,
+                adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp * effectMultiplier, 'unhappy'))
             smokable.unhappyness = smokable.unhappyness - temp
             if smokable.unhappyness > 0 then
                 smokable.unhappyness = 0
@@ -346,4 +352,56 @@ function TrueSmoking.OnEat_Tobacco(player, smokableStats)
     end
 
     -- OnEat_Tobacco = TrueSmoking.OnEat_Tobacco
+
+    function TrueSmoking.EquipVisualItem(player, item)
+        local function getVisual(item)
+            local OnEat_Defaults = {
+                ['RecipeCodeOnEat.consumeNicotine'] = 'base.Mask_Cigarette',
+            }
+
+            local typeMatches = {
+                ['smokingpipe'] = 'Mask_Pipe',
+                ['joint'] = 'Mask_Cigarette',
+                ['blunt'] = 'Mask_Cigarillo',
+                ['spliff'] = 'Mask_Cigarillo',
+                ['can'] = false,
+                ['bong'] = false,
+            }
+
+            local itemType = item:getFullType():lower()
+            print('Looking for ' .. itemType)
+
+            for pattern, itemName in pairs(typeMatches) do
+                if itemType:find(pattern) then
+                    return itemName and instanceItem(itemName) or false
+                end
+            end
+
+            for key, value in pairs(OnEat_Defaults) do
+                if item:getOnEat() == key then return instanceItem(value) end
+            end
+
+            return false
+        end
+
+        if not TrueSmoking.Options.ManageHeadGear then return end
+        print('looking for ' .. item:getOnEat())
+        local visual = getVisual(item)
+        print('visual is ' .. tostring(visual))
+        if not player:getWornItem(TrueSmoking.registries.mask) and visual then
+            player:setWornItem(visual:getBodyLocation(), visual)
+            triggerEvent('OnClothingUpdated', player)
+        elseif player:getWornItem(TrueSmoking.registries.mask) then
+            player:removeWornItem(player:getWornItem(TrueSmoking.registries.mask))
+            TrueSmoking.EquipVisualItem(player, item)
+        end
+    end
+
+    function TrueSmoking.RemoveVisualItem(player)
+        if not TrueSmoking.Options.ManageHeadGear then return end
+        if player:getWornItem(TrueSmoking.registries.mask) then
+            player:removeWornItem(player:getWornItem(TrueSmoking.registries.mask))
+            triggerEvent('OnClothingUpdated',player)
+        end
+    end
 end

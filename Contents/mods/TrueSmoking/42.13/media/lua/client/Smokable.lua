@@ -8,15 +8,17 @@ Smokable.__index = Smokable
 
 local tsDebug = TrueSmoking.tsDebug
 
-function Smokable:new(player, item, table)
+function Smokable:new(player, item)
     local obj = {}
     setmetatable(obj, self)
-    obj:init(item, player, table)
+    obj:init(item, player)
     return obj
 end
 
 function Smokable:init(item, player)
     self.item = item
+    self.itemFullType = item:getFullType()
+    self.customEatSound = item:getCustomEatSound() or ''
 
     if instanceof(item, 'Drainable') then
         self.item = instanceItem('Base.CigaretteSingle')
@@ -24,7 +26,6 @@ function Smokable:init(item, player)
     end
 
     self.player = player
-    self.data = TrueSmoking:getModData(player)
 
     local data = self:getObject(self.item)
     for k, v in pairs(data) do
@@ -67,6 +68,33 @@ function Smokable:getItemStats(item)
     }
 end
 
+function Smokable:getStats()
+    return {
+        stress = self.stress,
+        boredom = self.boredom,
+        unhappyness = self.unhappyness,
+        fatigue = self.fatigue,
+        thirst = self.thirst,
+        hunger = self.hunger,
+        pain = self.pain,
+        endurance = self.endurance,
+        reduceFoodSick = self.reduceFoodSick,
+        originalStress = self.originalStress,
+        originalBoredom = self.originalBoredom,
+        originalUnhappyness = self.originalUnhappyness,
+        originalFatigue = self.originalFatigue,
+        originalThirst = self.originalThirst,
+        originalHunger = self.originalHunger,
+        originalPain = self.originalPain,
+        originalEndurance = self.originalEndurance,
+        originalReduceFoodSick = self.originalReduceFoodSick,
+
+        effectMultiplier = self.effectMultiplier,
+        puffPercent = self.puffPercent,
+        smokeLit = self.smokeLit,
+    }
+end
+
 function Smokable:getObject(item)
     local fullType = item:getFullType()
     print('TRUESMOKING::Looking for: ' .. fullType)
@@ -94,36 +122,6 @@ function Smokable:getObject(item)
         categoryMult = cat.Rolled
     end
 
-    -- Recipe-based fallbacks (vanilla OnEat system)
-    local onEat = item:getOnEat() or ''
-    local recipeDefaults = {
-        ['RecipeCodeOnEat.cigarettes'] = {
-            smokeLength     = TrueSmoking.Options.CigaretteLength or baseLength,
-            nicotineContent = 100,
-            visualItem      = 'Mask_Cigarette',
-        },
-        ['RecipeCodeOnEat.cigarillo'] = {
-            smokeLength     = TrueSmoking.Options.CigarilloLength or baseLength,
-            nicotineContent = 150,
-            visualItem      = 'Mask_Cigarillo',
-            categoryMult    = cat.Cigarillo,
-        },
-        ['RecipeCodeOnEat.cigar'] = {
-            smokeLength     = TrueSmoking.Options.CigarLength or baseLength,
-            nicotineContent = 300,
-            visualItem      = 'Mask_Cigar',
-            categoryMult    = cat.Cigar,
-        },
-    }
-
-    local recipe = recipeDefaults[onEat]
-    if recipe then
-        for k, v in pairs(recipe) do
-            if o[k] == nil then o[k] = v end
-        end
-        if recipe.categoryMult then categoryMult = recipe.categoryMult end
-    end
-
     -- Final defaults (only applied if not set by modder or recipe)
     local defaults = {
         smokeLength      = baseLength,
@@ -136,11 +134,11 @@ function Smokable:getObject(item)
         walkingFactor    = g.walkingFactor,
         runningFactor    = g.runningFactor,
         sprintingFactor  = g.sprintingFactor,
-        effectMultiplier = 1.0,
-        nicotineContent  = 40,
+        effectMultiplier = 1,
+        nicotineContent  = 100,
         conditions       = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
         visualItem       = 'Mask_Cigarette',
-        callback         = TrueSmoking.OnEat_Tobacco,
+        callback         = false,
     }
 
     -- Apply defaults only where missing
@@ -170,6 +168,7 @@ function Smokable:getObject(item)
     local modData = item:getModData()
     modData.SmokeLength = o.smokeLength
     modData.OriginalSmokeLength = o.originalSmokeLength
+    syncItemModData(self.player, item)
 
     return o
 end
@@ -183,140 +182,49 @@ function Smokable:getSavedSmokeLength(item)
     end
 end
 
-function Smokable:equipVisualItem()
-    if not TrueSmoking.Options.ManageHeadGear then return end
-    if not self.player:getWornItem(TrueSmoking.registries.mask) and instanceItem(self.visualItem) then
-        self.player:setWornItem(instanceItem(self.visualItem):getBodyLocation(), instanceItem(self.visualItem))
-    elseif self.player:getWornItem(TrueSmoking.registries.mask) then
-        self.player:removeWornItem(self.player:getWornItem(TrueSmoking.registries.mask))
-        self:equipVisualItem()
-    end
-end
-
-function Smokable:removeVisualItem()
-    if not TrueSmoking.Options.ManageHeadGear then return end
-    if self.player:getWornItem(TrueSmoking.registries.mask) then
-        self.player:removeWornItem(self.player:getWornItem(TrueSmoking.registries.mask))
-    end
-end
-
-function Smokable:getVisualItem(item)
-    if not TrueSmoking.Options.ManageHeadGear then return false end
-
-    local OnEat_Defaults = {
-        ['OnEat_Cigarettes'] = 'Mask_Cigarette',
-        ['OnEat_Cigarillo'] = 'Mask_Cigarillo',
-        ['OnEat_Cigar'] = 'Mask_Cigar',
-    }
-
-    local typeMatches = {
-        ['smokingpipe'] = 'Mask_Pipe',
-        ['joint'] = 'Mask_Cigarette',
-        ['blunt'] = 'Mask_Cigarillo',
-        ['spliff'] = 'Mask_Cigarillo',
-        ['can'] = false,
-        ['bong'] = false,
-    }
-
-    local itemType = item:getFullType():lower()
-
-    for pattern, itemName in pairs(typeMatches) do
-        if itemType:find(pattern) then
-            return itemName and instanceItem(itemName) or false
-        end
-    end
-
-    for key, value in pairs(OnEat_Defaults) do
-        if item:getOnEat() == key then return instanceItem(value) end
-    end
-
-    return false
-end
-
 function Smokable:light()
-    if not ISTimedActionQueue.hasActionType(self.player, 'LightSmoke') then
-        ISTimedActionQueue.add(LightSmoke:new(self.player))
-    end
-end
-
-function Smokable:start()
-    local data = TrueSmoking:getModData(self.player)
-    print('TRUESMOKING::Smokable start called - smokeLit: ' ..
-        tostring(self.smokeLit) .. ', isSmoking: ' .. tostring(data.isSmoking))
-    if not data.isSmoking then
-        data.isSmoking = true
-
-        local function updateWrapper()
-            self:update()
-        end
-        Events.OnPlayerUpdate.Add(updateWrapper)
-
-        self.updateWrapper = updateWrapper
-        self:equipVisualItem()
-        if self.cigPack then
-            self.cigPack:setUsedDelta(self.cigPack:getCurrentUsesFloat() - self.cigPack:getUseDelta())
-        else
-            self.player:getInventory():Remove(self.item)
-        end
-    end
-
     if not self.smokeLit then
         self.smokeLit = true
-        self.puffTimeMark = os.time()
-        data.lightingEatSound = ''
+        self.lightingEatSound = ''
 
         if self.burnRate == 0 then
             self.burnRate = ZombRandFloat(self.burnMin,
                 self.burnMax)
         end
     end
-    data.Smokable = self
-    print('TRUESMOKING::Smokable started - smokeLit: ' ..
-        tostring(self.smokeLit) .. ', isSmoking: ' .. tostring(self.data.isSmoking))
-    self.player:transmitModData()
+    if not ISTimedActionQueue.hasActionType(self.player, 'LightSmoke') then
+        ISTimedActionQueue.add(LightSmoke:new(self.player))
+    end
+end
+
+function Smokable:start(player, item)
+    self:init(item, player)
+
+    if not self.smokeLit then
+        self.smokeLit = true
+        self.lightingEatSound = ''
+
+        if self.burnRate == 0 then
+            self.burnRate = ZombRandFloat(self.burnMin,
+                self.burnMax)
+        end
+    end
+
+    return self
 end
 
 function Smokable:putOut()
-    if self.data.isSmoking and not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
-        ISTimedActionQueue.add(PutOut:new(self.player))
+    local data = TrueSmoking:getModData(self.player)
+    if data.isSmoking and not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
+        ISTimedActionQueue.add(PutOut:new(self.player, self.item, self.smokeLength,
+            self.customEatSound, self.itemFullType))
     end
 end
 
 function Smokable:stop()
-    self.data.isSmoking = false
-    self.data.takingPuff = false
     self.smokeLit = false
     self.hasDropped = false
     self.dropState = false
-
-    self.data.SmokingMoodle:stop()
-
-    self:removeVisualItem()
-
-    if self.updateWrapper then
-        Events.OnPlayerUpdate.Remove(self.updateWrapper)
-        self.updateWrapper = nil
-    end
-
-    TrueSmoking:checkForMaskAndEquip(self.player)
-
-    if self.item then
-        local onUse = self.replaceOnUse
-        if onUse and onUse ~= '' and self.smokeLength <= 0 then
-            print('TRUESMOKING::adding item: ' .. self.replaceOnUse)
-            TrueSmoking.addOnUseItem(self.player)
-        end
-
-        if self.smokeLength > 0 then
-            self.player:getInventory():AddItem(self.item)
-            self.player:getModData().Smokable = false
-        end
-
-        if self.smokeLength <= 0 then
-            self.item:getModData().SmokeLength = 0
-            self.player:getModData().Smokable = false
-        end
-    end
 end
 
 function Smokable:dropSmoke()
@@ -324,7 +232,6 @@ function Smokable:dropSmoke()
         .item)
     self.player:getCurrentSquare():AddWorldInventoryItem(self.item, dropX, dropY, dropZ)
     self.item = false
-    self.player:getModData().Smokable = false
     self:stop()
 end
 
@@ -341,26 +248,49 @@ function Smokable:checkDropConditions()
     return result
 end
 
-function Smokable:update()
-    -- tsDebug('TRUESMOKING::Smokable update tick')
-    if TrueSmoking.Options.Dropping and self.canDrop then
-        if not self.hasRolledForDrop and self:checkDropConditions() then
-            self.hasRolledForDrop = true
-            local roll = ZombRandFloat(0.0, 100.0)
-            local dropChance = self.player:hasTrait('Smoker') and TrueSmoking.Options.DroppingChanceSmoker or
-                TrueSmoking.Options.DroppingChanceNonSmoker
-            if dropChance >= roll then
-                self.hasDropped = true
-            end
+Events.OnPlayerUpdate.Add(function(player)
+    Smokable:update(player)
+end)
+
+function Smokable:update(player)
+    local data = TrueSmoking:getModData(player)
+    if not data or not data.isSmoking then return end
+    if isClient() then
+        if not player:getInventory():containsID(self.item:getID()) then
+            self.smokeLit = false
+            data.isSmoking = false
+            sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { data })
+            -- self.player:transmitModData()
+            return
         end
-        if self.hasRolledForDrop and not self:checkDropConditions() then
-            self.hasRolledForDrop = false
-            if self.hasDropped then
-                self.hasDropped = false
-                self:dropSmoke()
-            end
+    else
+        if not player:getInventory():contains(self.item) then
+            self.smokeLit = false
+            data.isSmoking = false
+            sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { data })
+            -- self.player:transmitModData()
+            return
         end
     end
+    -- tsDebug('TRUESMOKING::Smokable update tick')
+    -- if TrueSmoking.Options.Dropping and self.canDrop then
+    --     if not self.hasRolledForDrop and self:checkDropConditions() then
+    --         self.hasRolledForDrop = true
+    --         local roll = ZombRandFloat(0.0, 100.0)
+    --         local dropChance = self.player:hasTrait(CharacterTrait.SMOKER) and TrueSmoking.Options.DroppingChanceSmoker or
+    --             TrueSmoking.Options.DroppingChanceNonSmoker
+    --         if dropChance >= roll then
+    --             self.hasDropped = true
+    --         end
+    --     end
+    --     if self.hasRolledForDrop and not self:checkDropConditions() then
+    --         self.hasRolledForDrop = false
+    --         if self.hasDropped then
+    --             self.hasDropped = false
+    --             self:dropSmoke()
+    --         end
+    --     end
+    -- end
     if self.smokeLit then
         local gameSpeed = TrueSmoking.getGameSpeedMultiplier()
         local isWalking = self.player:isWalking() and self.conditions['walking']
@@ -369,8 +299,14 @@ function Smokable:update()
         local isStrafing = self.player:isStrafing() and self.conditions['strafing']
         local isReading = ISTimedActionQueue.hasActionType(self.player, 'ISReadABook')
 
+        if isKeyDown(TrueSmoking.Config.keySmoke) and data.holdingPuffKey == false then
+            data.holdingPuffKey = true
+        elseif data.holdingPuffKey == true and not isKeyDown(TrueSmoking.Config.keySmoke) then
+            data.holdingPuffKey = false
+        end
+
         local targetBurnRate
-        if self.data.takingPuff then
+        if data.takingPuff then
             targetBurnRate = self.burnMax * self.puffFactor
         elseif isSprinting then
             targetBurnRate = self.burnMin * self.sprintingFactor
@@ -400,24 +336,28 @@ function Smokable:update()
         self.smokeLength = self.smokeLength - self.burnRate * gameSpeed
         self.smokePercent = self.smokeLength / self.originalSmokeLength
 
-        TrueSmoking.OnEat_ItemStats(self)
+        sendClientCommand(self.player, 'TrueSmoking', 'OnEat_ItemStats', { self:getStats() })
+        if self.onEat == 'RecipeCodeOnEat.consumeNicotine' then
+            sendClientCommand(self.player, 'TrueSmoking', 'OnEat_Tobacco', { self:getStats() })
+        end
+        -- TrueSmoking.OnEat_ItemStats(self)
 
-        if TrueSmoking.Options.UseNicotineSystem and self.puffPercent > 0 and self.nicotineContent then
+        if TrueSmoking.Options.UseNicotineSystem and self.onEat == 'RecipeCodeOnEat.consumeNicotine' and self.puffPercent > 0 and self.nicotineContent then
             local nicotineAmount = self.nicotineContent * self.puffPercent
             NicotineSystem:smoke(self.player, nicotineAmount, self.nicotineContent)
         end
 
         if self.callback then
             self.callback(self)
+            -- sendClientCommand(self.player, 'TrueSmoking', 'smokableCallback', { self.callback, self:getStats() })
         end
 
         for _, func in ipairs(TrueSmoking.Callbacks) do
-            func(self)
+            -- func(self)
         end
 
-        self.item:getModData().SmokeLength = self.smokeLength
-        self.player:getModData().Smokable = { self.item:getFullType(), self.smokeLength }
-
+        sendClientCommand(self.player, 'TrueSmoking', 'updatePlayerData', { data })
+        sendClientCommand(self.player, 'TrueSmoking', 'updateItemData', { self.item, { SmokeLength = self.smokeLength } })
         self:idlePuff()
     end
 
@@ -439,13 +379,13 @@ end
 
 function Smokable:puff()
     if not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
-        ISTimedActionQueue.add(TakePuff:new(self.player))
+        ISTimedActionQueue.add(TakePuff:new(self.player, self.item, self.customEatSound,
+            self.itemFullType))
     end
 end
 
 function Smokable:idlePuff()
-    local timeDiff = os.difftime(os.time(), self.puffTimeMark)
-    if (TrueSmoking.Config.PassiveSmoking and timeDiff >= self.timeCheck) or (TrueSmoking.Config.KeepLit and self.burnRate < 0.00001 and self.smokeLit) then
+    if (TrueSmoking.Config.KeepLit and self.burnRate < 0.00001 and self.smokeLit) then
         self:puff()
     end
 end

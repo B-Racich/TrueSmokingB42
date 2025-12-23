@@ -26,6 +26,7 @@ function TrueSmoking.updateSmokingMoodle(player)
     local item = ts.Smokable
     if not item or not item.smokeLength then
         -- print('TRUESMOKING::No item found on smokable item, cannot update moodle')
+        moodle:setValue(0.5)
         return
     end
     local smokeLit = item.smokeLit

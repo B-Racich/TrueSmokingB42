@@ -2,7 +2,7 @@ require 'TrueSmoking'
 function TrueSmoking.onClientCommand(module, command, player, args)
     if module ~= 'TrueSmoking' then return end
 
-    if command == 'equipSmokableItem' then
+    if command == 'equipVisualItem' then
         local function getVisual(item)
             local OnEat_Defaults = {
                 ['RecipeCodeOnEat.consumeNicotine'] = 'base.Mask_Cigarette',
@@ -40,18 +40,18 @@ function TrueSmoking.onClientCommand(module, command, player, args)
         print('visual is ' .. tostring(visual))
         if not player:getWornItem(TrueSmoking.registries.mask) and visual then
             player:setWornItem(visual:getBodyLocation(), visual)
-            -- triggerEvent('OnClothingUpdated', player)
+            triggerEvent('OnClothingUpdated', player)
         elseif player:getWornItem(TrueSmoking.registries.mask) then
             player:removeWornItem(player:getWornItem(TrueSmoking.registries.mask))
             sendClientCommand(player, 'TrueSmoking', 'equipSmokableItem', { item })
         end
     end
 
-    if command == 'removeSmokableItem' then
+    if command == 'removeVisualItem' then
         if not TrueSmoking.Options.ManageHeadGear then return end
         if player:getWornItem(TrueSmoking.registries.mask) then
             player:removeWornItem(player:getWornItem(TrueSmoking.registries.mask))
-            -- triggerEvent('OnClothingUpdated',player)
+            triggerEvent('OnClothingUpdated',player)
         end
     end
 
@@ -98,7 +98,7 @@ function TrueSmoking.onClientCommand(module, command, player, args)
         if smokable and data then
             smokable:getModData().SmokeLength = data.SmokeLength
         end
-        -- syncItemModData(smokable)
+        -- syncItemModData(player, smokable)
         sendAddItemToContainer(player:getInventory(),smokable)
 
     end
@@ -114,6 +114,27 @@ function TrueSmoking.onClientCommand(module, command, player, args)
         local smokable = args[2]
         if callback and type(callback) == 'function' then
             callback(player, smokable)
+        end
+    end
+
+    if command == 'SyncItemModData' then
+        local item = args[1]
+        local data = args[2]
+        for k, v in pairs(data) do
+            item:getModData()[k] = v
+        end
+    end
+
+    if command == 'updatePlayerData' then
+        local data = args[1]
+        player:getModData().TrueSmoking = data
+    end
+
+    if command == 'updateItemData' then
+        local item = args[1]
+        local data = args[2]
+        for k, v in pairs(data) do
+            item:getModData()[k] = v
         end
     end
 end
