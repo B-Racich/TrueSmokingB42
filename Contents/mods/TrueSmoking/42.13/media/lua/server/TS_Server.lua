@@ -2,7 +2,9 @@ require 'TrueSmoking'
 function TrueSmoking.onClientCommand(module, command, playerRaw, args)
     if module ~= 'TrueSmoking' then return end
 
-    local player = getPlayerByOnlineID(playerRaw:getOnlineID())
+    local player = false
+    if not isclient and not isServer() then player = playerRaw
+    else player = getPlayerByOnlineID(playerRaw:getOnlineID()) end
 
     if command == 'equipVisualItem' then
         local function getVisual(item)
