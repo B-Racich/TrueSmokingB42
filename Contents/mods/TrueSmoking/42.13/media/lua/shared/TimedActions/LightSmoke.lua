@@ -119,7 +119,7 @@ function LightSmoke:complete()
     data.isSmoking = true
     data.takingPuff = false
     -- TrueSmoking.EquipVisualItem(self.character, self.item)
-    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
 
     -- self.character:transmitModData()
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { data })

@@ -1,4 +1,3 @@
-require 'TrueSmoking'
 function TrueSmoking.onClientCommand(module, command, playerRaw, args)
     if module ~= 'TrueSmoking' then return end
 
@@ -37,7 +36,10 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             return false
         end
 
-        if not TrueSmoking.Options.ManageHeadGear then return end
+        local ts = args[2] or false
+        if not ts then return end
+
+        if not ts.ManageHeadGear then return end
         local item = args[1]
         print('looking for ' .. item:getOnEat())
         local visual = getVisual(item)
@@ -52,7 +54,9 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
     end
 
     if command == 'removeVisualItem' then
-        if not TrueSmoking.Options.ManageHeadGear then return end
+        local ts = args[1] or false
+        if not ts then return end
+        if not ts.ManageHeadGear then return end
         if player:getWornItem(TrueSmoking.registries.mask) then
             player:removeWornItem(player:getWornItem(TrueSmoking.registries.mask))
             triggerEvent('OnClothingUpdated',player)

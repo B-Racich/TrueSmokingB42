@@ -1,11 +1,12 @@
 require 'TimedActions/ISBaseTimedAction'
 require 'TrueSmoking'
 require 'Smokable'
+require 'Utils'
 
 TakePuff = ISBaseTimedAction:derive('TakePuff')
 
 function TakePuff:isValid()
-    return self.data.isSmoking and self.ts.Smokable.smokeLength > 0
+    return self.data.isSmoking
 end
 
 function TakePuff:update()
@@ -13,7 +14,7 @@ function TakePuff:update()
     local curTime = os.time()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', {})
+            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', {TrueSmoking.Options})
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
             if hasPrimary then
@@ -29,9 +30,11 @@ function TakePuff:update()
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
 
+    local ts = TrueSmoking:getPlayerReference(self.character)
+
     -- Reset job if keybind is held
     if self:getJobDelta() >= .98 then
-        if self.ts.Smokable.smokeLength > 0 and (self.data.holdingPuffKey or self.data.B_HELD) and not self.endAction then -- We reset job delta for continous smoking
+        if ts.Smokable.smokeLength > 0 and (self.data.holdingPuffKey or self.data.B_HELD) and not self.endAction then -- We reset job delta for continous smoking
             self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
             self:resetJobDelta()
         end
@@ -131,7 +134,7 @@ end
 
 function TakePuff:complete()
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { { takingPuff = false } })
-    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
     -- TrueSmoking.EquipVisualItem(self.character, self.item)
     return true
 end
@@ -145,7 +148,7 @@ function TakePuff:new(character, item, eatSound, fullType)
 
     o.character = character
     o.data = character:getModData().TrueSmoking
-    o.ts = TrueSmoking:getPlayerReference(character)
+    -- o.ts = TrueSmoking:getPlayerReference(character)
     o.item = item
     o.eatSound = eatSound
     o.fullType = fullType

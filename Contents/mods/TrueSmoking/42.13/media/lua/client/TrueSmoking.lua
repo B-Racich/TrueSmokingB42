@@ -290,8 +290,8 @@ function TrueSmoking:findSmokable(player)
 end
 
 function TrueSmoking:onKeyStartPressed(key)
-    local o = getPlayer():getModData().TrueSmoking
     local player = getSpecificPlayer(0) -- Player_0 is always keyboard
+    local o = TrueSmoking:getModData(player)
     local ts = TrueSmoking:getPlayerReference(0)
     if player then
         if o.isSmoking and ts.Smokable.smokeLit and key == self.Config.keySmoke then

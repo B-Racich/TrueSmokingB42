@@ -1,7 +1,7 @@
 version=1
 id=3423984426
 title=True Smoking [B42MP]
-description=[h1] True Smoking [B42] [/h1]
+description=[h1] True Smoking [/h1]
 description=[code][h3]This mod provides a more realistic and immersive smoking experience. Smoking is no longer a short action but now a tracked and passively handled mechanic where the stats and effects are distributed over time while smoking. There is also a optional Nicotine System that implements Addiction and Withdrawal[/h3][/code]
 description=
 description=[h1]Smoking[/h1]

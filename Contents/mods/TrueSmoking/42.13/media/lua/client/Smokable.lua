@@ -25,7 +25,11 @@ function Smokable:init(item, player)
         self.cigPack = item
     end
 
-    self.player = player
+    if isClient() then
+        self.player = getPlayerByOnlineID(player:getOnlineID())
+    else
+        self.player = getSpecificPlayer(player:getID())
+    end
 
     local data = self:getObject(self.item)
     for k, v in pairs(data) do
@@ -226,6 +230,8 @@ function Smokable:stop()
     self.smokeLit = false
     self.hasDropped = false
     self.dropState = false
+    self.player:getModData().TrueSmoking.isSmoking = false
+    sendClientCommand(self.player, 'TrueSmoking', 'updatePlayerData', { { isSmoking = false } })
 end
 
 function Smokable:dropSmoke()
@@ -266,13 +272,13 @@ function Smokable:update(player)
     --         return
     --     end
     -- else
-        if not player:getInventory():contains(self.item) then
-            self.smokeLit = false
-            newData.isSmoking = false
-            sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { data })
-            -- self.player:transmitModData()
-            return
-        end
+    if not player:getInventory():contains(self.item) then
+        self.smokeLit = false
+        newData.isSmoking = false
+        sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { data })
+        -- self.player:transmitModData()
+        return
+    end
     -- end
     -- tsDebug('TRUESMOKING::Smokable update tick')
     -- if TrueSmoking.Options.Dropping and self.canDrop then
@@ -380,7 +386,8 @@ function Smokable:update(player)
 end
 
 function Smokable:puff()
-    if not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
+    local data = self.player:getModData().TrueSmoking
+    if data.isSmoking and self.smokeLit and not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
         ISTimedActionQueue.add(TakePuff:new(self.player, self.item, self.customEatSound,
             self.itemFullType))
     end
