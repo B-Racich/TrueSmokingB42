@@ -104,6 +104,7 @@ function PutOut:perform()
     local data = self.character:getModData().TrueSmoking
     data.isSmoking = false
     data.takingPuff = false
+    self.character:transmitModData()
     TrueSmoking:checkForMaskAndEquip(self.character)
     tsDebug('PutOut::perform - Performed put out action and checked for mask equip')
     ISBaseTimedAction.perform(self)

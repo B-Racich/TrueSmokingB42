@@ -95,7 +95,7 @@ function Smokable:getObject(item)
     elseif fullType:find("Can") then
         categoryMult = cat.Can
     elseif fullType:find("Rolled") then
-        categoryMult = cat.Rolled
+        categoryMult = cat.RolledCigarette
     end
 
     -- Recipe-based fallbacks (vanilla OnEat system)

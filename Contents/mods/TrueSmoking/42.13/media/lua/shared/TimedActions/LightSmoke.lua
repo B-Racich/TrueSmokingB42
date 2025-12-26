@@ -117,6 +117,7 @@ function LightSmoke:complete()
     -- local data = self.character:getModData().TrueSmoking
     local data = {}
     data.isSmoking = true
+    data.takingPuff = false
     -- TrueSmoking.EquipVisualItem(self.character, self.item)
     sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item })
 
