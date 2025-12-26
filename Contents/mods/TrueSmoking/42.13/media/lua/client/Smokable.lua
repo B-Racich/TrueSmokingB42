@@ -118,7 +118,7 @@ function Smokable:getObject(item)
         categoryMult = cat.Pipe
     elseif fullType:find('Can') then
         categoryMult = cat.Can
-    elseif fullType:find('Rolled') then
+    elseif fullType:find('RolledCigarette') then
         categoryMult = cat.Rolled
     end
 
@@ -194,7 +194,7 @@ function Smokable:light()
         end
     end
     if not ISTimedActionQueue.hasActionType(self.player, 'LightSmoke') then
-        ISTimedActionQueue.add(LightSmoke:new(self.player))
+        ISTimedActionQueue.add(LightSmoke:new(self.player, self.item))
     end
 end
 
