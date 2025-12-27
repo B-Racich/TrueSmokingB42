@@ -35,7 +35,6 @@ function ISTakePillAction:new(character, item)
             end
 
             print('TRUESMOKING::Setting up smokable')
-            table.Smokable = Smokable:new(item, character)
             item:getModData().modOnEat = hook
 
             return LightSmoke:new(character, item)
@@ -91,7 +90,7 @@ local originalUnequipNew = ISUnequipAction.new
 function ISUnequipAction:new(character, item, maxTime)
     local o = originalUnequipNew(self, character, item, maxTime)
 
-    local playerRef = TrueSmoking:getPlayerReference(character)
+    local playerRef = character:getModData().TrueSmoking
 
     if item:getBodyLocation() == TrueSmoking.registries.mask and playerRef.isSmoking then
         o.maxTime = 1
@@ -107,7 +106,7 @@ local originalUnequipComplete = ISUnequipAction.complete
 function ISUnequipAction:complete()
     originalUnequipComplete(self)
 
-    local playerRef = TrueSmoking:getPlayerReference(self.character)
+    local playerRef = self.character:getModData().TrueSmoking
 
     if self.item:getBodyLocation() == TrueSmoking.registries.mask and playerRef.isSmoking then
         playerRef.Smokable:putOut()
@@ -124,7 +123,7 @@ end
 local originalClothingComplete = ISWearClothing.complete
 function ISWearClothing:complete()
     local rtn = originalClothingComplete(self)
-    local table = TrueSmoking:getPlayerReference(self.character)
+    local table = self.character:getModData().TrueSmoking
     if self.item == table.mask then
         table.mask = false
     end
@@ -148,10 +147,13 @@ function ISWearClothing:new(character, item)
         SCBAnotank = true
     }
 
-    local table = TrueSmoking:getPlayerReference(character)
+    -- local table = TrueSmoking:getPlayerReference(character)
+    local data = character:getModData().TrueSmoking
 
-    if smokableBlacklist[item:getBodyLocation()] and not item:hasTag(ItemTag.CAN_EAT) and table.isSmoking then
-        table.Smokable:putOut()
+    if smokableBlacklist[item:getBodyLocation()] and not item:hasTag(ItemTag.CAN_EAT) and data.isSmoking then
+        -- table.Smokable:putOut()
+        data.isSmoking = false
+        character:transmitModData()
     end
 
     return o

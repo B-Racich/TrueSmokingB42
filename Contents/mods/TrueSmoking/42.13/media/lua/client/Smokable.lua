@@ -17,13 +17,13 @@ end
 
 function Smokable:init(item, player)
     self.item = item
-    self.itemFullType = item:getFullType()
-    self.customEatSound = item:getCustomEatSound() or ''
-
     if instanceof(item, 'Drainable') then
         self.item = instanceItem('Base.CigaretteSingle')
         self.cigPack = item
     end
+    self.itemFullType = item:getFullType()
+    self.customEatSound = item:getCustomEatSound() or ''
+
 
     if isClient() then
         self.player = getPlayerByOnlineID(player:getOnlineID())

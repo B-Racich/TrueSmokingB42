@@ -108,7 +108,8 @@ function NicotineSystem:initialize(player)
             end
         end
     end
-    player:transmitModData()
+    -- player:transmitModData()
+    sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data.nicotineSystem })
 end
 
 Events.OnCreatePlayer.Add(function(_, player)
@@ -116,7 +117,11 @@ Events.OnCreatePlayer.Add(function(_, player)
     NicotineSystem:UpdateDynamicConfig(player)
 end)
 
-function NicotineSystem:GameTimeUpdate(player)
+function NicotineSystem:GameTimeUpdate(playerRaw)
+    local player = playerRaw
+    if isClient() then
+        player = getPlayerByOnlineID(playerRaw:getOnlineID())
+    end
     if not player or player:isDead() then return end
 
     local data = player:getModData().nicotineSystem
@@ -274,11 +279,16 @@ function NicotineSystem:GameTimeUpdate(player)
             end
         end
     end
-    player:transmitModData()
+    -- player:transmitModData()
+    sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data })
     sendClientCommand(player, 'TrueSmoking', 'updateStats', { updateStats })
 end
 
-function NicotineSystem:smoke(player, rawAmountPerPuff, nicotineContent)
+function NicotineSystem:smoke(playerRaw, rawAmountPerPuff, nicotineContent)
+    local player = playerRaw
+    if isClient() then
+        player = getPlayerByOnlineID(playerRaw:getOnlineID())
+    end
     local data = player:getModData().nicotineSystem
     if not data then return end
 
@@ -308,5 +318,6 @@ function NicotineSystem:smoke(player, rawAmountPerPuff, nicotineContent)
         (1.0 - math.min(addictionTolerance * 0.85, 0.85))
 
     data.addictionLevel = math.min(maxAddiction, data.addictionLevel + effectiveGain)
-    player:transmitModData()
+    -- player:transmitModData()
+    sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data })
 end

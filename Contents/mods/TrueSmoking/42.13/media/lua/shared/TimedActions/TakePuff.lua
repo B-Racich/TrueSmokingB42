@@ -57,12 +57,11 @@ function TakePuff:start()
 
     --Track puff
     self.data.takingPuff = true
-    self.character:transmitModData()
-
+    
     if self.eatSound ~= '' then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
     end
-
+    
     -- Play custom sound when no sound is playing
     if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
         local gender = self.character:isFemale()
@@ -76,7 +75,8 @@ function TakePuff:start()
             end
         end
     end
-    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { self.data })
+    self.character:transmitModData()
+    -- sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { self.data })
 end
 
 function TakePuff:stop()
@@ -133,6 +133,7 @@ function TakePuff:perform()
 end
 
 function TakePuff:complete()
+    self.data.takingPuff = false
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { { takingPuff = false } })
     sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
     -- TrueSmoking.EquipVisualItem(self.character, self.item)

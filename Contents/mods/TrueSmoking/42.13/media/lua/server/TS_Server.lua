@@ -130,6 +130,17 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         end
         -- syncItemModData(player, item)
     end
+
+    if command == 'updatePlayerNicData' then
+        local data = args[1]
+        for key, value in pairs(data) do
+            if not player:getModData().nicotineSystem then
+                player:getModData().nicotineSystem = {}
+            end
+            player:getModData().nicotineSystem[key] = value
+        end
+        player:transmitModData()
+    end
 end
 
 Events.OnClientCommand.Add(TrueSmoking.onClientCommand)

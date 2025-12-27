@@ -290,9 +290,10 @@ function TrueSmoking:findSmokable(player)
 end
 
 function TrueSmoking:onKeyStartPressed(key)
-    local player = getSpecificPlayer(0) -- Player_0 is always keyboard
-    local o = TrueSmoking:getModData(player)
-    local ts = TrueSmoking:getPlayerReference(0)
+    local player = getPlayer() -- Player_0 is always keyboard
+    local o = player:getModData().TrueSmoking
+    local ts = TrueSmoking:getPlayerReference(player)
+    if not ts.Smokable.putOut then o.isSmoking = false end
     if player then
         if o.isSmoking and ts.Smokable.smokeLit and key == self.Config.keySmoke then
             ts.Smokable:puff()
@@ -334,8 +335,12 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
 end
 
-TrueSmoking.start = function(playerNum)
+TrueSmoking.start = function(playerNum, playerRaw)
     local player = getSpecificPlayer(playerNum)
+    -- if isClient() then
+    --     player = getPlayerByOnlineID(playerRaw:getOnlineID())
+    -- end
+    -- local player = playerRaw
     local o = player:getModData().TrueSmoking
     if not o then
         o = {}
@@ -378,8 +383,9 @@ TrueSmoking.start = function(playerNum)
         o.NicotineGameTimeWrapper = nicotineGameTimeWrapper
     end
 
-    o.isSmoking = false
+    -- o.isSmoking = false
 
+    player:transmitModData()
     sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { newData })
     Events.OnKeyStartPressed.Add(ts.keyWrapper)
     Events.OnFillInventoryObjectContextMenu.Add(ts.contextWrapper)
