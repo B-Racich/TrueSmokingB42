@@ -118,7 +118,7 @@ function LightSmoke:perform()
     -- if self.item then
     --     self.item = self.character:getInventory():AddItem(self.item)
     -- end
-    -- ts.Smokable = Smokable:start(self.character, self.item)
+    ts.Smokable = Smokable:start(self.character, self.item)
     tsDebug('LightSmoke::perform - Started smoking action')
 
     ISBaseTimedAction.perform(self)
