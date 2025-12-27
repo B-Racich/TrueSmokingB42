@@ -58,6 +58,36 @@ function Smokable:init(item, player)
     self.hasRolledForDrop = false
 end
 
+function Smokable:getVisualItem(item)
+    local OnEat_Defaults = {
+        ['RecipeCodeOnEat.consumeNicotine'] = 'base.Mask_Cigarette',
+    }
+
+    local typeMatches = {
+        ['smokingpipe'] = 'Mask_Pipe',
+        ['joint'] = 'Mask_Cigarette',
+        ['blunt'] = 'Mask_Cigarillo',
+        ['spliff'] = 'Mask_Cigarillo',
+        ['can'] = false,
+        ['bong'] = false,
+    }
+
+    local itemType = item:getFullType():lower()
+    print('Looking for ' .. itemType)
+
+    for pattern, itemName in pairs(typeMatches) do
+        if itemType:find(pattern) then
+            return itemName and instanceItem(itemName) or false
+        end
+    end
+
+    for key, value in pairs(OnEat_Defaults) do
+        if item:getOnEat() == key then return instanceItem(value) end
+    end
+
+    return false
+end
+
 function Smokable:getItemStats(item)
     return {
         stress = item:getStressChange() or -5,
@@ -352,7 +382,8 @@ function Smokable:update(player)
 
         if TrueSmoking.Options.UseNicotineSystem and self.onEat == 'RecipeCodeOnEat.consumeNicotine' and self.puffPercent > 0 and self.nicotineContent then
             local nicotineAmount = self.nicotineContent * self.puffPercent
-            sendClientCommand(self.player, 'TrueSmoking', 'smokeNicotine', { nicotineAmount, self.nicotineContent, NicotineSystem.Config })
+            sendClientCommand(self.player, 'TrueSmoking', 'smokeNicotine',
+            { nicotineAmount, self.nicotineContent, NicotineSystem.Config })
             -- NicotineSystem:smoke(self.player, nicotineAmount, self.nicotineContent)
         end
 
