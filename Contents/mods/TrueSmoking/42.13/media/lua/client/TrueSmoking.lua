@@ -186,7 +186,7 @@ function TrueSmoking:getModData(player)
 end
 
 function TrueSmoking:getPlayerReference(player)
-local num = player
+    local num = player
     if type(player) ~= 'number' then
         num = player:getPlayerNum()
     end
@@ -314,7 +314,12 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         local item = v
         local smokable = nil
 
-        local o = getSpecificPlayer(player):getModData().TrueSmoking
+        local o = false
+        if isClient() then
+            o = getPlayerByOnlineID(player):getModData().TrueSmoking
+        else
+            o = getSpecificPlayer(player):getModData().TrueSmoking
+        end
 
         if not instanceof(v, 'InventoryItem') then item = v.items[1] end
 

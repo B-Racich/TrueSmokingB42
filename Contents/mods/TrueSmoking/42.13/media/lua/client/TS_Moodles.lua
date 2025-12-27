@@ -180,21 +180,21 @@ function TrueSmoking.updateNicotineMoodle(player)
         local titleText = ''
 
         if addiction >= 87.5 then
-            titleText = getText('Moodles_nicotine_Bad_lvl4')  -- Extremely
+            titleText = getText('Moodles_TS_Nicotine_Bad_lvl4')  -- Extremely
         elseif addiction >= 75 then
-            titleText = getText('Moodles_nicotine_Bad_lvl3')  -- Severely
+            titleText = getText('Moodles_TS_Nicotine_Bad_lvl3')  -- Severely
         elseif addiction >= 62.5 then
-            titleText = getText('Moodles_nicotine_Bad_lvl2')  -- Heavily
+            titleText = getText('Moodles_TS_Nicotine_Bad_lvl2')  -- Heavily
         elseif addiction >= 50 then
-            titleText = getText('Moodles_nicotine_Bad_lvl1')  -- Strongly
+            titleText = getText('Moodles_TS_Nicotine_Bad_lvl1')  -- Strongly
         elseif addiction >= 37.5 then
-            titleText = getText('Moodles_nicotine_Good_lvl1') -- Moderately
+            titleText = getText('Moodles_TS_Nicotine_Good_lvl1') -- Moderately
         elseif addiction >= 25 then
-            titleText = getText('Moodles_nicotine_Good_lvl2') -- Mild
+            titleText = getText('Moodles_TS_Nicotine_Good_lvl2') -- Mild
         elseif addiction >= 12.5 then
-            titleText = getText('Moodles_nicotine_Good_lvl3') -- Slightly
+            titleText = getText('Moodles_TS_Nicotine_Good_lvl3') -- Slightly
         else
-            titleText = getText('Moodles_nicotine_Good_lvl4') -- No Addiction
+            titleText = getText('Moodles_TS_Nicotine_Good_lvl4') -- No Addiction
         end
 
         local level = moodle:getLevel()
@@ -205,15 +205,15 @@ function TrueSmoking.updateNicotineMoodle(player)
 
         local descText = ''
         if data.withdrawalLevel >= 80 then
-            descText = getText('Moodles_nicotine_withdrawal_4')
+            descText = getText('Moodles_TS_Nicotine_withdrawal_4')
         elseif data.withdrawalLevel >= 60 then
-            descText = getText('Moodles_nicotine_withdrawal_3')
+            descText = getText('Moodles_TS_Nicotine_withdrawal_3')
         elseif data.withdrawalLevel >= 40 then
-            descText = getText('Moodles_nicotine_withdrawal_2')
+            descText = getText('Moodles_TS_Nicotine_withdrawal_2')
         elseif data.withdrawalLevel >= 20 then
-            descText = getText('Moodles_nicotine_withdrawal_1')
+            descText = getText('Moodles_TS_Nicotine_withdrawal_1')
         else
-            descText = getText('Moodles_nicotine_withdrawal_0')
+            descText = getText('Moodles_TS_Nicotine_withdrawal_0')
         end
 
         local debugInfo = ''

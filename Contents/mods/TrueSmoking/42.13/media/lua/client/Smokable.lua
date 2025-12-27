@@ -28,7 +28,7 @@ function Smokable:init(item, player)
     if isClient() then
         self.player = getPlayerByOnlineID(player:getOnlineID())
     else
-        self.player = getSpecificPlayer(player:getID())
+        self.player = player
     end
 
     local data = self:getObject(self.item)
@@ -365,6 +365,7 @@ function Smokable:update(player)
         end
 
         sendClientCommand(self.player, 'TrueSmoking', 'updatePlayerData', { newData })
+        self.item:getModData().SmokeLength = self.smokeLength
         sendClientCommand(self.player, 'TrueSmoking', 'updateItemData', { self.item, { SmokeLength = self.smokeLength } })
         self:idlePuff()
     end

@@ -71,6 +71,7 @@ function PutOut:complete()
     local data = self.character:getModData().TrueSmoking
     if self.item then
         if self.smokeLength > 0 then
+            self.item:getModData().SmokeLength = self.smokeLength
             sendClientCommand(self.character, 'TrueSmoking', 'updateItemData', { self.item, { SmokeLength = self.smokeLength } })
         end
         if self.smokeLength <= 0 then
