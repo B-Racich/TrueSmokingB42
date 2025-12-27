@@ -14,7 +14,7 @@ function TakePuff:update()
     local curTime = os.time()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', {TrueSmoking.Options})
+            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
             if hasPrimary then
@@ -57,11 +57,11 @@ function TakePuff:start()
 
     --Track puff
     self.data.takingPuff = true
-    
+
     if self.eatSound ~= '' then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
     end
-    
+
     -- Play custom sound when no sound is playing
     if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
         local gender = self.character:isFemale()
@@ -98,9 +98,10 @@ function TakePuff:stop()
             end
         end
     end
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
     self.data.takingPuff = false
     self.character:transmitModData()
-    self:forceComplete()
+    -- self:forceComplete()
 end
 
 function TakePuff:serverStop()

@@ -284,40 +284,40 @@ function NicotineSystem:GameTimeUpdate(playerRaw)
     sendClientCommand(player, 'TrueSmoking', 'updateStats', { updateStats })
 end
 
-function NicotineSystem:smoke(playerRaw, rawAmountPerPuff, nicotineContent)
-    local player = playerRaw
-    if isClient() then
-        player = getPlayerByOnlineID(playerRaw:getOnlineID())
-    end
-    local data = player:getModData().nicotineSystem
-    if not data then return end
+-- function NicotineSystem:smoke(playerRaw, rawAmountPerPuff, nicotineContent)
+--     local player = playerRaw
+--     if isClient() then
+--         player = getPlayerByOnlineID(playerRaw:getOnlineID())
+--     end
+--     local data = player:getModData().nicotineSystem
+--     if not data then return end
 
-    local maxAddiction = 100
-    local puffFraction = rawAmountPerPuff / nicotineContent
+--     local maxAddiction = 100
+--     local puffFraction = rawAmountPerPuff / nicotineContent
 
-    local tolerance = math.min(data.addictionLevel / 100, 0.25)
-    local effectiveIntake = rawAmountPerPuff * (1.0 - tolerance)
+--     local tolerance = math.min(data.addictionLevel / 100, 0.25)
+--     local effectiveIntake = rawAmountPerPuff * (1.0 - tolerance)
 
-    if data.nicotineLevel > 70 then
-        local reduction = (data.nicotineLevel - 70) / 50
-        effectiveIntake = effectiveIntake * (1 - math.min(reduction, 0.65))
-    end
+--     if data.nicotineLevel > 70 then
+--         local reduction = (data.nicotineLevel - 70) / 50
+--         effectiveIntake = effectiveIntake * (1 - math.min(reduction, 0.65))
+--     end
 
-    if data.nicotineLevel + effectiveIntake > 100 then
-        local overflow = (data.nicotineLevel + effectiveIntake) - 100
-        data.nicotineOverflow = data.nicotineOverflow + overflow
-        data.nicotineLevel = 100
-    else
-        data.nicotineLevel = data.nicotineLevel + effectiveIntake
-    end
+--     if data.nicotineLevel + effectiveIntake > 100 then
+--         local overflow = (data.nicotineLevel + effectiveIntake) - 100
+--         data.nicotineOverflow = data.nicotineOverflow + overflow
+--         data.nicotineLevel = 100
+--     else
+--         data.nicotineLevel = data.nicotineLevel + effectiveIntake
+--     end
 
-    data.withdrawalLevel = math.max(0, data.withdrawalLevel - self.Config.WITHDRAWAL_RELIEF_PER_PUFF * puffFraction)
+--     data.withdrawalLevel = math.max(0, data.withdrawalLevel - self.Config.WITHDRAWAL_RELIEF_PER_PUFF * puffFraction)
 
-    local addictionTolerance = data.addictionLevel / maxAddiction
-    local effectiveGain = self.Config.ADDICTION_GAIN_PER_PUFF * puffFraction *
-        (1.0 - math.min(addictionTolerance * 0.85, 0.85))
+--     local addictionTolerance = data.addictionLevel / maxAddiction
+--     local effectiveGain = self.Config.ADDICTION_GAIN_PER_PUFF * puffFraction *
+--         (1.0 - math.min(addictionTolerance * 0.85, 0.85))
 
-    data.addictionLevel = math.min(maxAddiction, data.addictionLevel + effectiveGain)
-    -- player:transmitModData()
-    sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data })
-end
+--     data.addictionLevel = math.min(maxAddiction, data.addictionLevel + effectiveGain)
+--     -- player:transmitModData()
+--     sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data })
+-- end

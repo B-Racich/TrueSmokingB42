@@ -37,7 +37,7 @@ function ISTakePillAction:new(character, item)
             print('TRUESMOKING::Setting up smokable')
             item:getModData().modOnEat = hook
 
-            return LightSmoke:new(character, item)
+            -- return LightSmoke:new(character, item)
         end
     end
 

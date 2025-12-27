@@ -352,7 +352,8 @@ function Smokable:update(player)
 
         if TrueSmoking.Options.UseNicotineSystem and self.onEat == 'RecipeCodeOnEat.consumeNicotine' and self.puffPercent > 0 and self.nicotineContent then
             local nicotineAmount = self.nicotineContent * self.puffPercent
-            NicotineSystem:smoke(self.player, nicotineAmount, self.nicotineContent)
+            sendClientCommand(self.player, 'TrueSmoking', 'smokeNicotine', { nicotineAmount, self.nicotineContent, NicotineSystem.Config })
+            -- NicotineSystem:smoke(self.player, nicotineAmount, self.nicotineContent)
         end
 
         if self.callback then

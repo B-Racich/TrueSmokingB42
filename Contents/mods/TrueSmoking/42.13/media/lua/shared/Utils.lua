@@ -330,13 +330,13 @@ function TrueSmoking.OnEat_Tobacco(player, smokableStats)
             smokable.stress = 0
         end
 
-        if smokable.foodSick ~= 0 then
-            temp = smokable.originalFoodSick * percent
+        if smokable.reduceFoodSick ~= 0 then
+            temp = smokable.originalReduceFoodSick * percent
             stats:set(CharacterStat.FOOD_SICKNESS,
                 math.min(stats:get(CharacterStat.FOOD_SICKNESS) + temp * effectMultiplier, 100))
-            smokable.foodSick = smokable.foodSick - temp
-            if smokable.foodSick < 0 then
-                smokable.foodSick = 0
+            smokable.reduceFoodSick = smokable.reduceFoodSick - temp
+            if smokable.reduceFoodSick < 0 then
+                smokable.reduceFoodSick = 0
             end
         end
 

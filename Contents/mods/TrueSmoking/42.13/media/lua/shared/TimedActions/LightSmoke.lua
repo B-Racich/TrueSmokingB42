@@ -51,8 +51,18 @@ function LightSmoke:getRequiredItem()
 end
 
 function LightSmoke:start()
-    if isClient() and self.item and not self.cigPack then
+    -- if self.cigPack then
+    --     local cig = self.character:getInventory():AddItem('Base.CigaretteSingle')
+    --     self.item = cig
+    --     sendAddItemToContainer(self.character:getInventory(), cig)
+    -- end
+
+    if isClient() and self.item then
         self.item = self.character:getInventory():getItemById(self.item:getID())
+    end
+
+    if self.item and self.item.getCustomEatSound then
+        self.eatSound = self.item:getCustomEatSound() or ''
     end
 
     -- fromRelaunch is added in ISTimedAction to not consume stuff again when we relaunch the action
@@ -108,7 +118,7 @@ function LightSmoke:perform()
     -- if self.item then
     --     self.item = self.character:getInventory():AddItem(self.item)
     -- end
-    ts.Smokable = Smokable:start(self.character, self.item)
+    -- ts.Smokable = Smokable:start(self.character, self.item)
     tsDebug('LightSmoke::perform - Started smoking action')
 
     ISBaseTimedAction.perform(self)
@@ -117,9 +127,15 @@ end
 function LightSmoke:complete()
     print('TRUESMOKING::LightSmoke complete')
     if self.cigPack then
+        -- local ts = TrueSmoking:getPlayerReference(self.character)
         self.cigPack:setUsedDelta(self.cigPack:getCurrentUsesFloat() - self.cigPack:getUseDelta())
         sendItemStats(self.cigPack)
-        sendAddItemToContainer(self.character:getInventory(), self.item)
+        data.cigPackUsed = true
+        -- local cig = self.character:getInventory():AddItem('Base.CigaretteSingle')
+        -- self.item = cig
+        -- sendAddItemToContainer(self.character:getInventory(), cig)
+        -- ts.Smokable = Smokable:start(self.character, cig)
+        -- sendAddItemToContainer(self.character:getInventory(), self.item)
         -- sendClientCommand(self.character, 'TrueSmoking', 'addSmokable', { self.item })
     end
     -- self.lighter:UseAndSync()
@@ -155,12 +171,13 @@ function LightSmoke:new(character, item)
     o.character = character
     o.item = item
     if instanceof(item, 'Drainable') then
-        o.item = instanceItem('Base.CigaretteSingle')
+        -- o.item = instanceItem('Base.CigaretteSingle')
         o.cigPack = item
     end
     -- o.data = data
 
-    o.eatSound = o.item:getCustomEatSound() or ''
+    -- o.eatSound = o.item:getCustomEatSound() or ''
+    o.eatSound = ''
     o.eatAudio = 0
     o.maxTime = o:getDuration()
 

@@ -2,8 +2,11 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
     if module ~= 'TrueSmoking' then return end
 
     local player = false
-    if not isclient and not isServer() then player = playerRaw
-    else player = getPlayerByOnlineID(playerRaw:getOnlineID()) end
+    if not isClient() and not isServer() then
+        player = playerRaw
+    else
+        player = getPlayerByOnlineID(playerRaw:getOnlineID())
+    end
 
     if command == 'equipVisualItem' then
         local function getVisual(item)
@@ -59,7 +62,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         if not ts.ManageHeadGear then return end
         if player:getWornItem(TrueSmoking.registries.mask) then
             player:removeWornItem(player:getWornItem(TrueSmoking.registries.mask))
-            triggerEvent('OnClothingUpdated',player)
+            triggerEvent('OnClothingUpdated', player)
         end
     end
 
@@ -107,8 +110,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             smokable:getModData().SmokeLength = data.SmokeLength
         end
         -- syncItemModData(player, smokable)
-        sendAddItemToContainer(player:getInventory(),smokable)
-
+        sendAddItemToContainer(player:getInventory(), smokable)
     end
 
     if command == 'updatePlayerData' then
@@ -140,6 +142,45 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             player:getModData().nicotineSystem[key] = value
         end
         player:transmitModData()
+    end
+
+    if command == 'smokeNicotine' then
+        local rawAmountPerPuff = args[1]
+        local nicotineContent = args[2]
+        local config = args[3]
+        -- NicotineSystem:smoke(player, nicotineAmount, maxNicotine)
+
+        local data = player:getModData().nicotineSystem
+        if not data then return end
+
+        local maxAddiction = 100
+        local puffFraction = rawAmountPerPuff / nicotineContent
+
+        local tolerance = math.min(data.addictionLevel / 100, 0.25)
+        local effectiveIntake = rawAmountPerPuff * (1.0 - tolerance)
+
+        if data.nicotineLevel > 70 then
+            local reduction = (data.nicotineLevel - 70) / 50
+            effectiveIntake = effectiveIntake * (1 - math.min(reduction, 0.65))
+        end
+
+        if data.nicotineLevel + effectiveIntake > 100 then
+            local overflow = (data.nicotineLevel + effectiveIntake) - 100
+            data.nicotineOverflow = data.nicotineOverflow + overflow
+            data.nicotineLevel = 100
+        else
+            data.nicotineLevel = data.nicotineLevel + effectiveIntake
+        end
+
+        data.withdrawalLevel = math.max(0, data.withdrawalLevel - config.WITHDRAWAL_RELIEF_PER_PUFF * puffFraction)
+
+        local addictionTolerance = data.addictionLevel / maxAddiction
+        local effectiveGain = config.ADDICTION_GAIN_PER_PUFF * puffFraction *
+            (1.0 - math.min(addictionTolerance * 0.85, 0.85))
+
+        data.addictionLevel = math.min(maxAddiction, data.addictionLevel + effectiveGain)
+        player:transmitModData()
+        -- sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data })
     end
 end
 
