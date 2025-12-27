@@ -19,7 +19,7 @@ function ISTakePillAction:new(character, item)
 
     o = originalPillActionNew(self, character, item)
 
-    local table = TrueSmoking:getPlayerReference(character)
+    local table = character:getModData().TrueSmoking
 
     if (TrueSmoking.isInList(onEat, funcsToHook) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         print('TRUESMOKING::Checking item onEat: ' .. onEat)
