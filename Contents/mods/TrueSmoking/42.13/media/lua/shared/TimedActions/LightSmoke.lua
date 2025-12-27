@@ -51,12 +51,6 @@ function LightSmoke:getRequiredItem()
 end
 
 function LightSmoke:start()
-    -- if self.cigPack then
-    --     local cig = self.character:getInventory():AddItem('Base.CigaretteSingle')
-    --     self.item = cig
-    --     sendAddItemToContainer(self.character:getInventory(), cig)
-    -- end
-
     if isClient() and self.item then
         self.item = self.character:getInventory():getItemById(self.item:getID())
     end
@@ -70,7 +64,8 @@ function LightSmoke:start()
         local lighter = self:getRequiredItem()
         self.lighter = lighter
         lighter:setUsedDelta(lighter:getCurrentUsesFloat() - lighter:getUseDelta())
-        sendItemStats(lighter)
+        -- sendItemStats(lighter)
+        lighter:syncItemFields()
     end
 
     if self.eatSound ~= '' then
@@ -115,12 +110,11 @@ function LightSmoke:perform()
     if self.eatAudio ~= 0 and self.character:getEmitter():isPlaying(self.eatAudio) then
         self.character:stopOrTriggerSound(self.eatAudio);
     end
-    -- if self.item then
-    --     self.item = self.character:getInventory():AddItem(self.item)
-    -- end
     ts.Smokable = Smokable:start(self.character, self.item)
-    local visual = ts.Smokable:getVisualItem(self.item)
-    self.character:setWornItem(visual:getBodyLocation(), visual)
+    if isClient() then
+        local visual = ts.Smokable:getVisualItem(self.item)
+        self.character:setWornItem(visual:getBodyLocation(), visual)
+    end
     tsDebug('LightSmoke::perform - Started smoking action')
     ISBaseTimedAction.perform(self)
 end
@@ -128,29 +122,15 @@ end
 function LightSmoke:complete()
     print('TRUESMOKING::LightSmoke complete')
     if self.cigPack then
-        -- local ts = TrueSmoking:getPlayerReference(self.character)
         self.cigPack:setUsedDelta(self.cigPack:getCurrentUsesFloat() - self.cigPack:getUseDelta())
         sendItemStats(self.cigPack)
         data.cigPackUsed = true
-        -- local cig = self.character:getInventory():AddItem('Base.CigaretteSingle')
-        -- self.item = cig
-        -- sendAddItemToContainer(self.character:getInventory(), cig)
-        -- ts.Smokable = Smokable:start(self.character, cig)
-        -- sendAddItemToContainer(self.character:getInventory(), self.item)
-        -- sendClientCommand(self.character, 'TrueSmoking', 'addSmokable', { self.item })
     end
-    -- self.lighter:UseAndSync()
-    -- local data = self.character:getModData().TrueSmoking
     local data = {}
     data.isSmoking = true
     data.takingPuff = false
-    -- TrueSmoking.EquipVisualItem(self.character, self.item)
     sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
-
-    -- self.character:transmitModData()
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { data })
-    -- self.character:transmitModData()
-    -- syncItemModData(self.character, self.item)
     tsDebug('LightSmoke::complete - Transmitted mod data after lighting smoke')
     return true
 end

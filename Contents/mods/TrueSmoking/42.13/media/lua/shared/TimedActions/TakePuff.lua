@@ -14,7 +14,9 @@ function TakePuff:update()
     local curTime = os.time()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+            if isClient() then
+                self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+            end
             sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
@@ -99,9 +101,12 @@ function TakePuff:stop()
             end
         end
     end
+    local ts = TrueSmoking:getPlayerReference(self.character)
     ts.Smokable = Smokable:start(self.character, self.item)
-    local visual = ts.Smokable:getVisualItem(self.item)
-    self.character:setWornItem(visual:getBodyLocation(), visual)
+    if isClient() then
+        local visual = ts.Smokable:getVisualItem(self.item)
+        self.character:setWornItem(visual:getBodyLocation(), visual)
+    end
     sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
     self.data.takingPuff = false
     self.character:transmitModData()
@@ -135,8 +140,10 @@ function TakePuff:perform()
     self.data.takingPuff = false
     local ts = TrueSmoking:getPlayerReference(self.character)
     ts.Smokable = Smokable:start(self.character, self.item)
-    local visual = ts.Smokable:getVisualItem(self.item)
-    self.character:setWornItem(visual:getBodyLocation(), visual)
+    if isClient() then
+        local visual = ts.Smokable:getVisualItem(self.item)
+        self.character:setWornItem(visual:getBodyLocation(), visual)
+    end
     self.character:transmitModData()
     ISBaseTimedAction.perform(self)
 end

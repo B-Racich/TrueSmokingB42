@@ -18,7 +18,9 @@ function PutOut:update()
     if not self.visualItemFlag then
         if os.difftime(curTime, self.timer) > self.visualItemTimer then
             -- Smokable:removeVisualItem(self.character)
-            self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+            if isClient() then
+                self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+            end
             sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
             self.visualItemFlag = true
             local hasPrimary = self.character:getPrimaryHandItem()
@@ -63,6 +65,9 @@ end
 
 function PutOut:stop()
     local ts = TrueSmoking:getPlayerReference(self.character)
+    if isClient() then
+        self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+    end
     ts.Smokable:stop()
     self:forceComplete()
     ISBaseTimedAction.stop(self)
@@ -73,7 +78,8 @@ function PutOut:complete()
     if self.item then
         if self.smokeLength > 0 then
             self.item:getModData().SmokeLength = self.smokeLength
-            sendClientCommand(self.character, 'TrueSmoking', 'updateItemData', { self.item, { SmokeLength = self.smokeLength } })
+            sendClientCommand(self.character, 'TrueSmoking', 'updateItemData',
+            { self.item, { SmokeLength = self.smokeLength } })
         end
         if self.smokeLength <= 0 then
             local onUse = self.item:getReplaceOnUseFullType()
@@ -105,7 +111,9 @@ end
 
 function PutOut:perform()
     local ts = TrueSmoking:getPlayerReference(self.character)
-    self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+    if isClient() then
+        self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+    end
     ts.Smokable:stop()
     -- local data = self.character:getModData().TrueSmoking
     -- data.isSmoking = false
