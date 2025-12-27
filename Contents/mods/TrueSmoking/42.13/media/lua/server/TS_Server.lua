@@ -52,6 +52,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             triggerEvent('OnClothingUpdated', player)
         elseif player:getWornItem(TrueSmoking.registries.mask) then
             player:removeWornItem(player:getWornItem(TrueSmoking.registries.mask))
+            triggerEvent('OnClothingUpdated', player)
             sendClientCommand(player, 'TrueSmoking', 'equipSmokableItem', { item })
         end
     end

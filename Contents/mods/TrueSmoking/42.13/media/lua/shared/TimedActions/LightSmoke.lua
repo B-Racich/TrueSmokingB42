@@ -113,7 +113,8 @@ function LightSmoke:perform()
     ts.Smokable = Smokable:start(self.character, self.item)
     if isClient() then
         local visual = ts.Smokable:getVisualItem(self.item)
-        self.character:setWornItem(visual:getBodyLocation(), visual)
+        self.character:setWornItem(TrueSmoking.registries.mask, visual)
+        -- triggerEvent('OnClothingUpdated', self.character)
     end
     tsDebug('LightSmoke::perform - Started smoking action')
     ISBaseTimedAction.perform(self)

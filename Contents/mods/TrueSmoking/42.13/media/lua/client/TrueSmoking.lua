@@ -417,8 +417,8 @@ TrueSmoking.stop = function(player)
     end
 end
 
-local group = BodyLocations.getGroup('Human')
-group:getOrCreateLocation(TrueSmoking.registries.mask)
+-- local group = BodyLocations.getGroup('Human')
+-- group:getOrCreateLocation(TrueSmoking.registries.mask)
 
 Events.OnCreatePlayer.Add(TrueSmoking.start)
 
@@ -459,7 +459,7 @@ Events.OnInitGlobalModData.Add(function()
         burnMin = 0.000125 * smokingSpeed,
         burnMax = 0.000300 * smokingSpeed,
         burnSpeed = 0.0025,
-        burnSpeedDecay = 0.20,
+        burnSpeedDecay = 0.10,
         puffFactor = 1.35 * puffStrength,
         walkingFactor = 1.0 + (movementBurn - 1) * 0.5,
         runningFactor = 1.15 + (movementBurn - 1) * 0.8,

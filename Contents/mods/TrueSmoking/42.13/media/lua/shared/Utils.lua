@@ -2,6 +2,9 @@ TrueSmoking = TrueSmoking or {}
 
 TrueSmoking.DEBUG = true
 
+local group = BodyLocations.getGroup("Human")
+
+group:getOrCreateLocation(TrueSmoking.registries.mask)
 
 --TODO:: CLIENT COMMAND STAT CHANGES FOR SMOKABLE/NICOTINE
 -- REWORK SMOKE EFFECTS TO EVERY MINUTE

@@ -85,7 +85,7 @@ function Smokable:getVisualItem(item)
         if item:getOnEat() == key then return instanceItem(value) end
     end
 
-    return false
+    return instanceItem('base.Mask_Cigarette')
 end
 
 function Smokable:getItemStats(item)
