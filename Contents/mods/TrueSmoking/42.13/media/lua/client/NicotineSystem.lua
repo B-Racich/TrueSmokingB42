@@ -260,14 +260,14 @@ function NicotineSystem:GameTimeUpdate(playerRaw)
     if TrueSmoking and TrueSmoking.Options and TrueSmoking.Options.DynamicSmokerTrait then
         if data.addictionLevel >= self.Config.SMOKER_TRAIT_GAIN_THRESHOLD and not player:hasTrait(CharacterTrait.SMOKER) then
             -- player:getTraits():add('Smoker')
-            sendClientCommand(player, 'TrueSmoking', 'addTrait', {'SMOKER'})
+            sendClientCommand(player, 'TrueSmoking', 'addTrait', { 'SMOKER' })
             if HaloTextHelper then
                 HaloTextHelper.addTextWithArrow(player, getText('UI_TRUESMOKING_BECAME_SMOKER'), true,
                     HaloTextHelper.getColorRed())
             end
         elseif data.addictionLevel < self.Config.SMOKER_TRAIT_LOSE_THRESHOLD and player:hasTrait(CharacterTrait.SMOKER) then
             -- player:getTraits():remove('Smoker')
-            sendClientCommand(player, 'TrueSmoking', 'removeTrait', {'SMOKER'})
+            sendClientCommand(player, 'TrueSmoking', 'removeTrait', { 'SMOKER' })
             -- stats:setStressFromCigarettes(0)
             updateStats['NICOTINE_WITHDRAWAL'] = 0
             -- stats:reset(CharacterStat.NICOTINE_WITHDRAWAL)

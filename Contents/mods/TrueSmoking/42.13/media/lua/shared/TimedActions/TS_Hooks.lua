@@ -10,11 +10,12 @@ require 'TimedActions/ISTakePillAction'
 
 local originalPillActionNew = ISTakePillAction.new
 function ISTakePillAction:new(character, item)
- local o = {}
+    local o = {}
     local onEat = item:getOnEat() or ''
     local hook = 'OnEat_Hook'
     local hasSmokableTag = item:hasTag(ItemTag.SMOKABLE)
-    local funcsToHook = { 'cigarettes', 'RecipeCodeOnEat.consumeNicotine', 'OnEat_Cigarettes', 'OnEat_Cigarillo', 'OnEat_Cigar',
+    local funcsToHook = { 'cigarettes', 'RecipeCodeOnEat.consumeNicotine', 'OnEat_Cigarettes', 'OnEat_Cigarillo',
+        'OnEat_Cigar',
         'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnEat_Weed' }
 
     o = originalPillActionNew(self, character, item)
@@ -44,15 +45,16 @@ function ISTakePillAction:new(character, item)
     return o
 end
 
-local originalFoodActionNew  = ISEatFoodAction.new
+local originalFoodActionNew = ISEatFoodAction.new
 function ISEatFoodAction:new(character, item, percentage)
     local o = {}
     local onEat = item:getOnEat() or ''
     local hook = 'OnEat_Hook'
     local hasSmokableTag = item:hasTag(ItemTag.SMOKABLE)
     local funcsToHook = { 'RecipeCodeOnEat.consumeNicotine',
-        'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnSmoke_Blunt', 'OnSmoke_Cannabis',
-        'OnSmoke_CannaCigar', 'OnSmoke_Spliff', 'OnSmoke_Cigar','OnSmoke_Blunt' }
+        'OnEat_WeedSmoke', 'OnEat_WeedJoint', 'OnEat_WeedPipe', 'OnEat_HempCigarillo', 'OnEat_Tobacco', 'OnSmoke_Blunt',
+        'OnSmoke_Cannabis',
+        'OnSmoke_CannaCigar', 'OnSmoke_Spliff', 'OnSmoke_Cigar', 'OnSmoke_Blunt' }
 
     o = originalFoodActionNew(self, character, item, percentage)
 
@@ -114,7 +116,6 @@ function ISUnequipAction:complete()
 
     return true
 end
-
 
 --[[
     Hook the complete method to mark when our mask actually equipped, this allows the keybind to try again

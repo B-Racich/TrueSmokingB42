@@ -293,8 +293,8 @@ function TrueSmoking:onKeyStartPressed(key)
     local player = getPlayer() -- Player_0 is always keyboard
     local o = player:getModData().TrueSmoking
     local ts = TrueSmoking:getPlayerReference(player)
-    if not ts.Smokable.putOut then o.isSmoking = false end
-    if player then
+    if not ts.Smokable and ts.Smokable.putOut then o.isSmoking = false end
+    if player and o then
         if o.isSmoking and ts.Smokable.smokeLit and key == self.Config.keySmoke then
             ts.Smokable:puff()
         elseif o.isSmoking and not ts.Smokable.smokeLit and key == self.Config.keySmoke then
@@ -316,11 +316,11 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         local smokable = nil
 
         local o = false
-        if isClient() then
-            o = getPlayerByOnlineID(player):getModData().TrueSmoking
-        else
-            o = getSpecificPlayer(player):getModData().TrueSmoking
-        end
+        -- if isClient() then
+        --     o = getPlayerByOnlineID(player):getModData().TrueSmoking
+        -- else
+        o = getSpecificPlayer(player):getModData().TrueSmoking
+        -- end
 
         if not instanceof(v, 'InventoryItem') then item = v.items[1] end
 
@@ -335,8 +335,8 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
 end
 
-TrueSmoking.start = function(playerNum, playerRaw)
-    local player = getSpecificPlayer(playerNum)
+TrueSmoking.start = function(playerNum, player)
+    -- local player = getSpecificPlayer(playerNum)
     -- if isClient() then
     --     player = getPlayerByOnlineID(playerRaw:getOnlineID())
     -- end

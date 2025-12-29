@@ -1,25 +1,30 @@
-require ' MF_ISMoodle'
-require 'TrueSmoking'
-
--- local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
+require 'MF_ISMoodle'
 MF.createMoodle('TS_Smoking_New')
 MF.createMoodle('TS_Nicotine')
-
-local tsDebug = TrueSmoking.tsDebug
+-- local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
 
 function TrueSmoking.updateSmokingMoodle(player)
     -- local moodleID = TrueSmoking.Options.UseNewMoodle and 'TS_Smoking_New' or 'TS_Smoking_Old'
     local playerNum = player:getPlayerNum()
+    local playerOb = getSpecificPlayer(playerNum)
+    if isClient() then
+        playerNum = player:getOnlineID()
+        playerOb = getPlayerByOnlineID(playerNum)
+    end
+    if playerOb:isDead() then return end
+    -- if not MF then return end
+    -- local moodle = MF.getMoodle('TS_Smoking_New', playerNum)
     local moodle = MF.getMoodle('TS_Smoking_New', playerNum)
-    if moodle == nil then
+
+    if not moodle then
         -- tsDebug('TRUESMOKING::No smoking moodle found for player')
         return
     end
 
-    local data = player:getModData().TrueSmoking
+    local data = playerOb:getModData().TrueSmoking
     if data == nil then
         -- print('TRUESMOKING::No mod data found for player, cannot update smoking moodle')
-        moodle:setValue(0.5)
+        -- moodle:setValue(0.5)
         return
     end
 
@@ -155,12 +160,20 @@ function TrueSmoking.smokingDebugInfo(item)
 end
 
 function TrueSmoking.updateNicotineMoodle(player)
-    if not player or not player:getModData().nicotineSystem then return end
-
+    
     local playerNum = player:getPlayerNum()
-    local data = player:getModData().nicotineSystem
+    if isClient() then
+        playerNum = player:getOnlineID()
+        playerOb = getPlayerByOnlineID(playerNum)
+    end
+    if not playerOb then return end
+    if not playerOb or not playerOb:getModData().nicotineSystem or playerOb:isDead() then return end
+    local data = playerOb:getModData().nicotineSystem
     local moodle = MF.getMoodle('TS_Nicotine', playerNum)
-    if not moodle then return end
+    -- local moodle = MF.getMoodle('TS_Nicotine')
+
+    if not moodle or moodle == nil or not data then return end
+    moodle:getValue()
 
     local shouldShow = TrueSmoking.Config.DebugMoodles or (data.withdrawalLevel > 15 and data.nicotineLevel < 8)
     local hideMoodles = TrueSmoking.Config.HideMoodles or TrueSmoking.Config.HideAddictionMoodle
@@ -168,7 +181,7 @@ function TrueSmoking.updateNicotineMoodle(player)
     local moodleValue = 0.5 -- default = hidden/neutral
 
     if shouldShow and not hideMoodles then
-        local withdrawalNorm = math.min(data.withdrawalLevel / 100.0, 1.0)
+        local withdrawalNorm = math.min(data.withdrawalLevel / 100.0, 1.0) or 1.0
         moodleValue = 1.0 - withdrawalNorm -- 1.0 = no withdrawal (green), 0.0 = max (red)
     end
 
@@ -250,3 +263,8 @@ Events.OnPlayerUpdate.Add(function(player)
     TrueSmoking.updateSmokingMoodle(player)
     TrueSmoking.updateNicotineMoodle(player)
 end)
+
+-- Events.OnPlayerDeath.Add(function(player)
+--     Events.OnPlayerUpdate.Remove(TrueSmoking.updateSmokingMoodle(player))
+--     Events.OnPlayerUpdate.Remove(TrueSmoking.updateNicotineMoodle(player))
+-- end)
