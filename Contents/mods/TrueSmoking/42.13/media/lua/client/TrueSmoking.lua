@@ -165,18 +165,27 @@ function TrueSmoking:equipItem(player, item)
     ISTimedActionQueue.add(ISWearClothing:new(player, item))
 end
 
-function TrueSmoking:getModData(player)
-    local num = player
-    if type(player) ~= 'number' then
-        num = player:getPlayerNum()
+function TrueSmoking:getModData(playerRaw)
+    local player = false
+    local num = false
+    if type(playerRaw) ~= 'number' then
+        num = playerRaw:getPlayerNum()
+        if isClient then
+            num = playerRaw:getOnlineID()
+            player = getPlayerByOnlineID(num)
+        else
+            player = getSpecificPlayer(num)
+        end
+    else
+        if isClient then
+            player = getPlayerByOnlineID(playerRaw)
+        else
+            player = getSpecificPlayer(playerRaw)
+        end
     end
 
-    if not num or not getSpecificPlayer(num) then
-        tsDebug('getModData - Invalid player number: ' .. tostring(num))
-        return
-    end
     -- print('TRUESMOKING::Getting player reference for player num: ' .. tostring(num))
-    local md = getSpecificPlayer(num):getModData()
+    local md = player:getModData()
     if md and not md.TrueSmoking then
         tsDebug('getModData - Creating new TrueSmoking modData for player num: ' .. num)
         md.TrueSmoking = {}
@@ -189,6 +198,12 @@ function TrueSmoking:getPlayerReference(player)
     local num = player
     if type(player) ~= 'number' then
         num = player:getPlayerNum()
+        if isClient then
+            -- num = player:getOnlineID()
+            num = 0
+        else
+            num = player:getPlayerNum()
+        end
     end
 
     if num == 0 then
@@ -206,10 +221,13 @@ function TrueSmoking:useRecipe(item, player, recipeString)
     local containers = ISInventoryPaneContextMenu.getContainers(player)
     local recipes = CraftRecipeManager.getUniqueRecipeItems(item, player, containers)
     if recipes and recipes:size() > 0 then
-        local recipe = recipes:get(0)
-        local name = recipe:getName()
-        if string.match(name, 'Take') then
-            ISInventoryPaneContextMenu.OnNewCraft(item, recipe, player:getPlayerNum(), false)
+        for i = 0, recipes:size()-1 do
+            local recipe = recipes:get(i)
+            local name = recipe:getName()
+            if string.match(name, 'Take') then
+                ISInventoryPaneContextMenu.OnNewCraft(item, recipe, player:getPlayerNum(), false)
+                break
+            end
         end
     end
 end
@@ -290,10 +308,14 @@ function TrueSmoking:findSmokable(player)
 end
 
 function TrueSmoking:onKeyStartPressed(key)
-    local player = getPlayer() -- Player_0 is always keyboard
+    local player = getPlayer()
+    -- if isClient() then
+    --     player = getPlayerByOnlineID(getPlayer():getOnlineID())
+    -- end
+    -- local player = getPlayer() -- Player_0 is always keyboard
     local o = player:getModData().TrueSmoking
     local ts = TrueSmoking:getPlayerReference(player)
-    if not ts.Smokable and ts.Smokable.putOut then o.isSmoking = false end
+    if not ts.Smokable or not ts.Smokable.putOut then o.isSmoking = false end
     if player and o then
         if o.isSmoking and ts.Smokable.smokeLit and key == self.Config.keySmoke then
             ts.Smokable:puff()
@@ -316,16 +338,12 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
         local smokable = nil
 
         local o = false
-        -- if isClient() then
-        --     o = getPlayerByOnlineID(player):getModData().TrueSmoking
-        -- else
         o = getSpecificPlayer(player):getModData().TrueSmoking
-        -- end
 
         if not instanceof(v, 'InventoryItem') then item = v.items[1] end
 
         smokable = context:getOptionFromName(getText('ContextMenu_Smoke'))
-        if smokable then
+        if smokable and o then
             if o.isSmoking or not self:hasRequiredItem(item, getSpecificPlayer(player)) then
                 smokable.notAvailable = true
             elseif not o.isSmoking and self:hasRequiredItem(item, getSpecificPlayer(player)) then
@@ -335,23 +353,20 @@ function TrueSmoking:toggleSmokeMenuOption(player, context, items)
     end
 end
 
-TrueSmoking.start = function(playerNum, player)
-    -- local player = getSpecificPlayer(playerNum)
+TrueSmoking.start = function(playerNum, playerRaw)
+    local player = getSpecificPlayer(playerNum)
     -- if isClient() then
     --     player = getPlayerByOnlineID(playerRaw:getOnlineID())
     -- end
-    -- local player = playerRaw
     local o = player:getModData().TrueSmoking
     if not o then
+        tsDebug('start - Creating new TrueSmoking modData for player num: ' .. tostring(playerNum))
         o = {}
+        player:getModData().TrueSmoking = o
     end
+    o = player:getModData().TrueSmoking
     local ts = TrueSmoking:getPlayerReference(player)
 
-    local newData = {
-        eatSound = '',
-        lightingEatSound = '',
-        isSmoking = false,
-    }
     o.eatSound = ''
     o.lightingEatSound = ''
     o.isSmoking = false
@@ -372,6 +387,7 @@ TrueSmoking.start = function(playerNum, player)
     end
     ts.contextWrapper = contextWrapper
 
+
     if TrueSmoking.Options.UseNicotineSystem then
         NicotineSystem:initialize(player)
         NicotineSystem:UpdateDynamicConfig(player)
@@ -382,11 +398,10 @@ TrueSmoking.start = function(playerNum, player)
         Events.EveryOneMinute.Add(nicotineGameTimeWrapper)
         o.NicotineGameTimeWrapper = nicotineGameTimeWrapper
     end
-
     -- o.isSmoking = false
 
     player:transmitModData()
-    sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { newData })
+    -- sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { newData })
     Events.OnKeyStartPressed.Add(ts.keyWrapper)
     Events.OnFillInventoryObjectContextMenu.Add(ts.contextWrapper)
 end

@@ -8,8 +8,11 @@ PutOut = ISBaseTimedAction:derive('PutOut')
 local tsDebug = TrueSmoking.tsDebug
 
 function PutOut:isValid()
-    --Check if we have a smoke lit
-    return self.data.isSmoking
+    if self.item then
+        return true
+    else
+        return false
+    end
 end
 
 function PutOut:update()
@@ -74,12 +77,11 @@ function PutOut:stop()
 end
 
 function PutOut:complete()
-    local data = self.character:getModData().TrueSmoking
     if self.item then
         if self.smokeLength > 0 then
             self.item:getModData().SmokeLength = self.smokeLength
             sendClientCommand(self.character, 'TrueSmoking', 'updateItemData',
-            { self.item, { SmokeLength = self.smokeLength } })
+                { self.item, { SmokeLength = self.smokeLength } })
         end
         if self.smokeLength <= 0 then
             local onUse = self.item:getReplaceOnUseFullType()
@@ -92,17 +94,15 @@ function PutOut:complete()
         end
     end
 
-    sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
     -- TrueSmoking.RemoveVisualItem(self.character)
 
-    local newData = {}
-    newData.isSmoking = false
-    newData.takingPuff = false
+    local data = {}
     data.isSmoking = false
     data.takingPuff = false
 
-    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { newData })
-    self.character:transmitModData()
+    sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { data })
+    -- self.character:transmitModData()
     -- TrueSmoking:checkForMaskAndEquip(self.character)
 
     tsDebug('PutOut::complete - Transmitted mod data after putting out smoke')
@@ -115,10 +115,6 @@ function PutOut:perform()
         self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
     end
     ts.Smokable:stop()
-    -- local data = self.character:getModData().TrueSmoking
-    -- data.isSmoking = false
-    -- data.takingPuff = false
-    -- self.character:transmitModData()
     TrueSmoking:checkForMaskAndEquip(self.character) --should be fine since calls vanilla action chain?
     tsDebug('PutOut::perform - Performed put out action and checked for mask equip')
     ISBaseTimedAction.perform(self)

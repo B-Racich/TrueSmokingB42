@@ -108,8 +108,8 @@ function NicotineSystem:initialize(player)
             end
         end
     end
-    -- player:transmitModData()
-    sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data.nicotineSystem })
+    player:transmitModData()
+    -- sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data.nicotineSystem })
 end
 
 Events.OnCreatePlayer.Add(function(_, player)
@@ -131,9 +131,7 @@ function NicotineSystem:GameTimeUpdate(playerRaw)
     end
 
     local stats       = player:getStats()
-    local bd          = player:getBodyDamage()
-    local tableRef    = TrueSmoking and player:getModData().TrueSmoking
-    local isSmoking   = tableRef and tableRef.Smokable and tableRef.Smokable.smokeLit
+    local isSmoking   = player:getModData().TrueSmoking and player:getModData().TrueSmoking.isSmoking
     local lastSmoke   = player:getTimeSinceLastSmoke()
     local updateStats = {}
 
@@ -279,8 +277,8 @@ function NicotineSystem:GameTimeUpdate(playerRaw)
             end
         end
     end
-    -- player:transmitModData()
-    sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data })
+    player:transmitModData()
+    -- sendClientCommand(player, 'TrueSmoking', 'updatePlayerNicData', { data })
     sendClientCommand(player, 'TrueSmoking', 'updateStats', { updateStats })
 end
 
