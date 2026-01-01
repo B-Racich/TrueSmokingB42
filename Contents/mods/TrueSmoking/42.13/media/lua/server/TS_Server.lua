@@ -47,6 +47,18 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         print('looking for ' .. item:getOnEat())
         local visual = getVisual(item)
         print('visual is ' .. tostring(visual))
+        local type = item:getFullType()
+
+        local types = {
+            ['Base.CigaretteSingle'] = 'Base.Mask_Cigarette',
+            ['Base.CigaretteRolled'] = 'Base.Mask_Cigarette',
+            ['Base.Cigarillo'] = 'Base.Mask_Cigarillo',
+            ['Base.Cigar'] = 'Base.Mask_Cigar',
+            ['Base.SmokingPipe_Tobacco'] = 'Base.Mask_Pipe',
+        }
+
+        visual = (types[type] and instanceItem(types[type]) or false)
+
         if not player:getWornItem(TrueSmoking.registries.mask) and visual then
             player:setWornItem(visual:getBodyLocation(), visual)
             triggerEvent('OnClothingUpdated', player)
