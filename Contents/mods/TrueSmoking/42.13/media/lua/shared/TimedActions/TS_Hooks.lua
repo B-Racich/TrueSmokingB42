@@ -109,9 +109,10 @@ function ISUnequipAction:complete()
     originalUnequipComplete(self)
 
     local playerRef = self.character:getModData().TrueSmoking
+    local table = TrueSmoking:getPlayerReference(self.character)
 
     if self.item:getBodyLocation() == TrueSmoking.registries.mask and playerRef.isSmoking then
-        playerRef.Smokable:putOut()
+        table.Smokable:putOut()
     end
 
     return true
