@@ -158,7 +158,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             temp = 1 * percent * effectMultiplier
             local currentStress = stats:get(CharacterStat.STRESS)
             local withdrawal = stats:get(CharacterStat.NICOTINE_WITHDRAWAL)
-            local adjustedStress = currentStress - withdrawal
+            local adjustedStress = math.max(currentStress - withdrawal, 0)
             stats:set(CharacterStat.STRESS, adjustStat(adjustedStress, temp, false))
             
             temp = 0.51 * percent * effectMultiplier
