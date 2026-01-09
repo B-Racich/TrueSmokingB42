@@ -120,7 +120,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         -- Handle pain
         if smokableStats.pain ~= 0 and smokableStats.originalPain then
             temp = smokableStats.originalPain * percent
-            stats:set(CharacterStat.PAIN, adjustStat(stats:getPain(), temp, false))
+            stats:set(CharacterStat.PAIN, adjustStat(stats:get(CharacterStat.PAIN), temp, false))
         end
         
         -- Handle endurance
@@ -156,8 +156,10 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             stats:set(CharacterStat.UNHAPPINESS, adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp, false))
             
             temp = 1 * percent * effectMultiplier
-            stats:set(CharacterStat.STRESS,
-                adjustStat(stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp, false))
+            local currentStress = stats:get(CharacterStat.STRESS)
+            local withdrawal = stats:get(CharacterStat.NICOTINE_WITHDRAWAL)
+            local adjustedStress = currentStress - withdrawal
+            stats:set(CharacterStat.STRESS, adjustStat(adjustedStress, temp, false))
             
             temp = 0.51 * percent * effectMultiplier
             stats:set(CharacterStat.NICOTINE_WITHDRAWAL,
