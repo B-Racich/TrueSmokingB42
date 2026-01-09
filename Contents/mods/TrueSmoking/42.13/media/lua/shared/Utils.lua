@@ -6,7 +6,7 @@ local group = BodyLocations.getGroup("Human")
 
 group:getOrCreateLocation(TrueSmoking.registries.mask)
 
---TODO:: CLIENT COMMAND STAT CHANGES FOR SMOKABLE/NICOTINE
+-- CLIENT COMMAND STAT CHANGES FOR SMOKABLE/NICOTINE - IMPLEMENTED in TS_Server.lua
 -- REWORK SMOKE EFFECTS TO EVERY MINUTE
 -- TEST SP/MP
 

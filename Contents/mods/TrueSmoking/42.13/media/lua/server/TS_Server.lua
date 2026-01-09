@@ -80,15 +80,121 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
     end
 
     if command == 'OnEat_ItemStats' then
-        local stats = args[1]
-        local puffPercent = args[2]
-        TrueSmoking.OnEat_ItemStats(player, stats)
+        local smokableStats = args[1]
+        local percent = smokableStats.puffPercent
+        local stats = player:getStats()
+        
+        local function adjustStat(stat, value, add)
+            local newStat = stat - math.abs(value)
+            if newStat < 0 then
+                newStat = 0
+            end
+            if add then newStat = stat + value end
+            return newStat
+        end
+        
+        local temp
+        
+        -- Handle boredom
+        if smokableStats.boredom and smokableStats.boredom ~= 0 and smokableStats.originalBoredom then
+            temp = smokableStats.originalBoredom * percent
+            stats:set(CharacterStat.BOREDOM,
+                adjustStat(stats:get(CharacterStat.BOREDOM), temp - ZomboidGlobals.BoredomIncrease))
+        end
+        
+        -- Handle hunger
+        if smokableStats.hunger and smokableStats.hunger ~= 0 and smokableStats.originalHunger then
+            temp = smokableStats.originalHunger * percent
+            stats:set(CharacterStat.HUNGER, adjustStat(stats:get(CharacterStat.HUNGER), temp, true))
+        end
+        
+        -- Handle thirst
+        if smokableStats.thirst and smokableStats.thirst ~= 0 and smokableStats.originalThirst then
+            temp = smokableStats.originalThirst * percent
+            stats:set(CharacterStat.THIRST, adjustStat(stats:get(CharacterStat.THIRST), temp, true))
+        end
+        
+        -- Handle pain
+        if smokableStats.pain and smokableStats.pain ~= 0 and smokableStats.originalPain then
+            temp = smokableStats.originalPain * percent
+            stats:set(CharacterStat.PAIN, adjustStat(stats:getPain(), temp))
+        end
+        
+        -- Handle endurance
+        if smokableStats.endurance and smokableStats.endurance ~= 0 and smokableStats.originalEndurance then
+            temp = smokableStats.originalEndurance * percent
+            stats:set(CharacterStat.ENDURANCE, adjustStat(stats:get(CharacterStat.ENDURANCE), temp))
+        end
+        
+        -- Handle fatigue
+        if smokableStats.fatigue and smokableStats.fatigue ~= 0 and smokableStats.originalFatigue then
+            local add = smokableStats.fatigue > 0
+            temp = smokableStats.originalFatigue * percent
+            stats:set(CharacterStat.FATIGUE, adjustStat(stats:get(CharacterStat.FATIGUE), temp, add))
+        end
+        
+        -- Handle reduceFoodSickness
+        if smokableStats.reduceFoodSick and smokableStats.reduceFoodSick ~= 0 and smokableStats.originalReduceFoodSick then
+            temp = smokableStats.originalReduceFoodSick * percent
+            stats:set(CharacterStat.FOOD_SICKNESS, math.min(stats:get(CharacterStat.FOOD_SICKNESS) - temp, 100))
+        end
     end
 
     if command == 'OnEat_Tobacco' then
-        local stats = args[1]
-        local puffPercent = args[2]
-        TrueSmoking.OnEat_Tobacco(player, stats)
+        local smokableStats = args[1]
+        local percent = smokableStats.puffPercent
+        local stats = player:getStats()
+        local effectMultiplier = smokableStats.effectMultiplier or 1.0
+        
+        local function adjustStat(stat, value, add)
+            local newStat = stat - math.abs(value)
+            if newStat < 0 then
+                newStat = 0
+            end
+            if add then newStat = stat + value end
+            return newStat
+        end
+        
+        local temp
+        
+        -- Mimic vanilla logic for smoker trait
+        if player:hasTrait(CharacterTrait.SMOKER) then
+            temp = 100 * percent * effectMultiplier
+            stats:set(CharacterStat.UNHAPPINESS, adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp))
+            
+            temp = 1 * percent * effectMultiplier
+            stats:set(CharacterStat.STRESS,
+                adjustStat(stats:get(CharacterStat.STRESS) - stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp))
+            
+            temp = 0.51 * percent * effectMultiplier
+            stats:set(CharacterStat.NICOTINE_WITHDRAWAL,
+                adjustStat(stats:get(CharacterStat.NICOTINE_WITHDRAWAL), temp))
+            
+            temp = 10 * percent * effectMultiplier
+            player:setTimeSinceLastSmoke(player:getTimeSinceLastSmoke() - temp)
+        else
+            -- Distribute stats for non-smoker (stress and sickness)
+            if smokableStats.originalStress then
+                temp = smokableStats.originalStress * percent
+                stats:set(CharacterStat.STRESS, adjustStat(stats:get(CharacterStat.STRESS), temp * effectMultiplier))
+            end
+            
+            -- Set these to 0 for safety
+            stats:set(CharacterStat.NICOTINE_WITHDRAWAL, 0)
+            player:setTimeSinceLastSmoke(0)
+            
+            if smokableStats.reduceFoodSick and smokableStats.reduceFoodSick ~= 0 and smokableStats.originalReduceFoodSick then
+                temp = smokableStats.originalReduceFoodSick * percent
+                stats:set(CharacterStat.FOOD_SICKNESS,
+                    math.min(stats:get(CharacterStat.FOOD_SICKNESS) + temp * effectMultiplier, 100))
+            end
+            
+            if smokableStats.unhappyness and smokableStats.unhappyness ~= 0 and smokableStats.originalUnhappyness then
+                temp = smokableStats.originalUnhappyness * percent
+                stats:set(CharacterStat.UNHAPPINESS,
+                    adjustStat(stats:get(CharacterStat.UNHAPPINESS), temp * effectMultiplier))
+            end
+        end
     end
 
     if command == 'updateStats' then
