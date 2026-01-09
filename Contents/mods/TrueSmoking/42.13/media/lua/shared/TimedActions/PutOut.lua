@@ -1,126 +1,166 @@
+--[[
+    PutOut.lua - Timed Action for Putting Out a Smokable
+    
+    Handles the animation and state transition for putting out
+    or saving a partially-smoked cigarette/cigar.
+]]
+
 require 'TimedActions/ISBaseTimedAction'
-require 'TrueSmoking'
-require 'Smokable'
-require 'Utils'
+require 'Core'
+require 'Data'
 
 PutOut = ISBaseTimedAction:derive('PutOut')
 
-local tsDebug = TrueSmoking.tsDebug
+--------------------------------------------------------------------------------
+-- Validation
+--------------------------------------------------------------------------------
 
 function PutOut:isValid()
-    if self.item then
-        return true
-    else
-        return false
-    end
-end
-
-function PutOut:update()
-    -- Take smoke from mouth sync timer
-    local curTime = os.time()
-    if not self.visualItemFlag then
-        if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            -- Smokable:removeVisualItem(self.character)
-            if isClient() then
-                self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
-            end
-            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
-            self.visualItemFlag = true
-            local hasPrimary = self.character:getPrimaryHandItem()
-            if hasPrimary then
-                self:setOverrideHandModels(hasPrimary, self.item)
-            else
-                self:setOverrideHandModels(nil, self.item)
-            end
-            -- self:setOverrideHandModels(self.character:getPrimaryHandItem():getStaticModel(), self.item)
-        end
-    end
-
-    if self.eatSound ~= '' and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
-        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
-    end
+    return self.item ~= nil
 end
 
 function PutOut:waitToStart()
-    --Wait for timed actions to finish
-    if self.character:isStrafing() or self.character:isRunning() or self.character:isSprinting() or self.character:isAiming()
-        or self.character:isAsleep() or self.character:isPerformingAnAction() then
+    local char = self.character
+    if char:isStrafing() or char:isRunning() or char:isSprinting() 
+        or char:isAiming() or char:isAsleep() or char:isPerformingAnAction() then
         return true
-    else
-        return false
     end
+    return false
 end
 
+--------------------------------------------------------------------------------
+-- Action Lifecycle
+--------------------------------------------------------------------------------
+
 function PutOut:start()
-    if TrueSmoking.Config.HideAllActionBars then
-        self.action:setUseProgressBar(false)
+    -- Hide progress bar if option is set
+    if TrueSmoking.Config and TrueSmoking.Config.HideAllActionBars then
+        self:setUseProgressBar(false)
     end
+    
     self.timer = os.time()
-    --Set the animation
+    
+    -- Set animation
     self:setActionAnim(CharacterActionAnims.Eat)
     self:setAnimVariable('FoodType', self.item:getEatType())
     self:setOverrideHandModels(nil, nil)
 
+    -- Play sound
     if self.eatSound ~= '' then
-        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
+    end
+end
+
+function PutOut:update()
+    local curTime = os.time()
+    
+    -- Remove visual item mid-animation (synced with hand reaching mouth)
+    if not self.visualItemFlag then
+        if os.difftime(curTime, self.timer) > self.visualItemTimer then
+            -- Remove visual
+            if isClient() then
+                local worn = self.character:getWornItem(TrueSmoking.registries.mask)
+                if worn then
+                    self.character:removeWornItem(worn)
+                end
+            end
+            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
+            self.visualItemFlag = true
+            
+            -- Update hand model
+            local primary = self.character:getPrimaryHandItem()
+            self:setOverrideHandModels(primary, self.item)
+        end
+    end
+
+    -- Loop audio
+    if self.eatSound ~= '' and self.eatAudio ~= 0 then
+        if not self.character:getEmitter():isPlaying(self.eatAudio) then
+            self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
+        end
     end
 end
 
 function PutOut:stop()
-    local ts = TrueSmoking:getPlayerReference(self.character)
+    local ref = TrueSmoking.getPlayerRef(self.character)
+    
+    -- Remove visual
     if isClient() then
-        self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
+        local worn = self.character:getWornItem(TrueSmoking.registries.mask)
+        if worn then
+            self.character:removeWornItem(worn)
+        end
     end
-    ts.Smokable:stop()
+    
+    -- Stop smokable
+    if ref and ref.smokable then
+        ref.smokable:stop()
+    end
+    
     self:forceComplete()
     ISBaseTimedAction.stop(self)
 end
 
+function PutOut:perform()
+    TrueSmoking.debug('PutOut:perform - Putting out smoke')
+    
+    local ref = TrueSmoking.getPlayerRef(self.character)
+    
+    -- Remove visual
+    if isClient() then
+        local worn = self.character:getWornItem(TrueSmoking.registries.mask)
+        if worn then
+            self.character:removeWornItem(worn)
+        end
+    end
+    
+    -- Stop smokable
+    if ref and ref.smokable then
+        ref.smokable:stop()
+    end
+    
+    -- Check for mask re-equip (shemagh, etc.)
+    TrueSmoking.checkForMaskAndEquip(self.character)
+    
+    ISBaseTimedAction.perform(self)
+end
+
 function PutOut:complete()
+    -- Handle item persistence
     if self.item then
         if self.smokeLength > 0 then
+            -- Save remaining length
             self.item:getModData().SmokeLength = self.smokeLength
-            sendClientCommand(self.character, 'TrueSmoking', 'updateItemData',
-                { self.item, { SmokeLength = self.smokeLength } })
-        end
-        if self.smokeLength <= 0 then
+            sendClientCommand(self.character, 'TrueSmoking', 'updateItemData', { 
+                self.item, 
+                { SmokeLength = self.smokeLength } 
+            })
+        else
+            -- Fully consumed - replace with butt
             local onUse = self.item:getReplaceOnUseFullType()
             if onUse and onUse ~= '' then
-                local item = self.character:getInventory():AddItem(onUse)
-                sendRemoveItemFromContainer(self.character:getInventory(), item)
+                local newItem = self.character:getInventory():AddItem(onUse)
+                sendRemoveItemFromContainer(self.character:getInventory(), newItem)
             end
             self.character:getInventory():Remove(self.item)
             sendRemoveItemFromContainer(self.character:getInventory(), self.item)
         end
     end
 
-    -- TrueSmoking.RemoveVisualItem(self.character)
-
-    local data = {}
-    data.isSmoking = false
-    data.takingPuff = false
-
+    -- Sync state
     sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
-    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { data })
-    -- self.character:transmitModData()
-    -- TrueSmoking:checkForMaskAndEquip(self.character)
-
-    tsDebug('PutOut::complete - Transmitted mod data after putting out smoke')
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { 
+        { isSmoking = false, takingPuff = false } 
+    })
+    
+    TrueSmoking.debug('PutOut:complete - State synced')
     return true
 end
 
-function PutOut:perform()
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    if isClient() then
-        self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
-    end
-    ts.Smokable:stop()
-    TrueSmoking:checkForMaskAndEquip(self.character) --should be fine since calls vanilla action chain?
-    tsDebug('PutOut::perform - Performed put out action and checked for mask equip')
-    ISBaseTimedAction.perform(self)
-end
+--------------------------------------------------------------------------------
+-- Constructor
+--------------------------------------------------------------------------------
 
---Fix args at some point
 function PutOut:new(character, item, smokeLength, eatSound, fullType)
     local o = ISBaseTimedAction.new(self, character)
 
@@ -129,13 +169,13 @@ function PutOut:new(character, item, smokeLength, eatSound, fullType)
     o.stopOnAim = true
 
     o.character = character
-    o.data = character:getModData().TrueSmoking
+    o.data = TrueSmoking.Data.getSmoking(character)
     o.item = item
     o.maxTime = 120
     o.smokeLength = smokeLength
     o.fullType = fullType
 
-    o.eatSound = eatSound
+    o.eatSound = eatSound or ''
     o.eatAudio = 0
 
     o.visualItemTimer = 0.7

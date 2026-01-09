@@ -1,0 +1,548 @@
+--[[
+    SmokableItem.lua - Smokable Object Handler (Refactored)
+
+    Manages the active smoking state for a single cigarette/cigar/pipe.
+    Handles burn rate calculations, stat buffering, and nicotine puff events.
+
+    This is a cleaner version of Smokable.lua using the new architecture.
+]]
+
+require 'TimedActions/ISBaseTimedAction'
+require 'Core'
+require 'Data'
+require 'Visuals'
+
+--------------------------------------------------------------------------------
+-- Smokable Class
+--------------------------------------------------------------------------------
+
+SmokableItem = {}
+SmokableItem.__index = SmokableItem
+
+-- Global alias for external mod compatibility
+Smokable = SmokableItem
+
+--------------------------------------------------------------------------------
+-- Constructor
+--------------------------------------------------------------------------------
+
+--- Create a new SmokableItem instance
+-- @param player IsoPlayer
+-- @param item InventoryItem
+-- @return SmokableItem
+function SmokableItem:new(player, item)
+    local obj = setmetatable({}, self)
+    obj:init(item, player)
+    return obj
+end
+
+--------------------------------------------------------------------------------
+-- Initialization
+--------------------------------------------------------------------------------
+
+--- Initialize smokable with item data
+-- @param item InventoryItem
+-- @param player IsoPlayer
+function SmokableItem:init(item, player)
+    -- Handle drainable (cigarette packs)
+    if instanceof(item, 'Drainable') then
+        self.cigPack = item
+        item = instanceItem('Base.CigaretteSingle')
+    end
+
+    self.item = item
+    self.itemFullType = item:getFullType()
+    self.customEatSound = item:getCustomEatSound() or ''
+    self.onEat = item:getOnEat() or false
+
+    -- Resolve player for MP
+    self.player = isClient() and getPlayerByOnlineID(player:getOnlineID()) or player
+
+    -- Load smokable config
+    local config = self:loadConfig()
+    for k, v in pairs(config) do
+        self[k] = v
+    end
+
+    -- Load item stats
+    local stats = self:extractItemStats()
+    for k, v in pairs(stats) do
+        self[k] = v
+        self['original' .. k:sub(1, 1):upper() .. k:sub(2)] = v
+    end
+
+    -- Runtime state
+    self.canDrop = self.conditions and self.conditions.canDrop or false
+    self.replaceOnUse = item:getModData().replaceOnUse or false
+    self.smokePercent = self.smokeLength / self.originalSmokeLength
+    self.smokeLit = false
+    self.puffPercent = 0.0
+    self.burnRate = ZombRandFloat(self.burnMax * 0.75, self.burnMax * 1.15)
+    self.hasRolledForDrop = false
+end
+
+--- Load configuration for this smokable type
+-- @return table Config with all burn/effect parameters
+function SmokableItem:loadConfig()
+    local fullType = self.item:getFullType()
+    local opt = TrueSmoking.Options
+    local g = opt.Global
+    local cat = opt.Category
+
+    -- Start with registered config or empty
+    local registered = TrueSmoking.SmokableObjects[fullType]
+    local cfg = registered and TrueSmoking.deepCopy(registered) or {}
+
+    -- Determine category multiplier
+    local categoryMult = cat.Cigarette
+    if fullType:find('Cigar$') and not fullType:find('Cigarillo') then
+        categoryMult = cat.Cigar
+    elseif fullType:find('Cigarillo') then
+        categoryMult = cat.Cigarillo
+    elseif fullType:find('Pipe') or fullType:find('CanPipe') then
+        categoryMult = cat.Pipe
+    elseif fullType:find('Can') then
+        categoryMult = cat.Can
+    elseif fullType:find('RolledCigarette') then
+        categoryMult = cat.RolledCigarette or cat.Rolled
+    end
+
+    -- Default values
+    local defaults = {
+        smokeLength = opt.SmokeLength or 1.0,
+        burnMin = g.burnMin * categoryMult,
+        burnMax = g.burnMax * categoryMult,
+        burnSpeed = g.burnSpeed,
+        burnSpeedDecay = g.burnSpeedDecay,
+        decayRate = g.decayRate,
+        puffFactor = g.puffFactor,
+        walkingFactor = g.walkingFactor,
+        runningFactor = g.runningFactor,
+        sprintingFactor = g.sprintingFactor,
+        effectMultiplier = 1,
+        nicotineContent = 100,
+        conditions = { idle = true, walking = true, running = true, sprinting = true, strafing = true, canDrop = true },
+        visualItem = 'Mask_Cigarette',
+        callback = false,
+    }
+
+    for k, v in pairs(defaults) do
+        if cfg[k] == nil then cfg[k] = v end
+    end
+
+    cfg.fullType = fullType
+    cfg.originalSmokeLength = cfg.smokeLength
+
+    -- Restore saved progress
+    local saved = self.item:getModData().SmokeLength
+    if saved then
+        cfg.smokeLength = saved
+    end
+
+    -- SmokingSoundsOverhaul compatibility
+    if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
+        cfg.puffFactor = cfg.puffFactor / 2
+    end
+
+    -- Persist to item
+    self.item:getModData().SmokeLength = cfg.smokeLength
+    self.item:getModData().OriginalSmokeLength = cfg.originalSmokeLength
+    sendClientCommand(self.player, 'TrueSmoking', 'updateItemData', { self.item, self.item:getModData() })
+
+    return cfg
+end
+
+--- Extract stat values from item
+-- @return table Stat values
+function SmokableItem:extractItemStats()
+    local item = self.item
+    return {
+        stress = item:getStressChange() or -5,
+        boredom = item:getBoredomChange() or 0,
+        unhappiness = item:getUnhappyChange() or 0,
+        fatigue = item:getFatigueChange() or 0,
+        thirst = item:getThirstChange() or 0,
+        hunger = item:getHungChange() or 0,
+        pain = item:getPainReduction() or 0,
+        endurance = item:getEnduranceChange() or 0,
+        reduceFoodSick = item:getFoodSicknessChange() or 0,
+    }
+end
+
+--------------------------------------------------------------------------------
+-- Actions
+--------------------------------------------------------------------------------
+
+--- Light the smokable
+function SmokableItem:light()
+    if not self.smokeLit then
+        self.smokeLit = true
+        if self.burnRate == 0 then
+            self.burnRate = ZombRandFloat(self.burnMin, self.burnMax)
+        end
+    end
+
+    if not ISTimedActionQueue.hasActionType(self.player, 'LightSmoke') then
+        ISTimedActionQueue.add(LightSmoke:new(self.player, self.item))
+    end
+end
+
+--- Start smoking (called after lighting completes)
+-- @param player IsoPlayer
+-- @param item InventoryItem
+-- @return SmokableItem self
+function SmokableItem:start(player, item)
+    self:init(item, player)
+
+    if not self.smokeLit then
+        self.smokeLit = true
+        if self.burnRate == 0 then
+            self.burnRate = ZombRandFloat(self.burnMin, self.burnMax)
+        end
+    end
+
+    local data = self.player:getModData().TrueSmoking
+    data.isSmoking = true
+    data.takingPuff = false
+    sendClientCommand(self.player, 'TrueSmoking', 'updatePlayerData', { { isSmoking = true, takingPuff = false } })
+
+    return self
+end
+
+--- Take a puff
+function SmokableItem:puff()
+    local data = self.player:getModData().TrueSmoking
+    if data.isSmoking and self.smokeLit and not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
+        ISTimedActionQueue.add(TakePuff:new(self.player, self.item, self.customEatSound, self.itemFullType))
+    end
+end
+
+--- Idle puff to keep cigarette lit
+-- Only auto-puffs when player isn't busy with other actions (except smoking-related ones)
+function SmokableItem:idlePuff()
+    if not TrueSmoking.Config or not TrueSmoking.Config.KeepLit then return end
+    if self.burnRate >= 0.00001 or not self.smokeLit then return end
+
+    -- Don't interrupt other actions - only auto-puff if queue is empty or only has smoking actions
+    local queue = ISTimedActionQueue.getTimedActionQueue(self.player)
+    if queue and queue.queue then
+        for i = 1, #queue.queue do
+            local action = queue.queue[i]
+            if action and action.Type then
+                local actionType = tostring(action.Type)
+                -- Skip smoking-related actions
+                if actionType ~= 'TakePuff' and actionType ~= 'LightSmoke' and actionType ~= 'PutOut' then
+                    -- Player has other actions queued, don't auto-puff
+                    return
+                end
+            end
+        end
+    end
+
+    -- Also check if player is currently performing a non-smoking action
+    local current = queue and queue.current
+    if current and current.Type then
+        local currentType = tostring(current.Type)
+        if currentType ~= 'TakePuff' and currentType ~= 'LightSmoke' and currentType ~= 'PutOut' then
+            return
+        end
+    end
+
+    self:puff()
+end
+
+--- Put out the smokable
+function SmokableItem:putOut()
+    local data = self.player:getModData().TrueSmoking
+    if data.isSmoking and not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
+        ISTimedActionQueue.add(PutOut:new(self.player, self.item, self.smokeLength, self.customEatSound,
+            self.itemFullType))
+    end
+end
+
+--- Stop smoking completely
+function SmokableItem:stop()
+    self.smokeLit = false
+    self.hasDropped = false
+
+    local player = self.player or getPlayer()
+    local data = player:getModData().TrueSmoking
+    if data then
+        data.isSmoking = false
+        data.takingPuff = false
+    end
+    sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { { isSmoking = false, takingPuff = false } })
+end
+
+--------------------------------------------------------------------------------
+-- Update Loop
+--------------------------------------------------------------------------------
+
+--- Main update tick (called from OnPlayerUpdate)
+-- @param player IsoPlayer
+function SmokableItem:update(player)
+    local targetPlayer = self.player or player
+    local data = TrueSmoking.Data.getSmoking(targetPlayer)
+
+    if not data or not data.isSmoking or not self.item then return end
+
+    -- Check item still exists
+    if not targetPlayer:getInventory():contains(self.item) then
+        self.smokeLit = false
+        data.isSmoking = false
+        sendClientCommand(targetPlayer, 'TrueSmoking', 'updatePlayerData', { { isSmoking = false } })
+        return
+    end
+
+    if not self.smokeLit then return end
+
+    -- Calculate burn rate based on activity
+    local gameSpeed = TrueSmoking.getGameSpeedMultiplier()
+    local cond = self.conditions
+
+    local isWalking = self.player:isWalking() and cond.walking
+    local isRunning = self.player:isRunning() and cond.running
+    local isSprinting = self.player:isSprinting() and cond.sprinting
+    local isStrafing = self.player:isStrafing() and cond.strafing
+    local isReading = ISTimedActionQueue.hasActionType(self.player, 'ISReadABook')
+
+    local targetBurnRate
+    if data.takingPuff then
+        targetBurnRate = self.burnMax * self.puffFactor
+    elseif isSprinting then
+        targetBurnRate = self.burnMin * self.sprintingFactor
+    elseif isRunning then
+        targetBurnRate = self.burnMin * self.runningFactor
+    elseif isWalking or isStrafing then
+        targetBurnRate = self.burnMin * self.walkingFactor
+    elseif isReading then
+        targetBurnRate = self.burnMin * self.walkingFactor * 0.5
+    else
+        targetBurnRate = nil -- Idle decay
+    end
+
+    -- Apply burn rate changes
+    if targetBurnRate then
+        local speed = self.burnSpeed
+        if self.burnRate > self.burnMax then
+            speed = speed * self.burnSpeedDecay
+        end
+        self.burnRate = self.burnRate + (targetBurnRate - self.burnRate) * speed * gameSpeed
+    else
+        self.burnRate = self.burnRate * (self.decayRate ^ gameSpeed)
+    end
+
+    -- Update smoke state
+    self.puffPercent = self.burnRate * gameSpeed / self.originalSmokeLength
+    self.smokeLength = self.smokeLength - self.burnRate * gameSpeed
+    self.smokePercent = self.smokeLength / self.originalSmokeLength
+
+    -- Buffer stat changes for server to apply
+    self:bufferStats()
+
+    -- Buffer vanilla tobacco effects (smoker trait, nicotine withdrawal, etc.)
+    self:bufferTobaccoEffects()
+
+    -- Buffer nicotine puff
+    if TrueSmoking.Options.UseNicotineSystem and
+        self.onEat == 'RecipeCodeOnEat.consumeNicotine' and
+        self.puffPercent > 0 and self.nicotineContent then
+        local smokingData = data
+        smokingData.puffBuffer = smokingData.puffBuffer or {}
+        table.insert(smokingData.puffBuffer, {
+            nicotineContent = self.nicotineContent,
+            puffPercent = self.puffPercent,
+        })
+    end
+
+    -- Run callbacks
+    if self.callback then self.callback(self) end
+
+    -- Save progress
+    self.item:getModData().SmokeLength = self.smokeLength
+
+    -- Auto-puff to keep lit
+    self:idlePuff()
+
+    -- Handle relighting / burnout
+    if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000025 then
+        self.burnRate = 0
+        self.smokeLit = false
+    elseif not TrueSmoking.Options.SmokeRelighting and self.burnRate < self.burnMin then
+        self.burnRate = self.burnMin
+    end
+
+    -- Finished smoking
+    if self.smokeLength <= 0 then
+        self.smokeLength = 0
+        self.smokeLit = false
+        if TrueSmoking.Config.AutoPutOut then
+            self:putOut()
+        end
+    end
+end
+
+--- Buffer stat changes for server to apply
+-- Stats are buffered per-tick and sent to server frequently for application.
+-- Server is authoritative for stat changes (required for MP compatibility).
+-- Buffer is sent every ~1 second via EveryTenSeconds event (see client/Network.lua).
+function SmokableItem:bufferStats()
+    local player = self.player
+    if not player then return end
+    
+    local pct = self.puffPercent
+    if not pct or pct <= 0 then return end
+    
+    local data = TrueSmoking.Data.getSmoking(player)
+    if not data then return end
+    
+    local buffer = data.statsToApply
+    if not buffer then
+        data.statsToApply = {}
+        buffer = data.statsToApply
+    end
+    
+    local effectMult = self.effectMultiplier or 1.0
+    local gameSpeed = TrueSmoking.getGameSpeedMultiplier()
+    
+    -- Scale factor explanation:
+    -- puffPercent is ~0.0001-0.001 per tick at normal burn rates
+    -- A cigarette burns over ~5-10 minutes (~3000-6000 ticks at 1x speed)
+    -- Item stats like stress = -5 mean "reduce by 5 over full consumption"
+    -- We want to deliver ~2-3x the base stats over the smoke duration to overcome regen
+    -- 
+    -- With baseMult=3.0, effectMult=1-3, over 5000 ticks:
+    -- Total effect = sum(pct * baseMult * effectMult) ≈ 1.0 * 3.0 * 1.5 = 4.5x base stats
+    local baseMult = 3.0
+    
+    --- Add a stat delta to the buffer
+    -- @param key string Stat name for server (e.g., 'STRESS')
+    -- @param original number Item's base stat value (negative = reduce)
+    -- @param isIncrease boolean True if this stat should INCREASE (like boredom)
+    local function addStat(key, original, isIncrease)
+        if not original or original == 0 then return end
+        -- original is negative for beneficial effects (stress -5 = reduce by 5)
+        local delta = math.abs(original) * pct * effectMult * baseMult * gameSpeed
+        if isIncrease then
+            -- Stat should increase (detrimental) - use negative buffer value
+            buffer[key] = (buffer[key] or 0) - delta
+        else
+            -- Stat should decrease (beneficial) - use positive buffer value
+            buffer[key] = (buffer[key] or 0) + delta
+        end
+    end
+    
+    -- Buffer item's base stat effects
+    addStat('STRESS', self.originalStress, false)
+    addStat('UNHAPPINESS', self.originalUnhappiness, false)
+    addStat('FATIGUE', self.originalFatigue * 0.75, false)  -- Reduced by 25%
+    addStat('HUNGER', self.originalHunger * 0.75, false)  -- Reduced by 25%
+    addStat('THIRST', self.originalThirst, false)
+    addStat('BOREDOM', self.originalBoredom, true)  -- Boredom increases
+end
+
+--- Buffer vanilla tobacco/smoker trait effects for server application
+-- Mimics vanilla cigarette behavior from RecipeCodeOnEat.consumeNicotineLogic()
+-- Buffers stat deltas per-tick, sent to server frequently for application.
+function SmokableItem:bufferTobaccoEffects()
+    local player = self.player
+    if not player then return end
+    
+    local pct = self.puffPercent
+    if not pct or pct <= 0 then return end
+    
+    local effectMult = self.effectMultiplier or 1.0
+    local gameSpeed = TrueSmoking.getGameSpeedMultiplier()
+    
+    local data = TrueSmoking.Data.getSmoking(player)
+    if not data then return end
+    
+    local buffer = data.statsToApply
+    if not buffer then
+        data.statsToApply = {}
+        buffer = data.statsToApply
+    end
+    
+    -- Vanilla reference (RecipeCodeOnEat.consumeNicotineLogic):
+    -- For Smokers:
+    --   stats.add(UNHAPPINESS, stressChange * percent) -- stressChange is negative, so reduces
+    --   stats.add(STRESS, stressChange * percent)      -- stressChange is negative, so reduces
+    --   stats.remove(NICOTINE_WITHDRAWAL, 0.51 * percent)
+    --   player.setTimeSinceLastSmoke(withdrawal / 0.51)
+    --
+    -- For Non-Smokers:
+    --   stats.add(FOOD_SICKNESS, foodSickness * percent)
+    
+    -- Smoker multiplier: stronger effects for trait holders
+    -- Tuned to deliver meaningful impact over ~5-10 minute smoke duration
+    local smokerMult = 1.55 * effectMult * gameSpeed
+    
+    if player:hasTrait(CharacterTrait.SMOKER) then
+        -- Reduce unhappiness (vanilla stressChange is typically -5)
+        local unhappyDelta = 5 * pct * smokerMult
+        buffer['UNHAPPINESS'] = (buffer['UNHAPPINESS'] or 0) + unhappyDelta
+        
+        -- Reduce stress (0-1 scale, so smaller values)
+        local stressDelta = 0.08 * pct * smokerMult
+        buffer['STRESS'] = (buffer['STRESS'] or 0) + stressDelta
+        
+        -- Reduce nicotine withdrawal (max is 0.51)
+        local withdrawalDelta = 0.51 * pct * smokerMult
+        buffer['NICOTINE_WITHDRAWAL'] = (buffer['NICOTINE_WITHDRAWAL'] or 0) + withdrawalDelta
+        
+        -- Buffer timeSinceLastSmoke reduction
+        local timeDelta = 10.0 * pct * smokerMult
+        buffer['TIME_SINCE_LAST_SMOKE'] = (buffer['TIME_SINCE_LAST_SMOKE'] or 0) + timeDelta
+    else
+        -- Non-smoker: reset withdrawal/timer (flags for server)
+        buffer['RESET_NICOTINE_WITHDRAWAL'] = true
+        buffer['RESET_TIME_SINCE_LAST_SMOKE'] = true
+        
+        -- Apply food sickness if item causes it (non-smokers get sick)
+        if self.originalReduceFoodSick and self.originalReduceFoodSick > 0 then
+            local sickDelta = self.originalReduceFoodSick * pct * effectMult * gameSpeed
+            buffer['FOOD_SICKNESS'] = (buffer['FOOD_SICKNESS'] or 0) - sickDelta  -- Negative = increase
+        end
+    end
+end
+
+--- Get current stats for moodle display
+-- @return table Stats snapshot
+function SmokableItem:getStats()
+    return {
+        stress = self.stress,
+        boredom = self.boredom,
+        unhappiness = self.unhappiness,
+        fatigue = self.fatigue,
+        thirst = self.thirst,
+        hunger = self.hunger,
+        pain = self.pain,
+        endurance = self.endurance,
+        reduceFoodSick = self.reduceFoodSick,
+        originalStress = self.originalStress,
+        originalBoredom = self.originalBoredom,
+        originalUnhappiness = self.originalUnhappiness,
+        originalFatigue = self.originalFatigue,
+        originalThirst = self.originalThirst,
+        originalHunger = self.originalHunger,
+        originalPain = self.originalPain,
+        originalEndurance = self.originalEndurance,
+        originalReduceFoodSick = self.originalReduceFoodSick,
+        effectMultiplier = self.effectMultiplier,
+        puffPercent = self.puffPercent,
+        smokeLit = self.smokeLit,
+    }
+end
+
+--------------------------------------------------------------------------------
+-- Event Registration
+--------------------------------------------------------------------------------
+
+Events.OnPlayerUpdate.Add(function(player)
+    local ref = TrueSmoking.getPlayerRef(player)
+    if ref and ref.smokable and ref.smokable.update then
+        ref.smokable:update(player)
+    end
+end)
+
+return SmokableItem

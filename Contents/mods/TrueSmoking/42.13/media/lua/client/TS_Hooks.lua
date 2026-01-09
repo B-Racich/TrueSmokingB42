@@ -25,7 +25,8 @@ ISInventoryPaneContextMenu.eatItem = function(item, percentage, player, openingR
     else
         playerObj:getModData().TrueSmoking.CheckMaskSmoking = false
     end
-    playerObj:transmitModData()
+    sendClientCommand(playerObj, 'TrueSmoking', 'updatePlayerData', { { CheckMaskSmoking = playerObj:getModData().TrueSmoking.CheckMaskSmoking } })
+    -- playerObj:transmitModData()
     originalEatItem(item, percentage, player, openingRecipe, eatPercentage)
 end
 
@@ -46,7 +47,8 @@ ISInventoryPaneContextMenu.getEatingMask = function(playerObj, removeMask)
         o.shemagh = false
     end
 
-    playerObj:transmitModData()
+    sendClientCommand(playerObj, 'TrueSmoking', 'updatePlayerData', { { mask = o.mask, shemagh = o.shemagh } })
+    -- playerObj:transmitModData()
 
     --If we want to handle re-equipping tell the game we took nothing off
     if o.CheckMaskSmoking then

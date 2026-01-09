@@ -1,160 +1,192 @@
+--[[
+    TakePuff.lua - Timed Action for Taking a Puff
+
+    Handles the animation and stat application for puffing
+    on a lit smokable. Supports continuous puffing via held key.
+]]
+
 require 'TimedActions/ISBaseTimedAction'
-require 'TrueSmoking'
-require 'Smokable'
-require 'Utils'
+require 'Core'
+require 'Data'
 
 TakePuff = ISBaseTimedAction:derive('TakePuff')
 
+--------------------------------------------------------------------------------
+-- Validation
+--------------------------------------------------------------------------------
+
 function TakePuff:isValid()
-    return self.data.isSmoking
-end
-
-function TakePuff:update()
-    -- Sync up the anim to remove the visualItem when the hand reaches the mouth
-    local curTime = os.time()
-    if not self.visualItemFlag then
-        if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            if isClient() then
-                self.character:removeWornItem(self.character:getWornItem(TrueSmoking.registries.mask))
-            end
-            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
-            self.visualItemFlag = true
-            local hasPrimary = self.character:getPrimaryHandItem()
-            if hasPrimary then
-                self:setOverrideHandModels(hasPrimary, self.item)
-            else
-                self:setOverrideHandModels(nil, self.item)
-            end
-        end
-    end
-
-    -- Loop audio
-    if self.eatSound ~= '' and self.eatAudio ~= 0 and not self.character:getEmitter():isPlaying(self.eatAudio) then
-        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
-    end
-
-    local ts = TrueSmoking:getPlayerReference(self.character)
-
-    -- Reset job if keybind is held
-    if self:getJobDelta() >= .98 then
-        if ts.Smokable.smokeLength > 0 and (self.data.holdingPuffKey or self.data.B_HELD) and not self.endAction then -- We reset job delta for continous smoking
-            self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
-            self:resetJobDelta()
-        end
-    end
+    return self.data and self.data.isSmoking
 end
 
 function TakePuff:waitToStart()
     return false
 end
 
+--------------------------------------------------------------------------------
+-- Action Lifecycle
+--------------------------------------------------------------------------------
+
 function TakePuff:start()
-    if TrueSmoking.Config.HideActionBar or TrueSmoking.Config.HideAllActionBars then
-        self.action:setUseProgressBar(false)
+    -- Hide progress bar if option is set
+    if TrueSmoking.Config and (TrueSmoking.Config.HidePuffActionBar or TrueSmoking.Config.HideAllActionBars) then
+        self:setUseProgressBar(false)
     end
+
     self.timer = os.time()
-    -- set the anim for vanilla or modded
-    local anim = getActivatedMods():contains('\\SmokingSoundsOverhaul') and 'Smoke_Quiet' or CharacterActionAnims.Eat
+
+    -- Set animation (check for SmokingSoundsOverhaul mod)
+    local anim = CharacterActionAnims.Eat
+    if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
+        anim = 'Smoke_Quiet'
+    end
     self:setActionAnim(anim)
     self:setAnimVariable('FoodType', self.item:getEatType())
 
-    --Track puff
+    -- Mark puff in progress
     self.data.takingPuff = true
 
+    -- Handle audio
     if self.eatSound ~= '' then
-        self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end
 
-    -- Play custom sound when no sound is playing
+    -- Custom sound for SmokingSoundsOverhaul
     if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
         local gender = self.character:isFemale()
         local sound = SmokingSoundsOverhaul:getPuffSound(gender)
-        if self.eatSound == '' then -- No sound running for first time
+        if self.eatSound == '' then
             self.eatSound = sound
-            -- Check if we previously started a puff and its audio is still playing
             if not self.character:getEmitter():isPlaying(self.data.eatSound) then
                 self.data.eatSound = sound
-                self.eatAudio = self.character:getEmitter():playSound(self.eatSound);
+                self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
             end
         end
     end
-    self.character:transmitModData()
-    -- sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { self.data })
+
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { self.data })
+end
+
+function TakePuff:update()
+    local curTime = os.time()
+
+    -- Remove visual item mid-animation (synced with hand reaching mouth)
+    if not self.visualItemFlag then
+        if os.difftime(curTime, self.timer) > self.visualItemTimer then
+            -- Remove visual
+            if isClient() then
+                local worn = self.character:getWornItem(TrueSmoking.registries.mask)
+                if worn then
+                    self.character:removeWornItem(worn)
+                end
+            end
+            sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
+            self.visualItemFlag = true
+
+            -- Update hand model
+            local primary = self.character:getPrimaryHandItem()
+            self:setOverrideHandModels(primary, self.item)
+        end
+    end
+
+    -- Loop audio
+    if self.eatSound ~= '' and self.eatAudio ~= 0 then
+        if not self.character:getEmitter():isPlaying(self.eatAudio) then
+            self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
+        end
+    end
+
+    local ref = TrueSmoking.getPlayerRef(self.character)
+
+    -- Continuous puffing - reset job if key held
+    if self:getJobDelta() >= 0.98 then
+        if ref and ref.smokable and ref.smokable.smokeLength > 0 then
+            if (self.data.holdingPuffKey or self.data.B_HELD) and not self.endAction then
+                self.LongJobDelta = self.LongJobDelta + self:getJobDelta()
+                self:resetJobDelta()
+            end
+        end
+    end
 end
 
 function TakePuff:stop()
     ISBaseTimedAction.stop(self)
 
+    -- Stop audio
     if self.character:getEmitter():isPlaying(self.eatSound) then
         self.character:getEmitter():stopSound(self.eatAudio)
     end
 
-    if TrueSmoking.Options.Coughing then
-        local coughChance = 100
-        if self.character:hasTrait(CharacterTrait.SMOKER) then
-            if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
-                self.character:triggerCough()
-            end
-        else
-            if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceNonSmoker then
-                self.character:triggerCough()
-            end
-        end
-    end
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    ts.Smokable = Smokable:start(self.character, self.item)
-    if isClient() then
-        local visual = ts.Smokable:getVisualItem(self.item)
-        self.character:setWornItem(visual:getBodyLocation(), visual)
-    end
-    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
-    self.data.takingPuff = false
-    self.character:transmitModData()
-    -- self:forceComplete()
-end
+    -- Handle coughing
+    self:tryCough()
 
-function TakePuff:serverStop()
-    self:forceComplete()
+    -- Clear puff state
+    self.data.takingPuff = false
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { { takingPuff = false } })
 end
 
 function TakePuff:perform()
+    -- Stop audio if game speed is fast-forwarded
     if TrueSmoking.getGameSpeedMultiplier() > 1 then
         if self.character:getEmitter():isPlaying(self.eatSound) then
             self.character:getEmitter():stopSound(self.eatAudio)
         end
     end
 
+    -- Handle coughing
+    self:tryCough()
 
-    if TrueSmoking.Options.Coughing then
-        local coughChance = 100
-        if self.character:hasTrait(CharacterTrait.SMOKER) then
-            if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceSmoker then
-                self.character:triggerCough()
-            end
-        else
-            if ZombRand(coughChance) <= TrueSmoking.Options.CoughingChanceNonSmoker then
-                self.character:triggerCough()
-            end
+    -- Clear puff state
+    self.data.takingPuff = false
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { { takingPuff = false } })
+
+    -- Also re-equip locally on client for immediate visual feedback
+    if isClient() then
+        local mask = TrueSmoking.Visuals.createMask(self.item)
+        if mask then
+            self.character:setWornItem(TrueSmoking.registries.mask, mask)
         end
     end
-    self.data.takingPuff = false
-    local ts = TrueSmoking:getPlayerReference(self.character)
-    ts.Smokable = Smokable:start(self.character, self.item)
-    if isClient() then
-        local visual = ts.Smokable:getVisualItem(self.item)
-        self.character:setWornItem(visual:getBodyLocation(), visual)
-    end
-    self.character:transmitModData()
+
     ISBaseTimedAction.perform(self)
 end
 
 function TakePuff:complete()
     self.data.takingPuff = false
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { { takingPuff = false } })
-    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { self.item, TrueSmoking.Options })
-    -- TrueSmoking.EquipVisualItem(self.character, self.item)
+    -- Send fullType string instead of item object for proper MP serialization
+    local fullType = self.item and self.item:getFullType() or self.fullType
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem',
+        { fullType = fullType, options = TrueSmoking.Options })
+
+
     return true
 end
+
+--------------------------------------------------------------------------------
+-- Helpers
+--------------------------------------------------------------------------------
+
+function TakePuff:tryCough()
+    if not TrueSmoking.Options.Coughing then return end
+
+    local coughChance = 100
+    local threshold
+
+    if self.character:hasTrait(CharacterTrait.SMOKER) then
+        threshold = TrueSmoking.Options.CoughingChanceSmoker
+    else
+        threshold = TrueSmoking.Options.CoughingChanceNonSmoker
+    end
+
+    if ZombRand(coughChance) <= threshold then
+        self.character:triggerCough()
+    end
+end
+
+--------------------------------------------------------------------------------
+-- Constructor
+--------------------------------------------------------------------------------
 
 function TakePuff:new(character, item, eatSound, fullType)
     local o = ISBaseTimedAction.new(self, character)
@@ -164,12 +196,10 @@ function TakePuff:new(character, item, eatSound, fullType)
     o.stopOnAim = true
 
     o.character = character
-    o.data = character:getModData().TrueSmoking
-    -- o.ts = TrueSmoking:getPlayerReference(character)
+    o.data = TrueSmoking.Data.getSmoking(character)
     o.item = item
-    o.eatSound = eatSound
+    o.eatSound = eatSound or ''
     o.fullType = fullType
-    -- o.eatSound = ''
     o.eatAudio = 0
     o.maxTime = 220
     o.visualItemAnimLength = 3.7
