@@ -180,16 +180,23 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         
         if not fullType or not options or not options.ManageHeadGear then return end
 
-        -- Look up mask type directly from fullType string
-        local maskType
-        if TrueSmoking.Visuals and TrueSmoking.Visuals.TYPE_TO_MASK then
-            maskType = TrueSmoking.Visuals.TYPE_TO_MASK[fullType]
+        -- Use Visuals.lua to get mask type (handles NO_VISUAL_PATTERNS correctly)
+        local maskType = false
+        if TrueSmoking.Visuals and TrueSmoking.Visuals.getMaskType then
+            -- Create temporary item to check visual
+            local tempItem = instanceItem(fullType)
+            if tempItem then
+                maskType = TrueSmoking.Visuals.getMaskType(tempItem)
+            end
         end
         
-        -- Fallback to pattern matching
-        if not maskType then
+        -- Fallback to pattern matching (legacy support)
+        if maskType == nil then
             local lowerType = fullType:lower()
-            if lowerType:find('pipe') then
+            -- Check for no-visual patterns
+            if lowerType:find('bong') or lowerType:find('can') then
+                maskType = false
+            elseif lowerType:find('pipe') then
                 maskType = 'Base.Mask_Pipe'
             elseif lowerType:find('cigar[^e]') or lowerType:find('cigar$') then
                 maskType = 'Base.Mask_Cigar'
@@ -200,11 +207,14 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             end
         end
 
-        local mask = instanceItem(maskType)
-        if mask and not player:getWornItem(TrueSmoking.registries.mask) then
-            -- Use the registered body location to avoid conflicts with other clothing
-            player:setWornItem(TrueSmoking.registries.mask, mask)
-            triggerEvent('OnClothingUpdated', player)
+        -- Only equip if maskType is valid (not false)
+        if maskType and maskType ~= false then
+            local mask = instanceItem(maskType)
+            if mask and not player:getWornItem(TrueSmoking.registries.mask) then
+                -- Use the registered body location to avoid conflicts with other clothing
+                player:setWornItem(TrueSmoking.registries.mask, mask)
+                triggerEvent('OnClothingUpdated', player)
+            end
         end
     end
 
@@ -255,6 +265,16 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             item:getModData().SmokeLength = data.SmokeLength
         end
         sendAddItemToContainer(player:getInventory(), item)
+    end
+    
+    if command == 'replaceItem' then
+        local replaceType = args[1]
+        if replaceType and replaceType ~= '' then
+            local newItem = player:getInventory():AddItem(replaceType)
+            if newItem then
+                sendAddItemToContainer(player:getInventory(), newItem)
+            end
+        end
     end
 end
 

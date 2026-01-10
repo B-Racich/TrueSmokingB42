@@ -288,18 +288,16 @@ function SmokableItem:removeConsumedItem()
     -- Stop smoking state
     self:stop()
     
-    -- Replace with butt if applicable
-    local onUse = self.item:getReplaceOnUseFullType()
-    if onUse and onUse ~= '' then
-        local newItem = self.player:getInventory():AddItem(onUse)
-        if newItem then
-            sendAddItemToContainer(self.player:getInventory(), newItem)
-        end
-    end
-    
     -- Remove consumed item
     self.player:getInventory():Remove(self.item)
     sendRemoveItemFromContainer(self.player:getInventory(), self.item)
+    
+    -- Replace with butt/empty container if applicable (server-side for MP)
+    -- Read from ModData (pipes/bongs store replaceOnUse there)
+    local onUse = self.item:getModData().replaceOnUse or self.item:getReplaceOnUseFullType()
+    if onUse and onUse ~= '' then
+        sendClientCommand(self.player, 'TrueSmoking', 'replaceItem', { onUse })
+    end
     
     -- Check for mask re-equip
     TrueSmoking.checkForMaskAndEquip(self.player)

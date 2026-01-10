@@ -61,14 +61,15 @@ function PutOut:update()
     
     -- Remove visual item mid-animation (synced with hand reaching mouth)
     if not self.visualItemFlag then
-        if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            -- Remove visual
-            if isClient() then
-                local worn = self.character:getWornItem(TrueSmoking.registries.mask)
-                if worn then
-                    self.character:removeWornItem(worn)
-                end
-            end
+        local shouldRemoveNow = os.difftime(curTime, self.timer) > self.visualItemTimer
+        
+        -- For items with no visual, update hand models immediately
+        if not self.hasVisual then
+            shouldRemoveNow = true
+        end
+        
+        if shouldRemoveNow then
+            -- Remove visual (if it exists)
             sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
             self.visualItemFlag = true
             
@@ -148,14 +149,18 @@ function PutOut:complete()
                 { SmokeLength = self.smokeLength } 
             })
         else
-            -- Fully consumed - replace with butt
-            local onUse = self.item:getReplaceOnUseFullType()
-            if onUse and onUse ~= '' then
-                local newItem = self.character:getInventory():AddItem(onUse)
-                sendRemoveItemFromContainer(self.character:getInventory(), newItem)
-            end
+            -- Fully consumed - replace with butt/empty container
+            -- Read from ModData (pipes/bongs store replaceOnUse there)
+            local onUse = self.item:getModData().replaceOnUse or self.item:getReplaceOnUseFullType()
+            
+            -- Remove consumed item
             self.character:getInventory():Remove(self.item)
             sendRemoveItemFromContainer(self.character:getInventory(), self.item)
+            
+            -- Server-side replacement for MP compatibility
+            if onUse and onUse ~= '' then
+                sendClientCommand(self.character, 'TrueSmoking', 'replaceItem', { onUse })
+            end
         end
     end
 
@@ -192,6 +197,9 @@ function PutOut:new(character, item, smokeLength, eatSound, fullType)
 
     o.visualItemTimer = 0.7
     o.visualItemFlag = false
+    
+    -- Check if this item has a visual mask (false for bongs/cans)
+    o.hasVisual = item and TrueSmoking.Visuals.getMaskType(item) ~= false
 
     return o
 end

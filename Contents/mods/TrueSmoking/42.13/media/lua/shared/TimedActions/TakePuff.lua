@@ -77,8 +77,15 @@ function TakePuff:update()
 
     -- Remove visual item mid-animation (synced with hand reaching mouth)
     if not self.visualItemFlag then
-        if os.difftime(curTime, self.timer) > self.visualItemTimer then
-            -- Remove visual
+        local shouldRemoveNow = os.difftime(curTime, self.timer) > self.visualItemTimer
+        
+        -- For items with no visual, update hand models immediately
+        if not self.hasVisual then
+            shouldRemoveNow = true
+        end
+        
+        if shouldRemoveNow then
+            -- Remove visual (if it exists)
             if isClient() then
                 local worn = self.character:getWornItem(TrueSmoking.registries.mask)
                 if worn then
@@ -212,6 +219,9 @@ function TakePuff:new(character, item, eatSound, fullType)
     o.visualItemFlag = false
     o.LongJobDelta = 0
     o.JobFactor = o.visualItemTimer / o.maxTime
+    
+    -- Check if this item has a visual mask (false for bongs/cans)
+    o.hasVisual = item and TrueSmoking.Visuals.getMaskType(item) ~= false
 
     return o
 end
