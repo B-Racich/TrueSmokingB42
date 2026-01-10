@@ -15,48 +15,21 @@ require 'Core'
 require 'Data'
 require 'NicotineSystem'  -- Load shared config
 
---------------------------------------------------------------------------------
--- Dynamic Configuration (based on sandbox settings)
---------------------------------------------------------------------------------
-
---- Recalculate decay rates based on player addiction level and sandbox options
+--- Server-side initialization ensures UpdateDynamicConfig runs
+-- The shared NicotineSystem.lua defines UpdateDynamicConfig with the correct formula
+-- This wrapper ensures it's called on the server when a player connects
 -- @param player IsoPlayer
-function NicotineSystem:UpdateDynamicConfig(player)
-    local opt = self.Options
-    local cfg = self.Config
-    
-    local daysToZero   = math.max(1, opt.DaysToDetox or 30)
-    local daysToAddict = math.max(1, opt.DaysToAddiction or 42)
-    local daysToPeak   = math.max(1, opt.DaysToPeakWithdrawal or 3)
-    
-    local data = TrueSmoking.Data.getNicotine(player)
-    if not data then return end
-    
-    -- Calculate addiction decay rate
-    local minutesInDetox = daysToZero * 24 * 60
-    local baseDecay = math.max(data.addictionLevel, 1) / minutesInDetox
-    cfg.ADDICTION_DECAY_PER_MINUTE = baseDecay
-    cfg.ADDICTION_DECAY_PER_MINUTE_SMOKER = baseDecay * opt.SmokerTraitDecayMultiplier
-    
-    -- Calculate addiction gain per cigarette
-    local avgCigsPerDay = 3
-    local totalCigsToCap = avgCigsPerDay * daysToAddict
-    cfg.ADDICTION_PER_CIGARETTE = (100 / totalCigsToCap) * 1.15
-    
-    -- Passive addiction gain
-    local passiveDaily = 3.0 / daysToAddict
-    cfg.ADDICTION_GAIN_PER_MINUTE = math.max(0.00001, passiveDaily / 1440)
-    
-    -- Withdrawal peak rate
-    local minutesToPeak = daysToPeak * 24 * 60
-    cfg.WITHDRAWAL_PEAK_GAIN_PER_MINUTE = (100 / minutesToPeak) / 1.5
-end
-
---- Initialize nicotine data for a player (called on player creation)
--- @param player IsoPlayer
-function NicotineSystem:initialize(player)
+function NicotineSystem:initializeServer(player)
     -- Data.getNicotine handles initialization
     TrueSmoking.Data.getNicotine(player)
+    
+    -- Call the shared UpdateDynamicConfig to set correct decay rates
+    -- This is critical in MP where the shared OnCreatePlayer event doesn't run on dedicated server
+    if self.UpdateDynamicConfig then
+        self:UpdateDynamicConfig(player)
+        TrueSmoking.debug(string.format('Server: Initialized decay rates - ADDICTION_DECAY_PER_MINUTE=%.6f', 
+            self.Config.ADDICTION_DECAY_PER_MINUTE or 0))
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -270,7 +243,9 @@ function TrueSmoking.Nicotine.updatePlayer(player)
     
     -- Addiction decay when in withdrawal
     if lowNicotine and data.withdrawalLevel >= 0 and not isSmoking then
-        if not cfg.ADDICTION_DECAY_PER_MINUTE or cfg.ADDICTION_DECAY_PER_MINUTE == 0 then
+        -- Ensure decay rate is properly initialized (critical for MP server)
+        -- The default value is 0.0001, correct value for 30 days is ~0.00231
+        if not cfg.ADDICTION_DECAY_PER_MINUTE or cfg.ADDICTION_DECAY_PER_MINUTE < 0.001 then
             NicotineSystem:UpdateDynamicConfig(player)
         end
         
@@ -340,6 +315,5 @@ end
 --------------------------------------------------------------------------------
 
 Events.OnCreatePlayer.Add(function(_, player)
-    NicotineSystem:initialize(player)
-    NicotineSystem:UpdateDynamicConfig(player)
+    NicotineSystem:initializeServer(player)
 end)

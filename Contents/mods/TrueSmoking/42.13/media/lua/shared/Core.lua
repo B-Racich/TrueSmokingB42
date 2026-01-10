@@ -19,7 +19,7 @@ TrueSmoking = TrueSmoking or {}
 -- Configuration
 --------------------------------------------------------------------------------
 
-TrueSmoking.DEBUG = true  -- Set true to enable debug logging
+TrueSmoking.DEBUG = false  -- Set true to enable debug logging
 
 TrueSmoking.Options = TrueSmoking.Options or {}
 TrueSmoking.SmokableObjects = TrueSmoking.SmokableObjects or {}

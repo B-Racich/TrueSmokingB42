@@ -179,6 +179,9 @@ end
 
 function TSDebugWindow:onSliderChange(newValue, slider)
     if not self.player or not slider then return end
+    
+    -- Skip if we're refreshing from server data to prevent feedback loop
+    if self.isRefreshing then return end
 
     local dataType = slider.dataType
     local fieldName = slider.fieldName
@@ -226,6 +229,9 @@ end
 
 function TSDebugWindow:onCheckboxChange(index, selected, checkbox)
     if not self.player or not checkbox then return end
+    
+    -- Skip if we're refreshing from server data to prevent feedback loop
+    if self.isRefreshing then return end
 
     local dataType = checkbox.dataType
     local fieldName = checkbox.fieldName
@@ -271,6 +277,9 @@ end
 
 function TSDebugWindow:refreshData()
     if not self.player then return end
+    
+    -- Suppress callbacks during refresh to prevent feedback loop
+    self.isRefreshing = true
 
     local smokingData = TrueSmoking.Data.getSmoking(self.player)
     local nicData = TrueSmoking.Data.getNicotine(self.player)
@@ -347,6 +356,9 @@ function TSDebugWindow:refreshData()
             self.labels['stat.timeSinceLastSmoke']:setName(string.format('%.1f', self.player:getTimeSinceLastSmoke()))
         end
     end
+    
+    -- Re-enable callbacks after refresh completes
+    self.isRefreshing = false
 end
 
 function TSDebugWindow:update()
@@ -399,6 +411,7 @@ end
 
 -- F8 keybind
 function DebugUI.onKeyPress(key)
+    if not TrueSmoking.DEBUG then return end
     if key == Keyboard.KEY_F4 then
         DebugUI.toggle()
     end

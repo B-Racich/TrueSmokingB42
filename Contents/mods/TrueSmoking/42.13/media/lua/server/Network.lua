@@ -68,10 +68,8 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             md.nicotineSystem[key] = value
         end
         
-        -- Sync updated nicotine data back to client (critical for MP debug UI)
-        if isServer() and TrueSmoking.Nicotine and TrueSmoking.Nicotine.syncToClient then
-            TrueSmoking.Nicotine.syncToClient(player)
-        end
+        -- Don't immediately sync back - let the change persist
+        -- The next minute tick will handle syncing after processing
     end
 
     if command == 'updateItemData' then
