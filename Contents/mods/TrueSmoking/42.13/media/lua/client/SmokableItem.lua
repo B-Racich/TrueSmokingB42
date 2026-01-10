@@ -22,6 +22,10 @@ SmokableItem.__index = SmokableItem
 -- Global alias for external mod compatibility
 Smokable = SmokableItem
 
+-- Auto put-out retry configuration
+SmokableItem.PUT_OUT_RETRY_INTERVAL = 3.0  -- Seconds between retry attempts
+SmokableItem.PUT_OUT_RETRY_MAX = 0         -- Max retries (0 = unlimited)
+
 --------------------------------------------------------------------------------
 -- Constructor
 --------------------------------------------------------------------------------
@@ -79,6 +83,10 @@ function SmokableItem:init(item, player)
     self.puffPercent = 0.0
     self.burnRate = ZombRandFloat(self.burnMax * 0.75, self.burnMax * 1.15)
     self.hasRolledForDrop = false
+    
+    -- Auto put-out retry state
+    self.putOutRetryNext = nil
+    self.putOutRetryCount = 0
 end
 
 --- Load configuration for this smokable type
@@ -264,6 +272,10 @@ end
 function SmokableItem:removeConsumedItem()
     if not self.player or not self.item then return end
     
+    -- Clear retry state
+    self.putOutRetryNext = nil
+    self.putOutRetryCount = 0
+    
     -- Remove visual
     if not isServer() then
         local worn = self.player:getWornItem(TrueSmoking.registries.mask)
@@ -297,6 +309,10 @@ end
 function SmokableItem:stop()
     self.smokeLit = false
     self.hasDropped = false
+    
+    -- Clear retry state
+    self.putOutRetryNext = nil
+    self.putOutRetryCount = 0
 
     local player = self.player or getPlayer()
     local data = player:getModData().TrueSmoking
@@ -327,7 +343,36 @@ function SmokableItem:update(player)
         return
     end
 
-    if not self.smokeLit then return end
+    if not self.smokeLit then
+        -- Check if we need to retry putting out a fully consumed item
+        if TrueSmoking.Config and TrueSmoking.Config.AutoPutOut and 
+           self.smokeLength == 0 and 
+           self.item and 
+           self.putOutRetryNext and 
+           os.time() >= self.putOutRetryNext then
+            
+            -- Only retry if there's no PutOut action currently queued
+            if not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
+                TrueSmoking.debug('SmokableItem:update - Retrying AutoPutOut (attempt #' .. (self.putOutRetryCount + 1) .. ')')
+                self:putOut()
+                
+                -- Schedule next retry
+                self.putOutRetryCount = self.putOutRetryCount + 1
+                if SmokableItem.PUT_OUT_RETRY_MAX > 0 and self.putOutRetryCount >= SmokableItem.PUT_OUT_RETRY_MAX then
+                    TrueSmoking.debug('SmokableItem:update - Max retries reached, clearing retry state')
+                    self.putOutRetryNext = nil
+                else
+                    self.putOutRetryNext = os.time() + SmokableItem.PUT_OUT_RETRY_INTERVAL
+                end
+            else
+                -- PutOut is queued, clear retry state
+                TrueSmoking.debug('SmokableItem:update - PutOut action detected, clearing retry state')
+                self.putOutRetryNext = nil
+                self.putOutRetryCount = 0
+            end
+        end
+        return
+    end
 
     -- Calculate burn rate based on activity
     local gameSpeed = TrueSmoking.getGameSpeedMultiplier()
@@ -410,6 +455,10 @@ function SmokableItem:update(player)
         -- Force putOut to consume the item
         if TrueSmoking.Config.AutoPutOut then
             self:putOut()
+            -- Initialize retry mechanism in case putOut gets cancelled
+            self.putOutRetryNext = os.time() + SmokableItem.PUT_OUT_RETRY_INTERVAL
+            self.putOutRetryCount = 0
+            TrueSmoking.debug('SmokableItem:update - Cigarette consumed, AutoPutOut initiated with retry fallback')
         else
             -- If AutoPutOut is disabled, still need to remove the item
             self:removeConsumedItem()
@@ -524,7 +573,7 @@ function SmokableItem:bufferTobaccoEffects()
         buffer['UNHAPPINESS'] = (buffer['UNHAPPINESS'] or 0) + unhappyDelta
         
         -- Reduce stress (0-1 scale, so smaller values)
-        local stressDelta = 0.08 * pct * smokerMult
+        local stressDelta = 1 * pct * smokerMult
         buffer['STRESS'] = (buffer['STRESS'] or 0) + stressDelta
         
         -- Reduce nicotine withdrawal (max is 0.51)
