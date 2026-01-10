@@ -234,11 +234,17 @@ function TrueSmoking.Nicotine.updatePlayer(player)
         end
     end
     
-    -- Active smoking bonus to addiction
-    if isSmoking and data.nicotineLevel > 8 then
-        local gain = cfg.ADDICTION_GAIN_PER_MINUTE * cfg.ACTIVE_SMOKING_BONUS
+    -- Passive addiction gain when nicotine levels are sufficient (whether smoking or not)
+    if data.nicotineLevel >= cfg.NICOTINE_THRESHOLD then
+        local baseGain = cfg.ADDICTION_GAIN_PER_MINUTE
         local factor = math.min(data.nicotineLevel / 60, 1.6)
-        data.addictionLevel = math.min(100, data.addictionLevel + gain * factor)
+        
+        -- Active smoking provides bonus multiplier
+        if isSmoking then
+            baseGain = baseGain * cfg.ACTIVE_SMOKING_BONUS
+        end
+        
+        data.addictionLevel = math.min(100, data.addictionLevel + baseGain * factor)
     end
     
     -- Addiction decay when in withdrawal
