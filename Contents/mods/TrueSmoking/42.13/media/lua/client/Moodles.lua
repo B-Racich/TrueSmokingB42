@@ -103,6 +103,9 @@ end
 -- @param player IsoPlayer
 function TrueSmoking.updateNicotineMoodle(player)
     if player:isDead() then return end
+    
+    -- Don't show or process nicotine moodle if system is disabled
+    if not TrueSmoking.Options.UseNicotineSystem then return end
 
     local playerNum = player:getPlayerNum()
     local moodle = MF.getMoodle('TS_Nicotine', playerNum)

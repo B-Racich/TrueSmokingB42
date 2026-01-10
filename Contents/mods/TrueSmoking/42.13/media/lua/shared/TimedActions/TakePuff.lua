@@ -28,6 +28,11 @@ end
 --------------------------------------------------------------------------------
 
 function TakePuff:start()
+    -- Refresh item reference for MP (CRITICAL: item stored in constructor on client becomes invalid on server)
+    if isClient() and self.item then
+        self.item = self.character:getInventory():getItemById(self.item:getID())
+    end
+    
     -- Hide progress bar if option is set
     if TrueSmoking.Config and (TrueSmoking.Config.HidePuffActionBar or TrueSmoking.Config.HideAllActionBars) then
         self:setUseProgressBar(false)

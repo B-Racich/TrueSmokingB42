@@ -33,6 +33,11 @@ end
 --------------------------------------------------------------------------------
 
 function PutOut:start()
+    -- Refresh item reference for MP (CRITICAL: item stored in constructor on client becomes invalid on server)
+    if isClient() and self.item then
+        self.item = self.character:getInventory():getItemById(self.item:getID())
+    end
+    
     -- Hide progress bar if option is set
     if TrueSmoking.Config and TrueSmoking.Config.HideAllActionBars then
         self:setUseProgressBar(false)
@@ -126,6 +131,13 @@ function PutOut:perform()
 end
 
 function PutOut:complete()
+    -- Re-fetch item on server if needed (belt-and-suspenders)
+    if isServer() and self.item and self.item:getID() then
+        self.item = self.character:getInventory():getItemById(self.item:getID())
+    end
+    
+    TrueSmoking.debug('PutOut:complete - Item reference valid: ' .. tostring(self.item ~= nil))
+    
     -- Handle item persistence
     if self.item then
         if self.smokeLength > 0 then

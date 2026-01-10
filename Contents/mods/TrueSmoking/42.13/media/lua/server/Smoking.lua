@@ -106,12 +106,12 @@ Events.EveryOneMinute.Add(function()
             local player = players:get(i)
             if player then
                 -- Process nicotine system (addiction, withdrawal, decay)
-                if TrueSmoking.Nicotine and TrueSmoking.Nicotine.updatePlayer then
+                if TrueSmoking.Options.UseNicotineSystem and TrueSmoking.Nicotine and TrueSmoking.Nicotine.updatePlayer then
                     TrueSmoking.Nicotine.updatePlayer(player)
                 end
                 
                 -- Sync nicotine data to client
-                if TrueSmoking.Nicotine and TrueSmoking.Nicotine.syncToClient then
+                if TrueSmoking.Options.UseNicotineSystem and TrueSmoking.Nicotine and TrueSmoking.Nicotine.syncToClient then
                     TrueSmoking.Nicotine.syncToClient(player)
                 end
             end
@@ -123,7 +123,7 @@ Events.EveryOneMinute.Add(function()
             local player = getSpecificPlayer(i)
             if player and instanceof(player, 'IsoPlayer') then
                 -- Process nicotine system
-                if TrueSmoking.Nicotine and TrueSmoking.Nicotine.updatePlayer then
+                if TrueSmoking.Options.UseNicotineSystem and TrueSmoking.Nicotine and TrueSmoking.Nicotine.updatePlayer then
                     TrueSmoking.Nicotine.updatePlayer(player)
                 end
             end

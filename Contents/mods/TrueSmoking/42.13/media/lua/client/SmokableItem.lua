@@ -260,6 +260,39 @@ function SmokableItem:putOut()
     end
 end
 
+--- Remove fully consumed item without animation
+function SmokableItem:removeConsumedItem()
+    if not self.player or not self.item then return end
+    
+    -- Remove visual
+    if not isServer() then
+        local worn = self.player:getWornItem(TrueSmoking.registries.mask)
+        if worn then
+            self.player:removeWornItem(worn)
+        end
+    end
+    sendClientCommand(self.player, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
+    
+    -- Stop smoking state
+    self:stop()
+    
+    -- Replace with butt if applicable
+    local onUse = self.item:getReplaceOnUseFullType()
+    if onUse and onUse ~= '' then
+        local newItem = self.player:getInventory():AddItem(onUse)
+        if newItem then
+            sendAddItemToContainer(self.player:getInventory(), newItem)
+        end
+    end
+    
+    -- Remove consumed item
+    self.player:getInventory():Remove(self.item)
+    sendRemoveItemFromContainer(self.player:getInventory(), self.item)
+    
+    -- Check for mask re-equip
+    TrueSmoking.checkForMaskAndEquip(self.player)
+end
+
 --- Stop smoking completely
 function SmokableItem:stop()
     self.smokeLit = false
@@ -337,7 +370,7 @@ function SmokableItem:update(player)
     self.smokeLength = self.smokeLength - self.burnRate * gameSpeed
     self.smokePercent = self.smokeLength / self.originalSmokeLength
 
-    -- Buffer stat changes for server to apply
+    -- Buffer stat changes BEFORE clamping to 0 (so last puff counts)
     self:bufferStats()
 
     -- Buffer vanilla tobacco effects (smoker trait, nicotine withdrawal, etc.)
@@ -358,12 +391,6 @@ function SmokableItem:update(player)
     -- Run callbacks
     if self.callback then self.callback(self) end
 
-    -- Save progress
-    self.item:getModData().SmokeLength = self.smokeLength
-
-    -- Auto-puff to keep lit
-    self:idlePuff()
-
     -- Handle relighting / burnout
     if TrueSmoking.Options.SmokeRelighting and self.burnRate < 0.0000025 then
         self.burnRate = 0
@@ -372,13 +399,27 @@ function SmokableItem:update(player)
         self.burnRate = self.burnMin
     end
 
-    -- Finished smoking
+    -- Finished smoking - clamp AFTER buffering stats
     if self.smokeLength <= 0 then
         self.smokeLength = 0
         self.smokeLit = false
+        
+        -- Save final state
+        self.item:getModData().SmokeLength = 0
+        
+        -- Force putOut to consume the item
         if TrueSmoking.Config.AutoPutOut then
             self:putOut()
+        else
+            -- If AutoPutOut is disabled, still need to remove the item
+            self:removeConsumedItem()
         end
+    else
+        -- Save progress (only if not fully consumed)
+        self.item:getModData().SmokeLength = self.smokeLength
+        
+        -- Auto-puff to keep lit
+        self:idlePuff()
     end
 end
 

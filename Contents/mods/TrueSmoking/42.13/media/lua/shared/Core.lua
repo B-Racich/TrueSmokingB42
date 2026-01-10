@@ -181,6 +181,14 @@ function TrueSmoking.registerSmokables(objects)
     end
 end
 
+function TrueSmoking:setHotkeySmokes(items)
+    return true
+end
+
+function TrueSmoking:setSmokableObjects(smokables)
+    TrueSmoking.registerSmokables(smokables)
+end
+
 --- Register a callback to run each smoke tick
 -- @param func function Callback receiving Smokable instance
 function TrueSmoking.addCallback(func)
