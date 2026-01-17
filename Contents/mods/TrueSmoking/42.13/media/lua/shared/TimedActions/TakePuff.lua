@@ -43,7 +43,7 @@ function TakePuff:start()
     -- Set animation (check for SmokingSoundsOverhaul mod)
     local anim = CharacterActionAnims.Eat
     if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
-        anim = 'Smoke_Quiet'
+        anim = 'smoke_quiet'
     end
     self:setActionAnim(anim)
     self:setAnimVariable('FoodType', self.item:getEatType())
@@ -135,6 +135,21 @@ function TakePuff:stop()
     -- Clear puff state
     self.data.takingPuff = false
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { { takingPuff = false } })
+
+    -- Re-equip visual if it was removed during the puff animation
+    if self.visualItemFlag and self.hasVisual then
+        -- Client-side immediate visual feedback
+        if isClient() then
+            local mask = TrueSmoking.Visuals.createMask(self.item)
+            if mask then
+                self.character:setWornItem(TrueSmoking.registries.mask, mask)
+            end
+        end
+        -- Server sync for MP
+        local fullType = self.item and self.item:getFullType() or self.fullType
+        sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem',
+            { fullType = fullType, options = TrueSmoking.Options })
+    end
 end
 
 function TakePuff:perform()

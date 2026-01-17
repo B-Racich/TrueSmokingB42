@@ -240,15 +240,33 @@ function TrueSmoking.getNicotineDebugInfo(data)
 end
 
 --------------------------------------------------------------------------------
--- Update Loop
+-- Update Loop (Throttled Tick-Based)
 --------------------------------------------------------------------------------
 
-Events.EveryOneMinute.Add(function()
-    for i = 0, getNumActivePlayers() - 1 do
-        local player = getSpecificPlayer(i)
-        if player then
-            TrueSmoking.updateSmokingMoodle(player)
-            TrueSmoking.updateNicotineMoodle(player)
-        end
+-- Throttle configuration: Update every ~15 ticks (~0.5 seconds at 30 FPS)
+local MOODLE_UPDATE_INTERVAL = 30
+
+-- Track tick counters per player (keyed by online ID)
+local moodleUpdateCounters = {}
+
+Events.OnPlayerUpdate.Add(function(player)
+    if not player then return end
+
+    -- Get or initialize tick counter for this player
+    local playerId = player:getOnlineID()
+    local counter = moodleUpdateCounters[playerId] or 0
+
+    -- Increment counter and check if we should update
+    counter = counter + 1
+    if counter >= MOODLE_UPDATE_INTERVAL then
+        -- Reset counter
+        counter = 0
+
+        -- Update both moodles
+        TrueSmoking.updateSmokingMoodle(player)
+        TrueSmoking.updateNicotineMoodle(player)
     end
+
+    -- Store updated counter
+    moodleUpdateCounters[playerId] = counter
 end)
