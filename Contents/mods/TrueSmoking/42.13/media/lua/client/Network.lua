@@ -81,6 +81,22 @@ function TrueSmoking.onServerCommand(module, command, args)
             end
         end
     end
+
+    ----------------------------------------------------------------
+    -- Item Creation Callbacks
+    ----------------------------------------------------------------
+
+    if command == 'cigaretteCreated' then
+        -- Server created a cigarette from pack - store ID for LightSmoke:perform() to retrieve
+        local cigaretteId = args and args.cigaretteId
+        if cigaretteId then
+            local data = TrueSmoking.Data.getSmoking(player)
+            if data then
+                data.pendingCigaretteId = cigaretteId
+                TrueSmoking.debug('cigaretteCreated - Stored pending cigarette ID: ' .. tostring(cigaretteId))
+            end
+        end
+    end
 end
 
 Events.OnServerCommand.Add(TrueSmoking.onServerCommand)

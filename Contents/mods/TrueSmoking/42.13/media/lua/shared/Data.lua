@@ -27,6 +27,7 @@ local SMOKING_DEFAULTS = {
     eatSound = '',
     lightingEatSound = '',
     lastActivity = '',
+    pendingCigaretteId = nil,  -- Used to pass cigarette ID from server to client
 }
 
 --- Get or initialize smoking data for a player

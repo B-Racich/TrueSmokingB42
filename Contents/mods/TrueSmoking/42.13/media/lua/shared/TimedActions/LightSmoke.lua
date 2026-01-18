@@ -36,10 +36,10 @@ local function predicateNotEmpty(item)
 end
 
 function LightSmoke:getRequiredItem()
-    if not self.item:getRequireInHandOrInventory() then
+    if not self.item or not self.item:getRequireInHandOrInventory() then
         return nil
     end
-    
+
     local types = self.item:getRequireInHandOrInventory()
     for i = 1, types:size() do
         local fullType = moduleDotType(self.item:getModule(), types:get(i - 1))
@@ -64,17 +64,60 @@ end
 
 function LightSmoke:start()
     -- Refresh item reference for MP
-    if isClient() and self.item then
+    if self.item and self.item:getID() then
         self.item = self.character:getInventory():getItemById(self.item:getID())
     end
 
+    -- Refresh pack reference for MP (critical for packs)
+    if self.cigPack and self.cigPack:getID() then
+        self.cigPack = self.character:getInventory():getItemById(self.cigPack:getID())
+    end
+
+    -- Validate that we have a valid item to work with
+    local workingItem = self.item or self.cigPack
+    if not workingItem then
+        TrueSmoking.debug('LightSmoke:start - No valid item reference found after MP refresh, aborting')
+        self:forceStop()
+        return
+    end
+
+    -- If smoking from a pack, create actual cigarette item
+    if self.cigPack then
+        if isClient() then
+            -- MP: Send command to server to create cigarette (handles pack usage too)
+            sendClientCommand(self.character, 'TrueSmoking', 'createCigaretteFromPack', {
+                packId = self.cigPack:getID(),
+                cigType = 'Base.CigaretteSingle'
+            })
+            TrueSmoking.debug('LightSmoke:start - Requested server to create cigarette from pack')
+        else
+            -- SP: Create cigarette directly
+            self.cigarette = self.character:getInventory():AddItem('Base.CigaretteSingle')
+            if self.cigarette then
+                -- Transfer partial smoke data from pack if any
+                local packData = self.cigPack:getModData()
+                if packData.Cigs then
+                    for cigId, cigInfo in pairs(packData.Cigs) do
+                        self.cigarette:getModData().OriginalSmokeLength = cigInfo.OriginalSmokeLength
+                        self.cigarette:getModData().SmokeLength = cigInfo.SmokeLength
+                        packData.Cigs[cigId] = nil
+                        break
+                    end
+                end
+                -- Reduce pack uses
+                self.cigPack:setUsedDelta(self.cigPack:getCurrentUsesFloat() - self.cigPack:getUseDelta())
+                TrueSmoking.debug('LightSmoke:start - SP: Created cigarette from pack')
+            end
+        end
+    end
+
     -- Get custom eat sound
-    if self.item and self.item.getCustomEatSound then
-        self.eatSound = self.item:getCustomEatSound() or ''
+    if workingItem and workingItem.getCustomEatSound then
+        self.eatSound = workingItem:getCustomEatSound() or ''
     end
 
     -- Consume lighter uses if needed
-    if self.item:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
+    if workingItem and workingItem:getRequireInHandOrInventory() and not (self.carLighter or self.openFlame) then
         local lighter = self:getRequiredItem()
         if lighter then
             self.lighter = lighter
@@ -89,20 +132,20 @@ function LightSmoke:start()
     end
 
     -- Set job type
-    if self.item:getCustomMenuOption() then
-        self.item:setJobType(self.item:getCustomMenuOption())
+    if workingItem:getCustomMenuOption() then
+        workingItem:setJobType(workingItem:getCustomMenuOption())
     else
-        self.item:setJobType(getText('ContextMenu_Eat'))
+        workingItem:setJobType(getText('ContextMenu_Eat'))
     end
 
     -- Set hand models
     local primary = self.character:getPrimaryHandItem()
-    self:setOverrideHandModels(primary, self.item)
+    self:setOverrideHandModels(primary, workingItem)
 
     -- Set animation
-    self:setAnimVariable('FoodType', self.item:getEatType())
+    self:setAnimVariable('FoodType', workingItem:getEatType())
     self:setActionAnim(CharacterActionAnims.Eat)
-    
+
     TrueSmoking.debug('LightSmoke:start - Animation started')
 end
 
@@ -122,48 +165,105 @@ end
 
 function LightSmoke:perform()
     TrueSmoking.debug('LightSmoke:perform - Starting smoke')
-    
+
     local ref = TrueSmoking.getPlayerRef(self.character)
-    
+
     -- Stop audio
     if self.eatAudio ~= 0 and self.character:getEmitter():isPlaying(self.eatAudio) then
         self.character:stopOrTriggerSound(self.eatAudio)
     end
-    
-    -- Create and start smokable
+
+    -- Determine the cigarette item to smoke
+    local itemToSmoke = nil
+
+    if self.cigPack then
+        -- Smoking from pack - get the created cigarette
+        if isClient() then
+            -- MP: Retrieve cigarette ID from ModData (set by server command)
+            local data = TrueSmoking.Data.getSmoking(self.character)
+            local pendingId = data and data.pendingCigaretteId
+            if pendingId then
+                itemToSmoke = self.character:getInventory():getItemById(pendingId)
+                data.pendingCigaretteId = nil  -- Clear after use
+            end
+
+            -- Fallback: search for newly added cigarette if ID lookup fails
+            if not itemToSmoke then
+                itemToSmoke = self.character:getInventory():getFirstType('Base.CigaretteSingle')
+            end
+
+            if not itemToSmoke then
+                TrueSmoking.debug('LightSmoke:perform - MP: Could not find created cigarette, aborting')
+                return
+            end
+        else
+            -- SP: Use cigarette created in start()
+            itemToSmoke = self.cigarette
+            if not itemToSmoke then
+                TrueSmoking.debug('LightSmoke:perform - SP: Cigarette not created, aborting')
+                return
+            end
+        end
+    else
+        -- Smoking a single item directly (not from pack)
+        if self.item and self.item:getID() then
+            itemToSmoke = self.character:getInventory():getItemById(self.item:getID())
+        end
+        if not itemToSmoke then
+            TrueSmoking.debug('LightSmoke:perform - No valid item reference found, aborting')
+            return
+        end
+    end
+
+    TrueSmoking.debug('LightSmoke:perform - Using item: ' .. tostring(itemToSmoke:getFullType()))
+
+    -- Create and start smokable with the actual cigarette item
     local Smokable = require 'SmokableItem'
-    ref.smokable = Smokable:start(self.character, self.item)
-    
+    ref.smokable = Smokable:new(self.character, itemToSmoke)
+
+    -- Start smoking (this sets isSmoking = true and initializes the smoking state)
+    ref.smokable = ref.smokable:start(self.character, itemToSmoke)
+
+    -- Check if smokable initialization failed
+    if not ref.smokable then
+        TrueSmoking.debug('LightSmoke:perform - Failed to create smokable, aborting')
+        return
+    end
+
     -- Equip visual on client
-    if isClient() then
-        local visual = TrueSmoking.Visuals.createMask(self.item)
+    if not isServer() then
+        local visual = TrueSmoking.Visuals.createMask(itemToSmoke)
         if visual then
             self.character:setWornItem(TrueSmoking.registries.mask, visual)
         end
     end
-    
+
     ISBaseTimedAction.perform(self)
 end
 
 function LightSmoke:complete()
     TrueSmoking.debug('LightSmoke:complete - Syncing state')
-    
-    -- Handle cigarette pack usage
-    if self.cigPack then
-        self.cigPack:setUsedDelta(self.cigPack:getCurrentUsesFloat() - self.cigPack:getUseDelta())
-        sendItemStats(self.cigPack)
+
+    -- Pack usage is now handled in start() (SP) or by server command (MP)
+    -- No need to handle it here
+
+    -- Get the actual item being smoked for visual sync
+    local ref = TrueSmoking.getPlayerRef(self.character)
+    local fullType = 'Base.CigaretteSingle'  -- Default
+    if ref and ref.smokable and ref.smokable.item then
+        fullType = ref.smokable.item:getFullType()
+    elseif self.item and not self.cigPack then
+        fullType = self.item:getFullType()
     end
-    
-    -- Sync state to server - send fullType string instead of item object for proper MP serialization
-    local fullType = self.item and self.item:getFullType() or nil
-    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', { 
-        fullType = fullType, 
-        options = TrueSmoking.Options 
+
+    sendClientCommand(self.character, 'TrueSmoking', 'equipVisualItem', {
+        fullType = fullType,
+        options = TrueSmoking.Options
     })
-    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { 
-        { isSmoking = true, takingPuff = false } 
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', {
+        { isSmoking = true, takingPuff = false }
     })
-    
+
     return true
 end
 

@@ -45,13 +45,30 @@ end
 --------------------------------------------------------------------------------
 
 --- Initialize smokable with item data
--- @param item InventoryItem
+-- @param item InventoryItem - Must be an actual smokable item (not a pack)
 -- @param player IsoPlayer
 function SmokableItem:init(item, player)
-    -- Handle drainable (cigarette packs)
+    -- Validate we have an item
+    if not item then
+        TrueSmoking.debug('SmokableItem:init - No item provided')
+        return false
+    end
+
+    -- Refresh item reference for MP compatibility
+    if isClient() and item:getID() then
+        local refreshedItem = player:getInventory():getItemById(item:getID())
+        if not refreshedItem then
+            TrueSmoking.debug('SmokableItem:init - Item reference lost, cannot initialize')
+            return false
+        end
+        item = refreshedItem
+    end
+
+    -- Packs should be converted to cigarettes by LightSmoke before reaching here
+    -- If we still get a pack, fail gracefully
     if instanceof(item, 'Drainable') then
-        self.cigPack = item
-        item = instanceItem('Base.CigaretteSingle')
+        TrueSmoking.debug('SmokableItem:init - Received Drainable (pack) instead of cigarette, this should not happen')
+        return false
     end
 
     self.item = item
@@ -64,6 +81,10 @@ function SmokableItem:init(item, player)
 
     -- Load smokable config
     local config = self:loadConfig()
+    if not config then
+        TrueSmoking.debug('SmokableItem:init - Failed to load config')
+        return false
+    end
     for k, v in pairs(config) do
         self[k] = v
     end
@@ -83,10 +104,12 @@ function SmokableItem:init(item, player)
     self.puffPercent = 0.0
     self.burnRate = ZombRandFloat(self.burnMax * 0.75, self.burnMax * 1.15)
     self.hasRolledForDrop = false
-    
+
     -- Auto put-out retry state
     self.putOutRetryNext = nil
     self.putOutRetryCount = 0
+
+    return true  -- Success
 end
 
 --- Load configuration for this smokable type
@@ -94,25 +117,49 @@ end
 function SmokableItem:loadConfig()
     local fullType = self.item:getFullType()
     local opt = TrueSmoking.Options
-    local g = opt.Global
-    local cat = opt.Category
+
+    -- Ensure sandbox options are loaded (critical for MP where timing can vary)
+    if not opt.Global or not opt.Category then
+        TrueSmoking.loadSandboxOptions()
+    end
+
+    -- Fallback defaults if options still not loaded
+    local g = opt.Global or {
+        burnMin = 0.000125,
+        burnMax = 0.000300,
+        burnSpeed = 0.0025,
+        burnSpeedDecay = 0.10,
+        puffFactor = 1.35,
+        walkingFactor = 1.0,
+        runningFactor = 1.15,
+        sprintingFactor = 1.35,
+        decayRate = 0.995,
+    }
+    local cat = opt.Category or {
+        Cigarette = 1.0,
+        RolledCigarette = 0.9,
+        Cigarillo = 0.75,
+        Cigar = 0.50,
+        Pipe = 0.40,
+        Can = 0.60,
+    }
 
     -- Start with registered config or empty
     local registered = TrueSmoking.SmokableObjects[fullType]
     local cfg = registered and TrueSmoking.deepCopy(registered) or {}
 
     -- Determine category multiplier
-    local categoryMult = cat.Cigarette
+    local categoryMult = cat.Cigarette or 1.0
     if fullType:find('Cigar$') and not fullType:find('Cigarillo') then
-        categoryMult = cat.Cigar
+        categoryMult = cat.Cigar or 0.50
     elseif fullType:find('Cigarillo') then
-        categoryMult = cat.Cigarillo
+        categoryMult = cat.Cigarillo or 0.75
     elseif fullType:find('Pipe') or fullType:find('CanPipe') then
-        categoryMult = cat.Pipe
+        categoryMult = cat.Pipe or 0.40
     elseif fullType:find('Can') then
-        categoryMult = cat.Can
+        categoryMult = cat.Can or 0.60
     elseif fullType:find('RolledCigarette') then
-        categoryMult = cat.RolledCigarette or cat.Rolled
+        categoryMult = cat.RolledCigarette or cat.Rolled or 0.9
     end
 
     -- Default values
@@ -198,9 +245,12 @@ end
 --- Start smoking (called after lighting completes)
 -- @param player IsoPlayer
 -- @param item InventoryItem
--- @return SmokableItem self
+-- @return SmokableItem self or nil if initialization failed
 function SmokableItem:start(player, item)
-    self:init(item, player)
+    if not self:init(item, player) then
+        TrueSmoking.debug('SmokableItem:start - Initialization failed, cannot start smoking')
+        return nil
+    end
 
     if not self.smokeLit then
         self.smokeLit = true
@@ -209,7 +259,12 @@ function SmokableItem:start(player, item)
         end
     end
 
-    local data = self.player:getModData().TrueSmoking
+    -- Use Data helper to ensure TrueSmoking moddata is initialized
+    local data = TrueSmoking.Data.getSmoking(self.player)
+    if not data then
+        TrueSmoking.debug('SmokableItem:start - Failed to get smoking data')
+        return nil
+    end
     data.isSmoking = true
     data.takingPuff = false
     sendClientCommand(self.player, 'TrueSmoking', 'updatePlayerData', { { isSmoking = true, takingPuff = false } })
@@ -219,8 +274,8 @@ end
 
 --- Take a puff
 function SmokableItem:puff()
-    local data = self.player:getModData().TrueSmoking
-    if data.isSmoking and self.smokeLit and not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
+    local data = TrueSmoking.Data.getSmoking(self.player)
+    if data and data.isSmoking and self.smokeLit and not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
         ISTimedActionQueue.add(TakePuff:new(self.player, self.item, self.customEatSound, self.itemFullType))
     end
 end
@@ -261,8 +316,8 @@ end
 
 --- Put out the smokable
 function SmokableItem:putOut()
-    local data = self.player:getModData().TrueSmoking
-    if data.isSmoking and not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
+    local data = TrueSmoking.Data.getSmoking(self.player)
+    if data and data.isSmoking and not ISTimedActionQueue.hasActionType(self.player, 'PutOut') then
         ISTimedActionQueue.add(PutOut:new(self.player, self.item, self.smokeLength, self.customEatSound,
             self.itemFullType))
     end
@@ -313,7 +368,7 @@ function SmokableItem:stop()
     self.putOutRetryCount = 0
 
     local player = self.player or getPlayer()
-    local data = player:getModData().TrueSmoking
+    local data = TrueSmoking.Data.getSmoking(player)
     if data then
         data.isSmoking = false
         data.takingPuff = false

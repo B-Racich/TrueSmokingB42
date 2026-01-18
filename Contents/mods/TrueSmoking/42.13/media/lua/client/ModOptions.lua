@@ -68,6 +68,11 @@ Events.OnMainMenuEnter.Add(function()
     options:apply()
 end)
 
+-- Apply config when entering a game (for key binding changes)
+Events.OnInitWorld.Add(function()
+    options:apply()
+end)
+
 TrueSmoking.Config = config
 
 -- We now return the `config` object, so it can be used as a module!

@@ -74,13 +74,14 @@ function ISTakePillAction:new(character, item)
     
     if (isHookable(onEat) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         TrueSmoking.debug('ISTakePillAction:new - Checking item: ' .. tostring(item:getFullType()))
-        
+
         if not data.isSmoking then
             TrueSmoking.debug('ISTakePillAction:new - Hooking: ' .. onEat)
             setupSmokableHook(item)
+            return LightSmoke:new(character, item)
         end
     end
-    
+
     return o
 end
 

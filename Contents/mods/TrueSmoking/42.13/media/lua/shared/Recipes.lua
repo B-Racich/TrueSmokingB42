@@ -115,3 +115,12 @@ function TrueSmoking.Recipes.takeFromPack(items, result, player)
         end
     end
 end
+
+--------------------------------------------------------------------------------
+-- Global Function Aliases (for recipe compatibility)
+--------------------------------------------------------------------------------
+
+--- Alias for recipe file compatibility
+TrueSmoking.takeACigarette = TrueSmoking.Recipes.takeFromPack
+TrueSmoking.addToPack = TrueSmoking.Recipes.addToPack
+TrueSmoking.canAddToPack = TrueSmoking.Recipes.canAddToPack

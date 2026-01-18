@@ -266,7 +266,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         end
         sendAddItemToContainer(player:getInventory(), item)
     end
-    
+
     if command == 'replaceItem' then
         local replaceType = args[1]
         if replaceType and replaceType ~= '' then
@@ -275,6 +275,65 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
                 sendAddItemToContainer(player:getInventory(), newItem)
             end
         end
+    end
+
+    if command == 'createCigaretteFromPack' then
+        local argsTable = normalizeArgs(args)
+        local packId = argsTable.packId
+        local cigType = argsTable.cigType or 'Base.CigaretteSingle'
+
+        if not packId then return end
+
+        -- Find pack in player inventory
+        local pack = player:getInventory():getItemById(packId)
+        if not pack or not instanceof(pack, 'Drainable') then
+            TrueSmoking.debug('createCigaretteFromPack - Pack not found: ' .. tostring(packId))
+            return
+        end
+
+        -- Check pack has uses remaining
+        if pack:getCurrentUsesFloat() <= 0 then
+            TrueSmoking.debug('createCigaretteFromPack - Pack empty')
+            return
+        end
+
+        -- Create cigarette in inventory
+        local cigarette = player:getInventory():AddItem(cigType)
+        if not cigarette then
+            TrueSmoking.debug('createCigaretteFromPack - Failed to create cigarette')
+            return
+        end
+
+        -- Transfer any stored partial smoke data from pack
+        local packData = pack:getModData()
+        if packData.Cigs then
+            for cigId, cigInfo in pairs(packData.Cigs) do
+                cigarette:getModData().OriginalSmokeLength = cigInfo.OriginalSmokeLength
+                cigarette:getModData().SmokeLength = cigInfo.SmokeLength
+                packData.Cigs[cigId] = nil
+                break
+            end
+        end
+
+        -- Reduce pack uses
+        pack:setUsedDelta(pack:getCurrentUsesFloat() - pack:getUseDelta())
+
+        -- Store cigarette ID in player ModData for client to retrieve
+        local md = player:getModData()
+        md.TrueSmoking = md.TrueSmoking or {}
+        md.TrueSmoking.pendingCigaretteId = cigarette:getID()
+
+        -- Sync item to client
+        sendAddItemToContainer(player:getInventory(), cigarette)
+        sendItemStats(pack)
+
+        -- Notify client
+        sendServerCommand(player, 'TrueSmoking', 'cigaretteCreated', {
+            cigaretteId = cigarette:getID(),
+            packId = packId
+        })
+
+        TrueSmoking.debug('createCigaretteFromPack - Created cigarette ID: ' .. cigarette:getID())
     end
 end
 
