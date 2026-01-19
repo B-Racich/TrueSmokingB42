@@ -46,7 +46,7 @@ function TrueSmoking.updateSmokingMoodle(player)
     percent = math.max(0, math.min(1, percent))
 
     -- Check if moodles should be hidden
-    local config = require("ModOptions")
+    local config = TrueSmoking.Config or {}
     if config['HideMoodles'] then
         moodle:setValue(0.5)
         return
@@ -114,7 +114,7 @@ function TrueSmoking.updateNicotineMoodle(player)
     local data = TrueSmoking.Data.getNicotine(player)
     if not data then return end
 
-    local config = require("ModOptions")
+    local config = TrueSmoking.Config or {}
     local showDebug = config['DebugMoodles']
     local hideMoodles = config['HideMoodles']
 
