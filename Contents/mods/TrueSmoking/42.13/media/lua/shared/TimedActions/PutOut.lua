@@ -60,7 +60,7 @@ function PutOut:update()
     local curTime = os.time()
     
     -- Remove visual item mid-animation (synced with hand reaching mouth)
-    if not self.visualItemFlag then
+    if not self.visualItemFlag and self.timer then
         local shouldRemoveNow = os.difftime(curTime, self.timer) > self.visualItemTimer
         
         -- For items with no visual, update hand models immediately
@@ -89,7 +89,7 @@ end
 
 function PutOut:stop()
     local ref = TrueSmoking.getPlayerRef(self.character)
-    
+
     -- Remove visual
     if isClient() then
         local worn = self.character:getWornItem(TrueSmoking.registries.mask)
@@ -97,13 +97,18 @@ function PutOut:stop()
             self.character:removeWornItem(worn)
         end
     end
-    
+
     -- Stop smokable
     if ref and ref.smokable then
         ref.smokable:stop()
     end
-    
-    self:forceComplete()
+
+    -- Sync state to server (action interrupted, don't handle item persistence)
+    sendClientCommand(self.character, 'TrueSmoking', 'removeVisualItem', { TrueSmoking.Options })
+    sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', {
+        { isSmoking = false, takingPuff = false }
+    })
+
     ISBaseTimedAction.stop(self)
 end
 
