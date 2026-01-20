@@ -76,7 +76,7 @@ function TakePuff:update()
     local curTime = os.time()
 
     -- Remove visual item mid-animation (synced with hand reaching mouth)
-    if not self.visualItemFlag then
+    if not self.visualItemFlag and self.timer then
         local shouldRemoveNow = os.difftime(curTime, self.timer) > self.visualItemTimer
         
         -- For items with no visual, update hand models immediately
