@@ -27,6 +27,32 @@ SmokableItem.PUT_OUT_RETRY_INTERVAL = 3.0  -- Seconds between retry attempts
 SmokableItem.PUT_OUT_RETRY_MAX = 0         -- Max retries (0 = unlimited)
 
 --------------------------------------------------------------------------------
+-- Local Helpers
+--------------------------------------------------------------------------------
+
+--- Check if item is in any container on the player (main inventory or worn containers)
+-- @param player IsoPlayer
+-- @param item InventoryItem
+-- @return boolean
+local function itemInPlayerContainers(player, item)
+    -- Check main inventory
+    if player:getInventory():contains(item) then
+        return true
+    end
+    -- Check worn containers (backpacks, bags, etc.)
+    local worn = player:getWornItems()
+    for i = 0, worn:size() - 1 do
+        local wornItem = worn:get(i).item
+        if wornItem and wornItem:IsInventoryContainer() then
+            if wornItem:getInventory():contains(item) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+--------------------------------------------------------------------------------
 -- Constructor
 --------------------------------------------------------------------------------
 
@@ -388,8 +414,8 @@ function SmokableItem:update(player)
 
     if not data or not data.isSmoking or not self.item then return end
 
-    -- Check item still exists
-    if not targetPlayer:getInventory():contains(self.item) then
+    -- Check item still exists (in main inventory or worn containers like backpacks)
+    if not itemInPlayerContainers(targetPlayer, self.item) then
         self.smokeLit = false
         data.isSmoking = false
         sendClientCommand(targetPlayer, 'TrueSmoking', 'updatePlayerData', { { isSmoking = false } })
