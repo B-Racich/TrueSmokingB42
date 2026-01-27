@@ -81,8 +81,9 @@ function SmokableItem:init(item, player)
     end
 
     -- Refresh item reference for MP compatibility
+    -- Use helper to find item in any player container (main inventory or worn containers like backpacks)
     if isClient() and item:getID() then
-        local refreshedItem = player:getInventory():getItemById(item:getID())
+        local refreshedItem = TrueSmoking.getItemFromPlayerContainers(player, item:getID())
         if not refreshedItem then
             TrueSmoking.debug('SmokableItem:init - Item reference lost, cannot initialize')
             return false

@@ -34,8 +34,9 @@ end
 
 function PutOut:start()
     -- Refresh item reference for MP (CRITICAL: item stored in constructor on client becomes invalid on server)
-    if isClient() and self.item then
-        self.item = self.character:getInventory():getItemById(self.item:getID())
+    -- Use helper to find item in any player container (main inventory or worn containers like backpacks)
+    if self.item and self.item:getID() then
+        self.item = TrueSmoking.getItemFromPlayerContainers(self.character, self.item:getID())
     end
     
     -- Hide progress bar if option is set
@@ -138,30 +139,30 @@ end
 
 function PutOut:complete()
     -- Re-fetch item on server if needed (belt-and-suspenders)
+    -- Use helper to find item in any player container (main inventory or worn containers like backpacks)
     if isServer() and self.item and self.item:getID() then
-        self.item = self.character:getInventory():getItemById(self.item:getID())
+        self.item = TrueSmoking.getItemFromPlayerContainers(self.character, self.item:getID())
     end
-    
+
     TrueSmoking.debug('PutOut:complete - Item reference valid: ' .. tostring(self.item ~= nil))
-    
+
     -- Handle item persistence
     if self.item then
         if self.smokeLength > 0 then
             -- Save remaining length
             self.item:getModData().SmokeLength = self.smokeLength
-            sendClientCommand(self.character, 'TrueSmoking', 'updateItemData', { 
-                self.item, 
-                { SmokeLength = self.smokeLength } 
+            sendClientCommand(self.character, 'TrueSmoking', 'updateItemData', {
+                self.item,
+                { SmokeLength = self.smokeLength }
             })
         else
             -- Fully consumed - replace with butt/empty container
             -- Read from ModData (pipes/bongs store replaceOnUse there)
             local onUse = self.item:getModData().replaceOnUse or self.item:getReplaceOnUseFullType()
-            
-            -- Remove consumed item
-            self.character:getInventory():Remove(self.item)
-            sendRemoveItemFromContainer(self.character:getInventory(), self.item)
-            
+
+            -- Remove consumed item from whatever container it's in
+            TrueSmoking.removeItemFromPlayerContainers(self.character, self.item)
+
             -- Server-side replacement for MP compatibility
             if onUse and onUse ~= '' then
                 sendClientCommand(self.character, 'TrueSmoking', 'replaceItem', { onUse })

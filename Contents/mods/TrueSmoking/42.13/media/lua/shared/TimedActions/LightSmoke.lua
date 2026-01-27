@@ -64,13 +64,14 @@ end
 
 function LightSmoke:start()
     -- Refresh item reference for MP
+    -- Use helper to find item in any player container (main inventory or worn containers like backpacks)
     if self.item and self.item:getID() then
-        self.item = self.character:getInventory():getItemById(self.item:getID())
+        self.item = TrueSmoking.getItemFromPlayerContainers(self.character, self.item:getID())
     end
 
     -- Refresh pack reference for MP (critical for packs)
     if self.cigPack and self.cigPack:getID() then
-        self.cigPack = self.character:getInventory():getItemById(self.cigPack:getID())
+        self.cigPack = TrueSmoking.getItemFromPlayerContainers(self.character, self.cigPack:getID())
     end
 
     -- Validate that we have a valid item to work with
@@ -207,7 +208,7 @@ function LightSmoke:perform()
     else
         -- Smoking a single item directly (not from pack)
         if self.item and self.item:getID() then
-            itemToSmoke = self.character:getInventory():getItemById(self.item:getID())
+            itemToSmoke = TrueSmoking.getItemFromPlayerContainers(self.character, self.item:getID())
         end
         if not itemToSmoke then
             TrueSmoking.debug('LightSmoke:perform - No valid item reference found, aborting')

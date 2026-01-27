@@ -29,8 +29,9 @@ end
 
 function TakePuff:start()
     -- Refresh item reference for MP (CRITICAL: item stored in constructor on client becomes invalid on server)
-    if isClient() and self.item then
-        self.item = self.character:getInventory():getItemById(self.item:getID())
+    -- Use helper to find item in any player container (main inventory or worn containers like backpacks)
+    if self.item and self.item:getID() then
+        self.item = TrueSmoking.getItemFromPlayerContainers(self.character, self.item:getID())
     end
     
     -- Hide progress bar if option is set

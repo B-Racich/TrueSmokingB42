@@ -168,6 +168,61 @@ function TrueSmoking.getPlayerRef(player)
     return TrueSmoking.Players[num] or TrueSmoking.Players[0]
 end
 
+--- Find an item by ID in any player container (main inventory or worn containers)
+-- @param player IsoPlayer
+-- @param itemId number The item's ID
+-- @return InventoryItem|nil The item if found, nil otherwise
+function TrueSmoking.getItemFromPlayerContainers(player, itemId)
+    if not player or not itemId then return nil end
+
+    -- Check main inventory first
+    local item = player:getInventory():getItemById(itemId)
+    if item then return item end
+
+    -- Check worn containers (backpacks, bags, etc.)
+    local worn = player:getWornItems()
+    for i = 0, worn:size() - 1 do
+        local wornItem = worn:get(i).item
+        if wornItem and wornItem:IsInventoryContainer() then
+            item = wornItem:getInventory():getItemById(itemId)
+            if item then return item end
+        end
+    end
+
+    return nil
+end
+
+--- Remove an item from whatever player container it's in (main inventory or worn containers)
+-- @param player IsoPlayer
+-- @param item InventoryItem The item to remove
+-- @return boolean True if item was found and removed
+function TrueSmoking.removeItemFromPlayerContainers(player, item)
+    if not player or not item then return false end
+
+    -- Check main inventory
+    if player:getInventory():contains(item) then
+        player:getInventory():Remove(item)
+        sendRemoveItemFromContainer(player:getInventory(), item)
+        return true
+    end
+
+    -- Check worn containers (backpacks, bags, etc.)
+    local worn = player:getWornItems()
+    for i = 0, worn:size() - 1 do
+        local wornItem = worn:get(i).item
+        if wornItem and wornItem:IsInventoryContainer() then
+            local container = wornItem:getInventory()
+            if container:contains(item) then
+                container:Remove(item)
+                sendRemoveItemFromContainer(container, item)
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 --------------------------------------------------------------------------------
 -- Smokable Object Registration (for mod compatibility)
 --------------------------------------------------------------------------------
