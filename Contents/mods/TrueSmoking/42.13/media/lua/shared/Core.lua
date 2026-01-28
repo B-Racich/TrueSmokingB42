@@ -19,7 +19,7 @@ TrueSmoking = TrueSmoking or {}
 -- Configuration
 --------------------------------------------------------------------------------
 
-TrueSmoking.DEBUG = false  -- Set true to enable debug logging
+TrueSmoking.DEBUG = true  -- Set true to enable debug logging
 
 TrueSmoking.Options = TrueSmoking.Options or {}
 TrueSmoking.SmokableObjects = TrueSmoking.SmokableObjects or {}
@@ -35,6 +35,9 @@ function TrueSmoking.loadSandboxOptions()
     
     local sandbox = SandboxVars.TrueSmoking
     local opt = TrueSmoking.Options
+
+    -- Debug mode (sets global DEBUG flag)
+    TrueSmoking.DEBUG = sandbox.DebugMode or false
 
     -- Core options
     opt.ManageHeadGear = sandbox.ManageHeadGear
@@ -65,6 +68,10 @@ function TrueSmoking.loadSandboxOptions()
     local movementBurn = sandbox.MovementBurn or 1.0
     local idleBurnOut = sandbox.IdleBurnOut or 1.0
     local effectMult = sandbox.EffectMultiplier or 1.0
+
+    -- Hunger/fatigue reduction multipliers (default 0.25 = subtle effect, balanced for gameplay)
+    opt.HungerReduction = sandbox.HungerReduction or 0.25
+    opt.FatigueReduction = sandbox.FatigueReduction or 0.25
 
     -- Global burn parameters
     opt.Global = {

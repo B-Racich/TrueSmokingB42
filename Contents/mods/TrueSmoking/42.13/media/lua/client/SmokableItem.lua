@@ -136,6 +136,10 @@ function SmokableItem:init(item, player)
     self.putOutRetryNext = nil
     self.putOutRetryCount = 0
 
+    -- Passive puffing state
+    self.puffTimeMark = os.time()
+    self.nextPuffTime = self:calculateNextPuffTime()
+
     return true  -- Success
 end
 
@@ -304,15 +308,33 @@ function SmokableItem:puff()
     local data = TrueSmoking.Data.getSmoking(self.player)
     if data and data.isSmoking and self.smokeLit and not ISTimedActionQueue.hasActionType(self.player, 'TakePuff') then
         ISTimedActionQueue.add(TakePuff:new(self.player, self.item, self.customEatSound, self.itemFullType))
+        -- Reset passive puff timer after taking a puff
+        self:resetPuffTimer()
     end
 end
 
---- Idle puff to keep cigarette lit
--- Only auto-puffs when player isn't busy with other actions (except smoking-related ones)
-function SmokableItem:idlePuff()
-    if not TrueSmoking.Config or not TrueSmoking.Config.KeepLit then return end
-    if self.burnRate >= 0.00001 or not self.smokeLit then return end
+--- Calculate random time until next passive puff (in seconds)
+-- @return number Seconds until next passive puff
+function SmokableItem:calculateNextPuffTime()
+    local cfg = TrueSmoking.Config
+    local minTime = cfg and cfg.PassivePuffMinTime or 15
+    local maxTime = cfg and cfg.PassivePuffMaxTime or 45
+    -- Ensure min <= max
+    if minTime > maxTime then
+        minTime, maxTime = maxTime, minTime
+    end
+    return ZombRandFloat(minTime, maxTime)
+end
 
+--- Reset the passive puff timer (called after taking a puff)
+function SmokableItem:resetPuffTimer()
+    self.puffTimeMark = os.time()
+    self.nextPuffTime = self:calculateNextPuffTime()
+end
+
+--- Check if player can auto-puff (not busy with non-smoking actions)
+-- @return boolean True if player can auto-puff
+function SmokableItem:canAutoPuff()
     -- Don't interrupt other actions - only auto-puff if queue is empty or only has smoking actions
     local queue = ISTimedActionQueue.getTimedActionQueue(self.player)
     if queue and queue.queue then
@@ -322,8 +344,7 @@ function SmokableItem:idlePuff()
                 local actionType = tostring(action.Type)
                 -- Skip smoking-related actions
                 if actionType ~= 'TakePuff' and actionType ~= 'LightSmoke' and actionType ~= 'PutOut' then
-                    -- Player has other actions queued, don't auto-puff
-                    return
+                    return false
                 end
             end
         end
@@ -334,11 +355,39 @@ function SmokableItem:idlePuff()
     if current and current.Type then
         local currentType = tostring(current.Type)
         if currentType ~= 'TakePuff' and currentType ~= 'LightSmoke' and currentType ~= 'PutOut' then
+            return false
+        end
+    end
+
+    return true
+end
+
+--- Idle puff - handles both passive puffing and keep-lit functionality
+-- Only auto-puffs when player isn't busy with other actions (except smoking-related ones)
+function SmokableItem:idlePuff()
+    if not self.smokeLit then return end
+
+    local cfg = TrueSmoking.Config
+    if not cfg then return end
+
+    -- Check passive puffing first (timed auto-puffs)
+    if cfg.PassivePuffing then
+        local timeDiff = os.difftime(os.time(), self.puffTimeMark or os.time())
+        local nextPuff = self.nextPuffTime or self:calculateNextPuffTime()
+        if timeDiff >= nextPuff then
+            if self:canAutoPuff() then
+                self:puff()
+            end
             return
         end
     end
 
-    self:puff()
+    -- Check keep-lit (puff when ember is dying)
+    if cfg.KeepLit and self.burnRate < 0.00001 then
+        if self:canAutoPuff() then
+            self:puff()
+        end
+    end
 end
 
 --- Put out the smokable
@@ -605,8 +654,11 @@ function SmokableItem:bufferStats()
     -- Buffer item's base stat effects
     addStat('STRESS', self.originalStress, false)
     addStat('UNHAPPINESS', self.originalUnhappiness, false)
-    addStat('FATIGUE', self.originalFatigue * 0.75, false)  -- Reduced by 25%
-    addStat('HUNGER', self.originalHunger * 0.75, false)  -- Reduced by 25%
+    -- Apply hunger/fatigue reduction multipliers from sandbox options (default 0.25 for subtle effect)
+    local hungerMult = TrueSmoking.Options.HungerReduction or 0.25
+    local fatigueMult = TrueSmoking.Options.FatigueReduction or 0.25
+    addStat('FATIGUE', self.originalFatigue * fatigueMult, false)
+    addStat('HUNGER', self.originalHunger * hungerMult, false)
     addStat('THIRST', self.originalThirst, false)
     addStat('BOREDOM', self.originalBoredom, true)  -- Boredom increases
 end

@@ -55,6 +55,28 @@ option TrueSmoking.EffectMultiplier
     tooltip = TrueSmoking_EffectMultiplier_Tooltip,
 }
 
+option TrueSmoking.HungerReduction
+{
+    type = double,
+    min = 0.0,
+    max = 2.0,
+    default = 0.25,
+    page = TrueSmoking,
+    translation = TrueSmoking_HungerReduction,
+    tooltip = TrueSmoking_HungerReduction_Tooltip,
+}
+
+option TrueSmoking.FatigueReduction
+{
+    type = double,
+    min = 0.0,
+    max = 2.0,
+    default = 0.25,
+    page = TrueSmoking,
+    translation = TrueSmoking_FatigueReduction,
+    tooltip = TrueSmoking_FatigueReduction_Tooltip,
+}
+
 option TrueSmoking.ManageHeadGear
 {
     type = boolean,
@@ -191,4 +213,14 @@ option TrueSmoking.SmokerTraitDecayMultiplier
     default = 0.8,
     page = TrueSmokingNicotine,
     translation = TrueSmoking_SmokerTraitDecayMultiplier,
+}
+
+/* Debug */
+
+option TrueSmoking.DebugMode
+{
+    type = boolean,
+    default = false,
+    page = TrueSmoking,
+    translation = TrueSmoking_DebugMode,
 }

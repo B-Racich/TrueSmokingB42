@@ -211,17 +211,21 @@ function TrueSmoking.Nicotine.updatePlayer(player)
         -- Calculate strength based on how far above threshold (70-100 range)
         local threshold = cfg.NICOTINE_EFFECT_THRESHOLD or 70
         local strength = math.min((data.nicotineLevel - threshold) / (100 - threshold), 1.0)
-        
-        -- Higher impact fatigue reduction (only above threshold)
+
+        -- Get sandbox multipliers (default 0.25 for subtle effect)
+        local fatigueMult = TrueSmoking.Options.FatigueReduction or 0.25
+        local hungerMult = TrueSmoking.Options.HungerReduction or 0.25
+
+        -- Higher impact fatigue reduction (only above threshold, scaled by sandbox option)
         local currentFatigue = stats:get(CharacterStat.FATIGUE)
-        if currentFatigue > 0 then
-            stats:set(CharacterStat.FATIGUE, math.max(0, currentFatigue - cfg.FATIGUE_FROM_NICOTINE * strength))
+        if currentFatigue > 0 and fatigueMult > 0 then
+            stats:set(CharacterStat.FATIGUE, math.max(0, currentFatigue - cfg.FATIGUE_FROM_NICOTINE * strength * fatigueMult))
         end
-        
-        -- Higher impact hunger suppression (only above threshold)
+
+        -- Higher impact hunger suppression (only above threshold, scaled by sandbox option)
         local currentHunger = stats:get(CharacterStat.HUNGER)
-        if currentHunger > 0 then
-            stats:set(CharacterStat.HUNGER, math.max(0, currentHunger - cfg.HUNGER_FROM_NICOTINE * strength))
+        if currentHunger > 0 and hungerMult > 0 then
+            stats:set(CharacterStat.HUNGER, math.max(0, currentHunger - cfg.HUNGER_FROM_NICOTINE * strength * hungerMult))
         end
     end
     
@@ -233,7 +237,21 @@ function TrueSmoking.Nicotine.updatePlayer(player)
             stats:set(CharacterStat.STRESS, math.max(0, currentStress - cfg.STRESS_FROM_NICOTINE * strength))
         end
     end
-    
+
+    -- Suppress vanilla stress buildup while nicotine is active
+    -- This prevents rapid stress spike when nicotine depletes by keeping vanilla counters low
+    -- Once nicotine drops below threshold, stressFromCigarettes and timeSinceLastSmoke accumulate naturally from 0
+    local STRESS_SUPPRESSION_THRESHOLD = cfg.NICOTINE_THRESHOLD or 30
+    if data.nicotineLevel >= STRESS_SUPPRESSION_THRESHOLD then
+        -- Reset vanilla stress counters while nicotine is satisfying the craving
+        if stats.setStressFromCigarettes then
+            stats:setStressFromCigarettes(0)
+        end
+        if player.setTimeSinceLastSmoke then
+            player:setTimeSinceLastSmoke(0)
+        end
+    end
+
     -- Passive addiction gain when nicotine levels are sufficient (whether smoking or not)
     if data.nicotineLevel >= cfg.NICOTINE_THRESHOLD then
         local baseGain = cfg.ADDICTION_GAIN_PER_MINUTE
