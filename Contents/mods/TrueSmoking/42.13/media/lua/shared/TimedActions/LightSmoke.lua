@@ -127,7 +127,23 @@ function LightSmoke:start()
         end
     end
 
-    -- Play sound
+    -- Check for custom item sound (HGO, other mods with custom sounds)
+    local hasCustomSound = self.eatSound and self.eatSound ~= ''
+
+    -- Play SSO lighting sound if available (only if no custom item sound)
+    if not hasCustomSound and not self.carLighter and not self.openFlame then
+        local ssoActive = getActivatedMods():contains('\\SmokingSoundsOverhaul')
+            and SmokingSoundsOverhaul and SmokingSoundsOverhaul.getLightingSound
+
+        if ssoActive then
+            local lightingSound = SmokingSoundsOverhaul:getLightingSound(self.character, self.lighter)
+            if lightingSound and lightingSound ~= '' then
+                self.lightingAudio = self.character:getEmitter():playSound(lightingSound)
+            end
+        end
+    end
+
+    -- Play item eat sound (smoking inhale) - custom sounds or default
     if self.eatSound ~= '' then
         self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
     end

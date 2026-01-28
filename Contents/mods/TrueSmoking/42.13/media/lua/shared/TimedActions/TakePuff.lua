@@ -52,22 +52,33 @@ function TakePuff:start()
     -- Mark puff in progress
     self.data.takingPuff = true
 
-    -- Handle audio
-    if self.eatSound ~= '' then
-        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
-    end
+    -- Check for custom item sound first (HGO, other mods with custom sounds)
+    local customSound = self.item and self.item.getCustomEatSound and self.item:getCustomEatSound()
+    local hasCustomSound = customSound and customSound ~= ''
 
-    -- Custom sound for SmokingSoundsOverhaul
-    if getActivatedMods():contains('\\SmokingSoundsOverhaul') then
+    -- SSO is only used if item doesn't have its own custom sound
+    local ssoActive = not hasCustomSound
+        and getActivatedMods():contains('\\SmokingSoundsOverhaul')
+        and SmokingSoundsOverhaul and SmokingSoundsOverhaul.getPuffSound
+
+    if hasCustomSound then
+        -- Use item's custom sound (HGO bongs, etc.)
+        self.eatSound = customSound
+        self.eatAudio = self.character:getEmitter():playSound(customSound)
+        self.usingSSOSound = false
+    elseif ssoActive then
+        -- Use SSO puff sound
         local gender = self.character:isFemale()
-        local sound = SmokingSoundsOverhaul:getPuffSound(gender)
-        if self.eatSound == '' then
-            self.eatSound = sound
-            if not self.character:getEmitter():isPlaying(self.data.eatSound) then
-                self.data.eatSound = sound
-                self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
-            end
+        local ssoSound = SmokingSoundsOverhaul:getPuffSound(gender)
+        if ssoSound and ssoSound ~= '' then
+            self.eatSound = ssoSound
+            self.eatAudio = self.character:getEmitter():playSound(ssoSound)
+            self.usingSSOSound = true  -- Flag to prevent looping/early cutoff
         end
+    elseif self.eatSound ~= '' then
+        -- Use default item eat sound
+        self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
+        self.usingSSOSound = false
     end
 
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { self.data })
@@ -102,8 +113,8 @@ function TakePuff:update()
         end
     end
 
-    -- Loop audio
-    if self.eatSound ~= '' and self.eatAudio ~= 0 then
+    -- Loop audio (but not SSO sounds - they play once)
+    if self.eatSound ~= '' and self.eatAudio ~= 0 and not self.usingSSOSound then
         if not self.character:getEmitter():isPlaying(self.eatAudio) then
             self.eatAudio = self.character:getEmitter():playSound(self.eatSound)
         end
@@ -125,8 +136,8 @@ end
 function TakePuff:stop()
     ISBaseTimedAction.stop(self)
 
-    -- Stop audio
-    if self.character:getEmitter():isPlaying(self.eatSound) then
+    -- Stop audio (but let SSO sounds finish naturally)
+    if not self.usingSSOSound and self.character:getEmitter():isPlaying(self.eatAudio) then
         self.character:getEmitter():stopSound(self.eatAudio)
     end
 
@@ -154,9 +165,9 @@ function TakePuff:stop()
 end
 
 function TakePuff:perform()
-    -- Stop audio if game speed is fast-forwarded
-    if TrueSmoking.getGameSpeedMultiplier() > 1 then
-        if self.character:getEmitter():isPlaying(self.eatSound) then
+    -- Stop audio if game speed is fast-forwarded (but let SSO sounds finish)
+    if TrueSmoking.getGameSpeedMultiplier() > 1 and not self.usingSSOSound then
+        if self.character:getEmitter():isPlaying(self.eatAudio) then
             self.character:getEmitter():stopSound(self.eatAudio)
         end
     end
