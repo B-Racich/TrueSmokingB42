@@ -37,7 +37,7 @@ local function initSSO()
         end
 
         SSO_last_puff_sound = sound_rand
-        return "Smoking_puff" .. sound_rand .. gender
+        return "smoking_puff1"
     end
 
     --- Get a lighting sound name based on lighter type and gender

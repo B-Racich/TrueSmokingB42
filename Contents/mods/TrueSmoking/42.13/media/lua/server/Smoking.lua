@@ -80,7 +80,7 @@ function SmokingSystem:applyStats(player, stats)
     end
     
     if appliedCount > 0 and TrueSmoking.DEBUG then
-        TrueSmoking.debug('Applied ' .. appliedCount .. ' stats for ' .. player:getDisplayName())
+        -- TrueSmoking.debug('Applied ' .. appliedCount .. ' stats for ' .. player:getDisplayName())
     end
 end
 

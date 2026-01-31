@@ -148,7 +148,7 @@ Events.EveryOneMinute.Add(function()
     
     -- Send to server (works in both SP and MP)
     sendClientCommand(player, 'TrueSmoking', 'BufferedPuffs', { puffs = data.puffBuffer })
-    TrueSmoking.debug('Sent ' .. #data.puffBuffer .. ' buffered puffs to server')
+    -- TrueSmoking.debug('Sent ' .. #data.puffBuffer .. ' buffered puffs to server')
     
     data.puffBuffer = {}
 end)

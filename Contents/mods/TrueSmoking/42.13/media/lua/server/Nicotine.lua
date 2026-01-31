@@ -85,7 +85,7 @@ function TrueSmoking.Nicotine.processPuffBuffer(player)
     local buffer = smokingData.puffBuffer
     if #buffer == 0 then return end
     
-    TrueSmoking.debug('Processing ' .. #buffer .. ' buffered puffs')
+    -- TrueSmoking.debug('Processing ' .. #buffer .. ' buffered puffs')
     
     for _, puff in ipairs(buffer) do
         TrueSmoking.Nicotine.applyPuff(player, puff.nicotineContent, puff.puffPercent)

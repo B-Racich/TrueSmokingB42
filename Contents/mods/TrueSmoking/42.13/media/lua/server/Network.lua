@@ -110,7 +110,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         end
 
         if appended > 0 then
-            TrueSmoking.debug('Received ' .. appended .. ' puffs from ' .. player:getDisplayName())
+            -- TrueSmoking.debug('Received ' .. appended .. ' puffs from ' .. player:getDisplayName())
             if TrueSmoking.Nicotine and TrueSmoking.Nicotine.processPuffBuffer then
                 TrueSmoking.Nicotine.processPuffBuffer(player)
             end
@@ -142,7 +142,7 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         end
 
         if validCount > 0 then
-            TrueSmoking.debug('Received ' .. validCount .. ' stat updates from ' .. player:getDisplayName())
+            -- TrueSmoking.debug('Received ' .. validCount .. ' stat updates from ' .. player:getDisplayName())
             -- Apply stats immediately using SmokingSystem
             if SmokingSystem and SmokingSystem.applyStats then
                 SmokingSystem:applyStats(player, validatedStats)
