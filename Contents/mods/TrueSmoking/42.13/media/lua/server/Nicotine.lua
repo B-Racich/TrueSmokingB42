@@ -241,7 +241,7 @@ function TrueSmoking.Nicotine.updatePlayer(player)
     -- Suppress vanilla stress buildup while nicotine is active
     -- This prevents rapid stress spike when nicotine depletes by keeping vanilla counters low
     -- Once nicotine drops below threshold, stressFromCigarettes and timeSinceLastSmoke accumulate naturally from 0
-    local STRESS_SUPPRESSION_THRESHOLD = cfg.NICOTINE_THRESHOLD or 30
+    local STRESS_SUPPRESSION_THRESHOLD = 55
     if data.nicotineLevel >= STRESS_SUPPRESSION_THRESHOLD then
         -- Reset vanilla stress counters while nicotine is satisfying the craving
         if stats.setStressFromCigarettes then
