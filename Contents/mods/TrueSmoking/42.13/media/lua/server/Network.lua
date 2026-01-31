@@ -284,8 +284,8 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
 
         if not packId then return end
 
-        -- Find pack in player inventory
-        local pack = player:getInventory():getItemById(packId)
+        -- Find pack in player inventory or worn containers (backpacks, bags, etc.)
+        local pack = TrueSmoking.getItemFromPlayerContainers(player, packId)
         if not pack or not instanceof(pack, 'Drainable') then
             TrueSmoking.debug('createCigaretteFromPack - Pack not found: ' .. tostring(packId))
             return

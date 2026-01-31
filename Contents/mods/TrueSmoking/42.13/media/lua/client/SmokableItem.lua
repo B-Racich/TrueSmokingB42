@@ -30,26 +30,29 @@ SmokableItem.PUT_OUT_RETRY_MAX = 0         -- Max retries (0 = unlimited)
 -- Local Helpers
 --------------------------------------------------------------------------------
 
---- Check if item is in any container on the player (main inventory or worn containers)
+--- Find item in any container on the player by ID (main inventory or worn containers)
+-- Returns the item if found (handles MP sync where object references change)
 -- @param player IsoPlayer
--- @param item InventoryItem
--- @return boolean
-local function itemInPlayerContainers(player, item)
-    -- Check main inventory
-    if player:getInventory():contains(item) then
-        return true
-    end
+-- @param itemId number The item's ID
+-- @return InventoryItem|nil The item if found, nil otherwise
+local function findItemInPlayerContainers(player, itemId)
+    if not player or not itemId then return nil end
+
+    -- Check main inventory first
+    local item = player:getInventory():getItemById(itemId)
+    if item then return item end
+
     -- Check worn containers (backpacks, bags, etc.)
     local worn = player:getWornItems()
     for i = 0, worn:size() - 1 do
         local wornItem = worn:get(i).item
         if wornItem and wornItem:IsInventoryContainer() then
-            if wornItem:getInventory():contains(item) then
-                return true
-            end
+            item = wornItem:getInventory():getItemById(itemId)
+            if item then return item end
         end
     end
-    return false
+
+    return nil
 end
 
 --------------------------------------------------------------------------------
@@ -99,6 +102,7 @@ function SmokableItem:init(item, player)
     end
 
     self.item = item
+    self.itemId = item:getID()  -- Store ID for MP reference refresh
     self.itemFullType = item:getFullType()
     self.customEatSound = item:getCustomEatSound() or ''
     self.onEat = item:getOnEat() or false
@@ -418,10 +422,9 @@ function SmokableItem:removeConsumedItem()
     
     -- Stop smoking state
     self:stop()
-    
-    -- Remove consumed item
-    self.player:getInventory():Remove(self.item)
-    sendRemoveItemFromContainer(self.player:getInventory(), self.item)
+
+    -- Remove consumed item (check main inventory and worn containers like bags)
+    TrueSmoking.removeItemFromPlayerContainers(self.player, self.item)
     
     -- Replace with butt/empty container if applicable (server-side for MP)
     -- Read from ModData (pipes/bongs store replaceOnUse there)
@@ -462,14 +465,21 @@ function SmokableItem:update(player)
     local targetPlayer = self.player or player
     local data = TrueSmoking.Data.getSmoking(targetPlayer)
 
-    if not data or not data.isSmoking or not self.item then return end
+    if not data or not data.isSmoking or not self.itemId then return end
 
     -- Check item still exists (in main inventory or worn containers like backpacks)
-    if not itemInPlayerContainers(targetPlayer, self.item) then
+    -- Use ID-based lookup to handle MP sync where object references change
+    local currentItem = findItemInPlayerContainers(targetPlayer, self.itemId)
+    if not currentItem then
         self.smokeLit = false
         data.isSmoking = false
         sendClientCommand(targetPlayer, 'TrueSmoking', 'updatePlayerData', { { isSmoking = false } })
         return
+    end
+    -- Refresh item reference if it changed (handles MP inventory sync)
+    if currentItem ~= self.item then
+        TrueSmoking.debug('SmokableItem:update - Refreshed stale item reference (MP sync)')
+        self.item = currentItem
     end
 
     if not self.smokeLit then
