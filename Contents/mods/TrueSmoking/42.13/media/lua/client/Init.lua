@@ -6,6 +6,7 @@
 ]]
 
 require 'ISUI/ISInventoryPaneContextMenu'
+require 'MF_ISMoodle'
 require 'Core'
 require 'Data'
 require 'Visuals'
@@ -22,6 +23,12 @@ require 'DebugUI'
 -- @param playerNum number Player index
 -- @param player IsoPlayer
 function TrueSmoking.initPlayer(playerNum, player)
+    -- Ensure moodles are created for this player's session (fixes MP reconnect issues)
+    if MF and MF.createMoodle then
+        MF.createMoodle('TS_Smoking_New')
+        MF.createMoodle('TS_Nicotine')
+    end
+
     local data = TrueSmoking.Data.getSmoking(player)
     local ref = TrueSmoking.getPlayerRef(player)
 
