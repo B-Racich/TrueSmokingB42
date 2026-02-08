@@ -1,6 +1,6 @@
 --[[
     TS_Hooks.lua - Vanilla Action Hooks
-    
+
     Patches vanilla timed actions to integrate TrueSmoking:
     - ISEatFoodAction / ISTakePillAction → LightSmoke redirect
     - ISUnequipAction / ISWearClothing → Visual item management
@@ -67,11 +67,15 @@ end
 local originalPillActionNew = ISTakePillAction.new
 function ISTakePillAction:new(character, item)
     local o = originalPillActionNew(self, character, item)
-    
+
     local onEat = item:getOnEat() or ''
     local hasSmokableTag = item:hasTag(ItemTag.SMOKABLE)
     local data = TrueSmoking.Data.getSmoking(character)
-    
+
+    if item:getFullType() == 'Base.TobaccoChewing' then
+        return o
+    end
+
     if (isHookable(onEat) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         TrueSmoking.debug('ISTakePillAction:new - Checking item: ' .. tostring(item:getFullType()))
 
@@ -92,21 +96,25 @@ end
 local originalFoodActionNew = ISEatFoodAction.new
 function ISEatFoodAction:new(character, item, percentage)
     local o = originalFoodActionNew(self, character, item, percentage)
-    
+
     local onEat = item:getOnEat() or ''
     local hasSmokableTag = item:hasTag(ItemTag.SMOKABLE)
     local data = TrueSmoking.Data.getSmoking(character)
-    
+
+    if item:getFullType() == 'Base.TobaccoChewing' then
+        return o
+    end
+
     if (isHookable(onEat) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         TrueSmoking.debug('ISEatFoodAction:new - Checking item: ' .. tostring(item:getFullType()))
-        
+
         if not data.isSmoking then
             TrueSmoking.debug('ISEatFoodAction:new - Hooking: ' .. onEat)
             setupSmokableHook(item)
             return LightSmoke:new(character, item)
         end
     end
-    
+
     return o
 end
 
@@ -117,31 +125,31 @@ end
 local originalUnequipNew = ISUnequipAction.new
 function ISUnequipAction:new(character, item, maxTime)
     local o = originalUnequipNew(self, character, item, maxTime)
-    
+
     local data = TrueSmoking.Data.getSmoking(character)
-    
+
     -- Instant unequip for visual smoke items
     if item:getBodyLocation() == TrueSmoking.registries.mask and data.isSmoking then
         o.maxTime = 1
     end
-    
+
     return o
 end
 
 local originalUnequipComplete = ISUnequipAction.complete
 function ISUnequipAction:complete()
     originalUnequipComplete(self)
-    
+
     local data = TrueSmoking.Data.getSmoking(self.character)
     local ref = TrueSmoking.getPlayerRef(self.character)
-    
+
     -- Put out smoke if visual item is unequipped while smoking
     if self.item:getBodyLocation() == TrueSmoking.registries.mask and data.isSmoking then
         if ref and ref.smokable then
             ref.smokable:putOut()
         end
     end
-    
+
     return true
 end
 
@@ -152,14 +160,14 @@ end
 local originalClothingComplete = ISWearClothing.complete
 function ISWearClothing:complete()
     local rtn = originalClothingComplete(self)
-    
+
     local data = TrueSmoking.Data.getSmoking(self.character)
-    
+
     -- Clear mask flag when equipped
     if self.item == data.mask then
         data.mask = false
     end
-    
+
     return rtn
 end
 
@@ -176,16 +184,16 @@ local SMOKING_BLOCKERS = {
 local originalClothingNew = ISWearClothing.new
 function ISWearClothing:new(character, item)
     local o = originalClothingNew(self, character, item)
-    
+
     local bodyLoc = item:getBodyLocation()
     local data = TrueSmoking.Data.getSmoking(character)
-    
+
     -- Stop smoking when equipping blocking headgear
     if SMOKING_BLOCKERS[bodyLoc] and not item:hasTag(ItemTag.CAN_EAT) and data.isSmoking then
         data.isSmoking = false
         sendClientCommand(character, 'TrueSmoking', 'updatePlayerData', { { isSmoking = false } })
     end
-    
+
     return o
 end
 

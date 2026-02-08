@@ -28,6 +28,15 @@ Moodles_RU = {
     Moodles_TS_Nicotine_Bad_lvl3 = "Серьезная зависимость",
     Moodles_TS_Nicotine_Bad_lvl4 = "Критическая зависимость",
 
+    Moodles_TS_Nicotine_Old_Good_lvl4 = "Нет зависимости",
+    Moodles_TS_Nicotine_Old_Good_lvl3 = "Слабая зависимость",
+    Moodles_TS_Nicotine_Old_Good_lvl2 = "Умеренная зависимость",
+    Moodles_TS_Nicotine_Old_Good_lvl1 = "Средняя зависимость",
+    Moodles_TS_Nicotine_Old_Bad_lvl1 = "Сильная зависимость",
+    Moodles_TS_Nicotine_Old_Bad_lvl2 = "Тяжелая зависимость",
+    Moodles_TS_Nicotine_Old_Bad_lvl3 = "Серьезная зависимость",
+    Moodles_TS_Nicotine_Old_Bad_lvl4 = "Критическая зависимость",
+
     Moodles_TS_Nicotine_no_addiction = "Нет никотиновой зависимости.",
     Moodles_TS_Nicotine_addiction = "У вас никотиновая зависимость, для выздоровления нужно ~%1.",
 

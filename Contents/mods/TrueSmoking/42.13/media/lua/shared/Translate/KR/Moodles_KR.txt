@@ -28,6 +28,15 @@ Moodles_KR = {
     Moodles_TS_Nicotine_Bad_lvl3 = "매우 심한 중독",
     Moodles_TS_Nicotine_Bad_lvl4 = "극도로 심한 중독",
 
+    Moodles_TS_Nicotine_Old_Good_lvl4 = "중독 없음",
+    Moodles_TS_Nicotine_Old_Good_lvl3 = "약간 중독됨",
+    Moodles_TS_Nicotine_Old_Good_lvl2 = "경미한 중독",
+    Moodles_TS_Nicotine_Old_Good_lvl1 = "보통 중독",
+    Moodles_TS_Nicotine_Old_Bad_lvl1 = "강한 중독",
+    Moodles_TS_Nicotine_Old_Bad_lvl2 = "심한 중독",
+    Moodles_TS_Nicotine_Old_Bad_lvl3 = "매우 심한 중독",
+    Moodles_TS_Nicotine_Old_Bad_lvl4 = "극도로 심한 중독",
+
     Moodles_TS_Nicotine_no_addiction = "니코틴 중독 없음.",
     Moodles_TS_Nicotine_addiction = "니코틴 중독이 있으며, 회복에 약 ~%1이 필요합니다.",
 

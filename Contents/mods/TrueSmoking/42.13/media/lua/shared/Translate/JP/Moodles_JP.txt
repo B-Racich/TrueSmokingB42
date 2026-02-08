@@ -28,6 +28,15 @@ Moodles_JP = {
     Moodles_TS_Nicotine_Bad_lvl3 = "深刻な依存症",
     Moodles_TS_Nicotine_Bad_lvl4 = "極度の依存症",
 
+    Moodles_TS_Nicotine_Old_Good_lvl4 = "依存症なし",
+    Moodles_TS_Nicotine_Old_Good_lvl3 = "軽度の依存症",
+    Moodles_TS_Nicotine_Old_Good_lvl2 = "軽い依存症",
+    Moodles_TS_Nicotine_Old_Good_lvl1 = "中程度の依存症",
+    Moodles_TS_Nicotine_Old_Bad_lvl1 = "強い依存症",
+    Moodles_TS_Nicotine_Old_Bad_lvl2 = "重度の依存症",
+    Moodles_TS_Nicotine_Old_Bad_lvl3 = "深刻な依存症",
+    Moodles_TS_Nicotine_Old_Bad_lvl4 = "極度の依存症",
+
     Moodles_TS_Nicotine_no_addiction = "ニコチン依存症はありません。",
     Moodles_TS_Nicotine_addiction = "ニコチン依存症があり、回復には約~%1が必要です。",
 

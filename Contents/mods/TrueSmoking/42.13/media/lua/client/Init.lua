@@ -26,7 +26,9 @@ function TrueSmoking.initPlayer(playerNum, player)
     -- Ensure moodles are created for this player's session (fixes MP reconnect issues)
     if MF and MF.createMoodle then
         MF.createMoodle('TS_Smoking_New')
+        MF.createMoodle('TS_Smoking_Old')
         MF.createMoodle('TS_Nicotine')
+        MF.createMoodle('TS_Nicotine_Old')
     end
 
     local data = TrueSmoking.Data.getSmoking(player)

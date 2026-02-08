@@ -97,7 +97,7 @@ function SmokableItem:init(item, player)
     -- Packs should be converted to cigarettes by LightSmoke before reaching here
     -- If we still get a pack, fail gracefully
     if instanceof(item, 'Drainable') then
-        TrueSmoking.debug('SmokableItem:init - Received Drainable (pack) instead of cigarette, this should not happen')
+        -- TrueSmoking.debug('SmokableItem:init - Received Drainable (pack) instead of cigarette, this should not happen')
         return false
     end
 

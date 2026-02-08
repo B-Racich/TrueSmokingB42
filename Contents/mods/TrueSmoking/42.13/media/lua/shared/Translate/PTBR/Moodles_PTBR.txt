@@ -28,6 +28,15 @@ Moodles_PTBR = {
     Moodles_TS_Nicotine_Bad_lvl3 = "Severamente Dependente",
     Moodles_TS_Nicotine_Bad_lvl4 = "Extremamente Dependente",
 
+    Moodles_TS_Nicotine_Old_Good_lvl4 = "Sem Dependência",
+    Moodles_TS_Nicotine_Old_Good_lvl3 = "Levemente Dependente",
+    Moodles_TS_Nicotine_Old_Good_lvl2 = "Dependência Leve",
+    Moodles_TS_Nicotine_Old_Good_lvl1 = "Moderadamente Dependente",
+    Moodles_TS_Nicotine_Old_Bad_lvl1 = "Fortemente Dependente",
+    Moodles_TS_Nicotine_Old_Bad_lvl2 = "Altamente Dependente",
+    Moodles_TS_Nicotine_Old_Bad_lvl3 = "Severamente Dependente",
+    Moodles_TS_Nicotine_Old_Bad_lvl4 = "Extremamente Dependente",
+
     Moodles_TS_Nicotine_no_addiction = "Sem dependência de nicotina.",
     Moodles_TS_Nicotine_addiction = "Você tem dependência de nicotina, precisa de ~%1 para se recuperar.",
 

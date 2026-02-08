@@ -14,7 +14,25 @@ require 'Data'
 --------------------------------------------------------------------------------
 
 MF.createMoodle('TS_Smoking_New')
+MF.createMoodle('TS_Smoking_Old')
 MF.createMoodle('TS_Nicotine')
+MF.createMoodle('TS_Nicotine_Old')
+
+--- Get the active smoking moodle ID based on UseNewMoodle option
+local function getSmokingMoodleId()
+    if TrueSmoking.Options.UseNewMoodle == false then
+        return 'TS_Smoking_Old'
+    end
+    return 'TS_Smoking_New'
+end
+
+--- Get the active nicotine moodle ID based on UseNewMoodle option
+local function getNicotineMoodleId()
+    if TrueSmoking.Options.UseNewMoodle == false then
+        return 'TS_Nicotine_Old'
+    end
+    return 'TS_Nicotine'
+end
 
 --------------------------------------------------------------------------------
 -- Smoking Moodle
@@ -26,7 +44,14 @@ function TrueSmoking.updateSmokingMoodle(player)
     if player:isDead() then return end
 
     local playerNum = player:getPlayerNum()
-    local moodle = MF.getMoodle('TS_Smoking_New', playerNum)
+    local activeId = getSmokingMoodleId()
+    local inactiveId = activeId == 'TS_Smoking_New' and 'TS_Smoking_Old' or 'TS_Smoking_New'
+
+    -- Hide the inactive style moodle
+    local inactiveMoodle = MF.getMoodle(inactiveId, playerNum)
+    if inactiveMoodle then inactiveMoodle:setValue(0.5) end
+
+    local moodle = MF.getMoodle(activeId, playerNum)
     if not moodle then return end
 
     local data = TrueSmoking.Data.getSmoking(player)
@@ -108,7 +133,14 @@ function TrueSmoking.updateNicotineMoodle(player)
     if not TrueSmoking.Options.UseNicotineSystem then return end
 
     local playerNum = player:getPlayerNum()
-    local moodle = MF.getMoodle('TS_Nicotine', playerNum)
+    local activeId = getNicotineMoodleId()
+    local inactiveId = activeId == 'TS_Nicotine' and 'TS_Nicotine_Old' or 'TS_Nicotine'
+
+    -- Hide the inactive style moodle
+    local inactiveMoodle = MF.getMoodle(inactiveId, playerNum)
+    if inactiveMoodle then inactiveMoodle:setValue(0.5) end
+
+    local moodle = MF.getMoodle(activeId, playerNum)
     if not moodle then return end
 
     local data = TrueSmoking.Data.getNicotine(player)

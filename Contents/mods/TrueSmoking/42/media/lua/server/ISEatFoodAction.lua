@@ -14,6 +14,10 @@ function ISEatFoodAction:new(character, item, percentage)
 
     local table = TrueSmoking:getPlayerReference(character)
 
+    if item:getFullType() == 'Base.TobaccoChewing' then
+        return o
+    end
+
     if (TrueSmoking.isInList(onEat, funcsToHook) or hasSmokableTag) and not ISTimedActionQueue.hasActionType(character, 'LightSmoke') then
         print('TRUESMOKING::Checking item onEat: ' .. onEat)
         print('TRUESMOKING::Item ID: ' .. item:getID())

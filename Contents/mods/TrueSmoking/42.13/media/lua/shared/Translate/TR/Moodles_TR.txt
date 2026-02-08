@@ -28,6 +28,15 @@ Moodles_TR = {
     Moodles_TS_Nicotine_Bad_lvl3 = "A��r� Ba��ml�",
     Moodles_TS_Nicotine_Bad_lvl4 = "�aresizce Ba��ml�",
 
+    Moodles_TS_Nicotine_Old_Good_lvl4 = "Ba��ml�l�k Yok",
+    Moodles_TS_Nicotine_Old_Good_lvl3 = "Hafif Ba��ml�",
+    Moodles_TS_Nicotine_Old_Good_lvl2 = "Biraz Ba��ml�",
+    Moodles_TS_Nicotine_Old_Good_lvl1 = "Orta Derece Ba��ml�",
+    Moodles_TS_Nicotine_Old_Bad_lvl1 = "Fena Ba��ml�",
+    Moodles_TS_Nicotine_Old_Bad_lvl2 = "�ok Fena Ba��ml�",
+    Moodles_TS_Nicotine_Old_Bad_lvl3 = "A��r� Ba��ml�",
+    Moodles_TS_Nicotine_Old_Bad_lvl4 = "�aresizce Ba��ml�",
+
     Moodles_TS_Nicotine_no_addiction = "Nikotin ba��ml�l��� yok.",
     Moodles_TS_Nicotine_addiction = "Nikotin ba��ml�l���n var, kurtulmak i�in ~%1 ihtiyac�n var.",
 
