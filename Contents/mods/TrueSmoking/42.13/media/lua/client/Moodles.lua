@@ -38,6 +38,14 @@ end
 -- Smoking Moodle
 --------------------------------------------------------------------------------
 
+--- Check if a MoodleFramework moodle's ModData is initialized and safe to use
+-- MF.getMoodle() can return a stale object before OnCreatePlayer has initialized
+-- the player's ModData, causing null index errors inside setValue/getValue.
+local function isMoodleReady(player, moodleId)
+    local modData = player:getModData()
+    return modData and modData.Moodles and modData.Moodles[moodleId]
+end
+
 --- Update the smoking progress moodle
 -- @param player IsoPlayer
 function TrueSmoking.updateSmokingMoodle(player)
@@ -49,10 +57,10 @@ function TrueSmoking.updateSmokingMoodle(player)
 
     -- Hide the inactive style moodle
     local inactiveMoodle = MF.getMoodle(inactiveId, playerNum)
-    if inactiveMoodle then inactiveMoodle:setValue(0.5) end
+    if inactiveMoodle and isMoodleReady(player, inactiveId) then inactiveMoodle:setValue(0.5) end
 
     local moodle = MF.getMoodle(activeId, playerNum)
-    if not moodle then return end
+    if not moodle or not isMoodleReady(player, activeId) then return end
 
     local data = TrueSmoking.Data.getSmoking(player)
     local ref = TrueSmoking.getPlayerRef(player)
@@ -138,10 +146,10 @@ function TrueSmoking.updateNicotineMoodle(player)
 
     -- Hide the inactive style moodle
     local inactiveMoodle = MF.getMoodle(inactiveId, playerNum)
-    if inactiveMoodle then inactiveMoodle:setValue(0.5) end
+    if inactiveMoodle and isMoodleReady(player, inactiveId) then inactiveMoodle:setValue(0.5) end
 
     local moodle = MF.getMoodle(activeId, playerNum)
-    if not moodle then return end
+    if not moodle or not isMoodleReady(player, activeId) then return end
 
     local data = TrueSmoking.Data.getNicotine(player)
     if not data then return end
@@ -150,8 +158,10 @@ function TrueSmoking.updateNicotineMoodle(player)
     local showDebug = config['DebugMoodles']
     local hideMoodles = config['HideMoodles']
 
-    -- Show when in withdrawal or debug mode
-    local shouldShow = showDebug or (data.withdrawalLevel > 15 and data.nicotineLevel < 8)
+    -- Show when in withdrawal or debug mode (hide if player has lost addiction/smoker trait)
+    local hasAddiction = player:hasTrait(CharacterTrait.SMOKER)
+        or data.addictionLevel >= NicotineSystem.Config.SMOKER_TRAIT_LOSE_THRESHOLD
+    local shouldShow = showDebug or (hasAddiction and data.withdrawalLevel > 15 and data.nicotineLevel < 8)
 
     local moodleValue = 0.5 -- Hidden/neutral
 
