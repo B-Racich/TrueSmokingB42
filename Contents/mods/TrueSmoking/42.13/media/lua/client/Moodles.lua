@@ -66,11 +66,9 @@ function TrueSmoking.updateSmokingMoodle(player)
     local ref = TrueSmoking.getPlayerRef(player)
     local smokable = ref and ref.smokable
 
-    -- Default to hidden
+    -- Default to hidden (desync is handled by validateState on init)
     if not data or not data.isSmoking or not smokable or not smokable.smokeLength then
         moodle:setValue(0.5)
-        --This line seems to fix the login/reconnect isSmoking desync issue
-        sendClientCommand(player, 'TrueSmoking', 'updatePlayerData', { isSmoking = false })
         return
     end
 
