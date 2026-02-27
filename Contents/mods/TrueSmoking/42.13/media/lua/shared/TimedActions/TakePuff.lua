@@ -36,7 +36,7 @@ function TakePuff:start()
     
     -- Hide progress bar if option is set
     if TrueSmoking.Config and (TrueSmoking.Config.HidePuffActionBar or TrueSmoking.Config.HideAllActionBars) then
-        self:setUseProgressBar(false)
+        self.action:setUseProgressBar(false)
     end
 
     self.timer = os.time()
