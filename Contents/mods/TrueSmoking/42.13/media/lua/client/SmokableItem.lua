@@ -411,8 +411,8 @@ function SmokableItem:removeConsumedItem()
     self.putOutRetryNext = nil
     self.putOutRetryCount = 0
     
-    -- Remove visual
-    if not isServer() then
+    -- Remove visual (SP only: in MP, server handles via removeVisualItem command)
+    if not isClient() and not isServer() then
         local worn = self.player:getWornItem(TrueSmoking.registries.mask)
         if worn then
             self.player:removeWornItem(worn)

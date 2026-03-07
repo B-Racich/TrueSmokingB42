@@ -91,8 +91,8 @@ end
 function PutOut:stop()
     local ref = TrueSmoking.getPlayerRef(self.character)
 
-    -- Remove visual
-    if isClient() then
+    -- Remove visual (SP only: in MP, server handles via removeVisualItem command)
+    if not isClient() and not isServer() then
         local worn = self.character:getWornItem(TrueSmoking.registries.mask)
         if worn then
             self.character:removeWornItem(worn)
@@ -118,8 +118,8 @@ function PutOut:perform()
     
     local ref = TrueSmoking.getPlayerRef(self.character)
     
-    -- Remove visual
-    if isClient() then
+    -- Remove visual (SP only: in MP, server handles via removeVisualItem command)
+    if not isClient() and not isServer() then
         local worn = self.character:getWornItem(TrueSmoking.registries.mask)
         if worn then
             self.character:removeWornItem(worn)

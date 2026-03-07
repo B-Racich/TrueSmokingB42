@@ -98,7 +98,9 @@ function TakePuff:update()
         
         if shouldRemoveNow then
             -- Remove visual (if it exists)
-            if isClient() then
+            -- SP only: in MP, server handles via removeVisualItem command
+            -- (setWornItem auto-sends SyncClothingPacket which causes race conditions in MP)
+            if not isClient() and not isServer() then
                 local worn = self.character:getWornItem(TrueSmoking.registries.mask)
                 if worn then
                     self.character:removeWornItem(worn)
@@ -150,8 +152,8 @@ function TakePuff:stop()
 
     -- Re-equip visual if it was removed during the puff animation
     if self.visualItemFlag and self.hasVisual then
-        -- Client-side immediate visual feedback
-        if isClient() then
+        -- SP only: in MP, server handles via equipVisualItem command
+        if not isClient() and not isServer() then
             local mask = TrueSmoking.Visuals.createMask(self.item)
             if mask then
                 self.character:setWornItem(TrueSmoking.registries.mask, mask)
@@ -179,8 +181,8 @@ function TakePuff:perform()
     self.data.takingPuff = false
     sendClientCommand(self.character, 'TrueSmoking', 'updatePlayerData', { { takingPuff = false } })
 
-    -- Also re-equip locally on client for immediate visual feedback
-    if isClient() then
+    -- SP only: in MP, server handles via equipVisualItem command
+    if not isClient() and not isServer() then
         local mask = TrueSmoking.Visuals.createMask(self.item)
         if mask then
             self.character:setWornItem(TrueSmoking.registries.mask, mask)

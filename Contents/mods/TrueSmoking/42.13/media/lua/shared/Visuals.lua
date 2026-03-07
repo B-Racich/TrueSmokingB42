@@ -105,18 +105,19 @@ end
 function TrueSmoking.Visuals.equipMask(player, item)
     if not TrueSmoking.Options.ManageHeadGear then return end
     if not player or not item then return end
-    
+    -- MP: server handles via equipVisualItem command (setWornItem auto-sends SyncClothingPacket)
+    if isClient() then return end
+
     local mask = TrueSmoking.Visuals.createMask(item)
     if not mask then return end
-    
+
     local currentMask = player:getWornItem(TrueSmoking.registries.mask)
     if currentMask then
         player:removeWornItem(currentMask)
     end
-    
+
     -- Use the registered body location to avoid conflicts with other clothing
     player:setWornItem(TrueSmoking.registries.mask, mask)
-    triggerEvent('OnClothingUpdated', player)
 end
 
 --- Remove visual mask from player's face
@@ -124,10 +125,11 @@ end
 function TrueSmoking.Visuals.removeMask(player)
     if not TrueSmoking.Options.ManageHeadGear then return end
     if not player then return end
-    
+    -- MP: server handles via removeVisualItem command
+    if isClient() then return end
+
     local mask = player:getWornItem(TrueSmoking.registries.mask)
     if mask then
         player:removeWornItem(mask)
-        triggerEvent('OnClothingUpdated', player)
     end
 end

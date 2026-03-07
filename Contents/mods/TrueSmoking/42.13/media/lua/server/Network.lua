@@ -212,8 +212,8 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
             local mask = instanceItem(maskType)
             if mask and not player:getWornItem(TrueSmoking.registries.mask) then
                 -- Use the registered body location to avoid conflicts with other clothing
+                -- setWornItem auto-sends SyncClothingPacket in MP
                 player:setWornItem(TrueSmoking.registries.mask, mask)
-                triggerEvent('OnClothingUpdated', player)
             end
         end
     end
@@ -226,7 +226,6 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         local mask = player:getWornItem(TrueSmoking.registries.mask)
         if mask then
             player:removeWornItem(mask)
-            triggerEvent('OnClothingUpdated', player)
         end
     end
 

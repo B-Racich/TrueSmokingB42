@@ -57,10 +57,10 @@ function TrueSmoking.updateSmokingMoodle(player)
 
     -- Hide the inactive style moodle
     local inactiveMoodle = MF.getMoodle(inactiveId, playerNum)
-    if inactiveMoodle and isMoodleReady(player, inactiveId) then inactiveMoodle:setValue(0.5) end
+    if inactiveMoodle and inactiveMoodle.setValue and isMoodleReady(player, inactiveId) then inactiveMoodle:setValue(0.5) end
 
     local moodle = MF.getMoodle(activeId, playerNum)
-    if not moodle or not isMoodleReady(player, activeId) then return end
+    if not moodle or not moodle.setThresholds or not isMoodleReady(player, activeId) then return end
 
     local data = TrueSmoking.Data.getSmoking(player)
     local ref = TrueSmoking.getPlayerRef(player)
@@ -144,10 +144,10 @@ function TrueSmoking.updateNicotineMoodle(player)
 
     -- Hide the inactive style moodle
     local inactiveMoodle = MF.getMoodle(inactiveId, playerNum)
-    if inactiveMoodle and isMoodleReady(player, inactiveId) then inactiveMoodle:setValue(0.5) end
+    if inactiveMoodle and inactiveMoodle.setValue and isMoodleReady(player, inactiveId) then inactiveMoodle:setValue(0.5) end
 
     local moodle = MF.getMoodle(activeId, playerNum)
-    if not moodle or not isMoodleReady(player, activeId) then return end
+    if not moodle or not moodle.setThresholds or not isMoodleReady(player, activeId) then return end
 
     local data = TrueSmoking.Data.getNicotine(player)
     if not data then return end

@@ -247,8 +247,8 @@ function LightSmoke:perform()
         return
     end
 
-    -- Equip visual on client
-    if not isServer() then
+    -- Equip visual (SP only: in MP, server handles via equipVisualItem command)
+    if not isClient() and not isServer() then
         local visual = TrueSmoking.Visuals.createMask(itemToSmoke)
         if visual then
             self.character:setWornItem(TrueSmoking.registries.mask, visual)
