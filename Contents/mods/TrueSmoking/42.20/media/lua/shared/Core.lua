@@ -318,10 +318,3 @@ local group = BodyLocations.getGroup("Human")
 if group and TrueSmoking.registries and TrueSmoking.registries.mask then
     group:getOrCreateLocation(TrueSmoking.registries.mask)
 end
-
---------------------------------------------------------------------------------
--- Mod Compatibility Patches
---------------------------------------------------------------------------------
-
--- Load SmokingSoundsOverhaul integration (checks internally if SSO is active)
-require 'Patches/SmokingSoundsOverhaul_Patch'

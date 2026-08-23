@@ -25,25 +25,23 @@ local function initSSO()
     --- Get a puff sound name based on gender
     -- @param isFemale boolean Whether the player is female
     -- @return string Sound name like "Smoking_puff1f" or "Smoking_puff1m"
+    -- Only defined as a fallback; SSO's own SmokingSoundsOverhaulActions.lua
+    -- normally provides the real implementation first (do not clobber it).
+    if type(SmokingSoundsOverhaul.getPuffSound) ~= 'function' then
     function SmokingSoundsOverhaul:getPuffSound(isFemale)
         local gender = isFemale and "f" or "m"
-        local sound_rand = ZombRand(1, 4)
-
-        -- Avoid repeating the same sound
-        local attempts = 0
-        while sound_rand == SSO_last_puff_sound and attempts < 10 do
-            sound_rand = ZombRand(1, 4)
-            attempts = attempts + 1
-        end
-
-        SSO_last_puff_sound = sound_rand
-        return "smoking_puff1"
+        SSO_last_puff_sound = 1
+        return "Smoking_puff1" .. gender
+    end
     end
 
     --- Get a lighting sound name based on lighter type and gender
     -- @param player IsoPlayer The player lighting the smoke
     -- @param ignitionItem InventoryItem Optional - the lighter/matches item already found
     -- @return string Sound name like "Smoking_lighter1m" or "Smoking_matches2f"
+    -- Only defined as a fallback; SSO's own SmokingSoundsOverhaulActions.lua
+    -- normally provides the real implementation first (do not clobber it).
+    if type(SmokingSoundsOverhaul.getLightingSound) ~= 'function' then
     function SmokingSoundsOverhaul:getLightingSound(player, ignitionItem)
         if not player then return "" end
 
@@ -128,6 +126,7 @@ local function initSSO()
         -- Add gender suffix
         local gender = player:isFemale() and "f" or "m"
         return current_sound .. gender
+    end
     end
 end
 
