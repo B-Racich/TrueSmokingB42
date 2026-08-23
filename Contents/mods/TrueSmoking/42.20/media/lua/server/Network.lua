@@ -263,6 +263,25 @@ function TrueSmoking.onClientCommand(module, command, playerRaw, args)
         sendAddItemToContainer(player:getInventory(), item)
     end
 
+    if command == 'syncSmokeProgress' then
+        -- Client-simulated burn-down never runs server-side (it's a per-tick
+        -- OnPlayerUpdate loop, not a timed action), so the server's copy of
+        -- the item would otherwise still show its original SmokeLength when
+        -- it gets moved into a server-authoritative container (e.g. a world
+        -- container) mid-smoke.
+        local itemId = args and args.itemId
+        local smokeLength = args and args.smokeLength
+        if not itemId or smokeLength == nil then return end
+
+        local item = TrueSmoking.getItemFromPlayerContainers(player, itemId)
+        if not item then return end
+
+        item:getModData().SmokeLength = smokeLength
+        if args.originalSmokeLength then
+            item:getModData().OriginalSmokeLength = args.originalSmokeLength
+        end
+    end
+
     if command == 'replaceItem' then
         local replaceType = args[1]
         if replaceType and replaceType ~= '' then

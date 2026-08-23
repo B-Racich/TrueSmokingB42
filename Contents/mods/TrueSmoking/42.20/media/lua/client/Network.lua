@@ -134,6 +134,7 @@ Events.OnServerCommand.Add(TrueSmoking.onServerCommand)
 -- Server applies stats immediately upon receiving them.
 local statSendTickCounter = 0
 local STAT_SEND_INTERVAL = 30  -- Send every ~30 ticks (~1 second at 30fps)
+local lastSyncedSmokeLength = nil
 
 Events.OnPlayerUpdate.Add(function(player)
     if not player then return end
@@ -143,23 +144,46 @@ Events.OnPlayerUpdate.Add(function(player)
     statSendTickCounter = 0
     
     local data = TrueSmoking.Data.getSmoking(player)
-    if not data or not data.statsToApply then return end
-    
-    -- Check if there are any stats to send
-    local hasStats = false
-    for _ in pairs(data.statsToApply) do
-        hasStats = true
-        break
+    if data and data.statsToApply then
+        -- Check if there are any stats to send
+        local hasStats = false
+        for _ in pairs(data.statsToApply) do
+            hasStats = true
+            break
+        end
+
+        if hasStats then
+            -- Send to server (works in both SP and MP)
+            -- In SP: sendClientCommand triggers OnClientCommand immediately
+            -- In MP: sendClientCommand sends over network to server
+            sendClientCommand(player, 'TrueSmoking', 'BufferedStats', { stats = data.statsToApply })
+
+            -- Clear buffer after sending
+            data.statsToApply = {}
+        end
     end
-    if not hasStats then return end
-    
-    -- Send to server (works in both SP and MP)
-    -- In SP: sendClientCommand triggers OnClientCommand immediately
-    -- In MP: sendClientCommand sends over network to server
-    sendClientCommand(player, 'TrueSmoking', 'BufferedStats', { stats = data.statsToApply })
-    
-    -- Clear buffer after sending
-    data.statsToApply = {}
+
+    -- Keep the server's copy of the active smokable's item ModData current.
+    -- SmokableItem:update() only runs client-side (per-tick, not a timed
+    -- action), so without this, a mid-smoke transfer into a server-authoritative
+    -- container (a world container) would use the server's stale/original
+    -- SmokeLength instead of the player's actual remaining progress.
+    if isClient() then
+        local ref = TrueSmoking.getPlayerRef(player)
+        local smokable = ref and ref.smokable
+        if smokable and smokable.item and smokable.smokeLength then
+            if not lastSyncedSmokeLength or math.abs(lastSyncedSmokeLength - smokable.smokeLength) >= 0.01 then
+                lastSyncedSmokeLength = smokable.smokeLength
+                sendClientCommand(player, 'TrueSmoking', 'syncSmokeProgress', {
+                    itemId = smokable.item:getID(),
+                    smokeLength = smokable.smokeLength,
+                    originalSmokeLength = smokable.originalSmokeLength,
+                })
+            end
+        else
+            lastSyncedSmokeLength = nil
+        end
+    end
 end)
 
 -- Send buffered puffs to server every minute (nicotine system is less time-sensitive)
