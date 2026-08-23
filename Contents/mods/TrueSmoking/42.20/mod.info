@@ -4,6 +4,6 @@ description=True Smoking, a more realistic approach to smoking see Steam Worksho
 poster=poster.png
 require=MoodleFramework,StarlitLibrary
 loadAfter=MoodleFramework,StarlitLibrary
-minVersion=42.13
+minVersion=42.20
 modversion=1.0
 authors=Ratamus
