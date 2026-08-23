@@ -68,6 +68,8 @@ description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=34165
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3421508458]<B42>Reefer Madness[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2857762294]Smoking Sounds Overhaul[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2883633728][B41/B42]I Might Need A Lighter[/url] (IDNAL also supported)
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2769706949]Tidy Up Meister[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3173649443]Medical Meister[/url] (Turn on the option for smoke cigarettes on stress)
 description=[/list]
 description=
 description=[code][h3]Most mods should be compatible, if not let me know and I'll look at making a patch. I've also added a config system for modders to directly integrate into the True Smoking system, some mods may require their authors to add a config to fully support their OnEat methods[/h3][/code]
@@ -78,6 +80,8 @@ description=[*]Custom Animations
 description=[*]Mod support as requested and needed
 description=[*]Further tweaks, options, etc
 description=[/list]
+description=
+description=[img]https://media1.giphy.com/media/wRhSi68hscY8xNOlXS/giphy.gif[/img]
 description=
 description=[url=https://ko-fi.com/ratamus][img]https://storage.ko-fi.com/cdn/useruploads/display/f597fe2f-df71-45d9-b9d9-91a483ec2b32_suportmeonkofi.png[/img][/url]
 description=
