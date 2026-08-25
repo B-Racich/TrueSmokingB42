@@ -41,36 +41,6 @@ if MF and MF.ISMoodle and MF.ISMoodle.new and not MF.ISMoodle._TrueSmokingCtorHo
     end
 end
 
--- MF.ISMoodle:getXYPosition() reads self.char:getModData().Moodles to lay out
--- overlapping moodle icons, but that table can still be nil for a frame after
--- our moodles are created (before MF.MoodlesStorage finishes populating it),
--- which throws for every moodle mod sharing the character, not just ours.
-if MF and MF.ISMoodle and MF.ISMoodle.getXYPosition and not MF.ISMoodle._TrueSmokingXYPositionHotfix then
-    local originalGetXYPosition = MF.ISMoodle.getXYPosition
-    MF.ISMoodle._TrueSmokingXYPositionHotfix = true
-
-    function MF.ISMoodle:getXYPosition()
-        if not self or not self.char or not self.char.getModData or type(self.getMoodleData) ~= 'function' then
-            return originalGetXYPosition(self)
-        end
-
-        local playerModData = self.char:getModData()
-        if type(playerModData) ~= 'table' or type(playerModData.Moodles) == 'table' then
-            return originalGetXYPosition(self)
-        end
-
-        local previousMoodles = playerModData.Moodles
-        local _, currentMoodles = self:getMoodleData()
-        playerModData.Moodles = type(currentMoodles) == 'table' and currentMoodles or {}
-
-        local ok, x, y = pcall(originalGetXYPosition, self)
-        playerModData.Moodles = previousMoodles
-
-        if not ok then error(x) end
-        return x, y
-    end
-end
-
 --------------------------------------------------------------------------------
 -- Moodle Setup
 --------------------------------------------------------------------------------
